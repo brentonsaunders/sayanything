@@ -16,7 +16,8 @@ class PlayerDao {
             $row['id'],
             $row['game_id'],
             $row['name'],
-            $row['token']
+            $row['token'],
+            $row['order']
         );
     }
 
@@ -28,7 +29,8 @@ class PlayerDao {
                 $row['id'],
                 $row['game_id'],
                 $row['name'],
-                $row['token']
+                $row['token'],
+                $row['order']
             );
         }
 
@@ -67,21 +69,43 @@ class PlayerDao {
         return $this->playersFromRows($rows);
     }
 
+    public function getByGameIdAndToken($gameId, $token) {
+        $query = "SELECT * " . 
+                 "FROM players " . 
+                 "WHERE game_id = :game_id AND " . 
+                 "token = :token";
+
+        $rows = $this->db->query($query, [
+            ':game_id' => $gameId,
+            ':token' => $token
+        ]);
+
+        if(!$rows) {
+            return null;
+        }
+
+        return $this->playerFromRow($rows[0]);
+    }
+
     public function insert(Player $player) {
-        $query = "INSERT INTO players (game_id, name, token) " . 
-                 "VALUES (:game_id, :name, :token)";
+        $query = "INSERT INTO players " .
+                 "(game_id, name, token, `order`) " . 
+                 "VALUES " .
+                 "(:game_id, :name, :token, :order)";
 
         $this->db->query($query, [
             ':game_id' => $player->getGameId(),
             ':name' => $player->getName(),
-            ':token' => $player->getToken()
+            ':token' => $player->getToken(),
+            ':order' => $player->getOrder()
         ]);
 
         return new Player(
             $this->db->lastInsertId(),
             $player->getGameId(),
             $player->getName(),
-            $player->getToken()
+            $player->getToken(),
+            $player->getOrder()
         );
     }
 
@@ -89,13 +113,15 @@ class PlayerDao {
         $query = "UPDATE players " . 
                  "SET game_id = :game_id, " . 
                  "name = :name, " . 
-                 "token = :token " . 
+                 "token = :token, " . 
+                 "`order` = :order " .
                  "WHERE id = :id";
 
         $this->db->query($query, [
             ':game_id' => $player->getGameId(),
             ':name' => $player->getName(),
             ':token' => $player->getToken(),
+            ":order" => $player->getOrder(),
             ':id' => $player->getId()
         ]);
     }

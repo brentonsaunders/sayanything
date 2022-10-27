@@ -6,19 +6,19 @@ class Game {
     private $friendlyId = null;
     private $name = null;
     private $creatorId = null;
-    private $roundId = null;
+    private $currentRoundId = null;
     private $state = null;
     private $timeUpdated = null;
     private $dateCreated = null;
     private $players = null;
 
-    public function __construct($id, $friendlyId, $name, $creatorId, $roundId,
+    public function __construct($id, $friendlyId, $name, $creatorId, $currentRoundId,
         $state, $timeUpdated, $dateCreated) {
         $this->id = $id;
         $this->friendlyId = $friendlyId;
         $this->name = $name;
         $this->creatorId = $creatorId;
-        $this->roundId = $roundId;
+        $this->currentRoundId = $currentRoundId;
         $this->state = $state;
         $this->timeUpdated = $timeUpdated;
         $this->dateCreated = $dateCreated;
@@ -40,8 +40,8 @@ class Game {
         return $this->creatorId;
     }
 
-    public function getRoundId() {
-        return $this->roundId;
+    public function getCurrentRoundId() {
+        return $this->currentRoundId;
     }
 
     public function getState() {
@@ -76,8 +76,8 @@ class Game {
         $this->creatorId = $creatorId;
     }
 
-    public function setRoundId($roundId) {
-        $this->roundId = $roundId;
+    public function setCurrentRoundId($currentRoundId) {
+        $this->currentRoundId = $currentRoundId;
     }
 
     public function setState($state) {

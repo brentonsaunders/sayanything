@@ -17,9 +17,9 @@ class GameDao {
             $row['friendly_id'],
             $row['name'],
             $row['creator_id'],
-            $row['round_id'],
+            $row['current_round_id'],
             $row['state'],
-            $row['update_time'],
+            $row['time_updated'],
             $row['date_created']
         );
     }
@@ -58,15 +58,17 @@ class GameDao {
 
     public function insert(Game $game) {
         $query = "INSERT INTO games " .
-                 "(friendly_id, name, creator_id, round_id, state, update_time, date_created) " . 
+                 "(friendly_id, name, creator_id, current_round_id, state, time_updated, " . 
+                 "date_created) " . 
                  "VALUES " . 
-                 "(:friendly_id, :name, :creator_id, :round_id, :state, NOW(), NOW())";
+                 "(:friendly_id, :name, :creator_id, :current_round_id, :state, NOW(), " . 
+                 "NOW())";
 
         $this->db->query($query, [
             ':friendly_id' => $game->getFriendlyId(),
             ':name' => $game->getName(),
             ':creator_id' => $game->getCreatorId(),
-            ":round_id" => $game->getRoundId(),
+            ":current_round_id" => $game->getCurrentRoundId(),
             ':state' => $game->getState()
         ]);
 
@@ -78,9 +80,9 @@ class GameDao {
                  "SET friendly_id = :friendly_id, " . 
                  "name = :name, " . 
                  "creator_id = :creator_id, " . 
-                 "round_id = :round_id, " . 
+                 "current_round_id = :current_round_id, " . 
                  "state = :state, " . 
-                 'update_time = NOW(), '
+                 'time_updated = NOW(), ' .
                  "date_created = :date_created " . 
                  "WHERE id = :id";
 
@@ -88,7 +90,7 @@ class GameDao {
             ':friendly_id' => $game->getFriendlyId(),
             ':name' => $game->getName(),
             ':creator_id' => $game->getCreatorId(),
-            ":round_id" => $game->getRoundId(),
+            ":round_id" => $game->getCurrentRoundId(),
             ':state' => $game->getState(),
             ':date_created' => $game->getDateCreated(),
             ':id' => $game->getId()

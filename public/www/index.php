@@ -5,15 +5,26 @@ require '../../src/autoload.php';
 
 use Models\Game;
 use Models\Player;
+use Models\Round;
 use Daos\GameDao;
 use Daos\PlayerDao;
-use Repositories\GameRepository;
+use Daos\RoundDao;
+use Services\GameService;
 
 $db = new DatabaseHelper('localhost', 'sayanything', 'root', null);
 
-$gameRepo = new GameRepository(new GameDao($db), new PlayerDao($db));
+$gameService = new GameService(new GameDao($db), new PlayerDao($db),
+    new RoundDao($db));
 
-$game = $gameRepo->getById(4);
+$player = $gameService->createGame('Redbud Ballers', 'Brenton', 'high-heels');
 
-echo '<pre>'; print_r($game); echo '</pre>';
+$gameId = $player->getGameId();
+
+$gameService->joinGame($gameId, 'Bablu', 'car');
+$gameService->joinGame($gameId, 'Saad', 'guitar');
+$gameService->joinGame($gameId, 'Prem', 'clapperboard');
+$gameService->joinGame($gameId, 'Devesh', 'computer');
+$gameService->joinGame($gameId, 'TJ', 'martini-glass');
+
+$gameService->startGame($gameId);
 ?>

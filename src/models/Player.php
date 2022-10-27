@@ -6,12 +6,14 @@ class Player {
     private $gameId = null;
     private $name = null;
     private $token = null;
+    private $order = null;
 
-    public function __construct($id, $gameId, $name, $token) {
+    public function __construct($id, $gameId, $name, $token, $order) {
         $this->id = $id;
         $this->gameId = $gameId;
         $this->name = $name;
         $this->token = $token;
+        $this->order = $order;
     }
 
     public function getId() {
@@ -30,6 +32,10 @@ class Player {
         return $this->token;
     }
 
+    public function getOrder() {
+        return $this->order;
+    }
+
     public function setId($id) {
         $this->id = $id;
     }
@@ -44,5 +50,9 @@ class Player {
 
     public function setToken($token) {
         $this->token = $token;
+    }
+
+    public function setOrder($order) {
+        $this->order = $order;
     }
 }
