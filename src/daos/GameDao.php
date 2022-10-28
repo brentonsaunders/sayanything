@@ -90,7 +90,7 @@ class GameDao {
             ':friendly_id' => $game->getFriendlyId(),
             ':name' => $game->getName(),
             ':creator_id' => $game->getCreatorId(),
-            ":round_id" => $game->getCurrentRoundId(),
+            ":current_round_id" => $game->getCurrentRoundId(),
             ':state' => $game->getState(),
             ':date_created' => $game->getDateCreated(),
             ':id' => $game->getId()

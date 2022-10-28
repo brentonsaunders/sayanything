@@ -9,24 +9,23 @@ use Daos\GameDao;
 use Daos\PlayerDao;
 use Daos\RoundDao;
 use Services\PlayerService;
+use Services\RoundService;
 
 class GameService {
     const WAITING_FOR_PLAYERS = 'waiting-for-players';
     const CHOOSING_QUESTION = 'choosing-question';
 
     const MIN_PLAYERS = 4;
+    const MAX_PLAYERS = 8;
 
     private GameDao $gameDao;
-    private PlayerDao $playerDao;
+    private PlayerService $playerService;
+    private RoundService $roundService;
 
-    public function __construct(
-        GameDao $gameDao,
-        PlayerDao $playerDao,
-        RoundDao $roundDao
-    ) {
+    public function __construct(GameDao $gameDao, PlayerDao $playerDao, RoundDao $roundDao) {
         $this->gameDao = $gameDao;
-        $this->playerDao = $playerDao;
-        $this->roundDao = $roundDao;
+        $this->playerService = new PlayerService($playerDao);
+        $this->roundService = new RoundService($roundDao);
     }
 
     /**
@@ -42,10 +41,8 @@ class GameService {
 
         $game = $this->gameDao->insert($game);
 
-        $player = new Player(null, $game->getId(), $creatorName, $creatorToken,
-            null);
-
-        $player = $this->playerDao->insert($player);
+        $player = $this->playerService->createPlayer($game->getId(), $creatorName,
+            $creatorToken);
 
         $game->setCreatorId($player->getId());
 
@@ -60,14 +57,20 @@ class GameService {
     public function joinGame($gameId, $playerName, $playerToken) {
         $game = $this->gameDao->getById($gameId);
 
-        // Make sure this token isn't already in use
-        if($this->playerDao->getByGameIdAndToken($gameId, $playerToken)) {
-            throw new GameServiceException("Token is already being used!");
+        if($this->gameIsFull($gameId)) {
+            return new GameServiceException("Game is full!");
         }
 
-        $player = new Player(null, $gameId, $playerName, $playerToken, null);
+        $skipTurn = false;
 
-        $player = $this->playerDao->insert($player);
+        if($game->getState() !== self::WAITING_FOR_PLAYERS) {
+            // The player has to wait for players who joined before him
+            // to go before he can have his turn
+            $skipTurn = true;
+        }
+
+        $player = $this->playerService->createPlayer($gameId, $playerName,
+            $playerToken, $skipTurn);
 
         return $player;
     }
@@ -82,25 +85,71 @@ class GameService {
             throw new GameServiceException("Game has already started!");
         }
 
-        $players = $this->playerDao->getByGameId($gameId);
+        $players = $this->playerService->getPlayers($gameId);
 
         if(count($players) < self::MIN_PLAYERS) {
             throw new GameServiceException("Not enough players to start the game!");
         }
 
-        $playerService = new PlayerService($this->playerDao);
-
-        $players = $playerService->orderPlayers($gameId);
-
         $game->setState(self::CHOOSING_QUESTION);
 
         $this->gameDao->update($game);
 
-        $creatorId = $game->getCreatorId();
+        return $this->newRound($gameId);
+    }
 
-        $creator = $this->playerDao->getById($creatorId);
+    /**
+     * 
+     */
+    public function newRound($gameId) {
+        $game = $this->gameDao->getById($gameId);
 
-        return $creator;
+        $currentRoundId = $game->getCurrentRoundId();
+
+        if($currentRoundId === null) {
+            $activePlayerId = $game->getCreatorId();
+        } else {
+            $round = $this->roundService->getRound($currentRoundId);
+
+            $lastActivePlayerId = $round->getActivePlayerId();
+
+            $nextPlayer = $this->playerService->getNextPlayer($lastActivePlayerId);
+
+            $activePlayerId = $nextPlayer->getId();
+        }
+
+        $round = $this->roundService->createRound($gameId, $activePlayerId);
+
+        $game->setCurrentRoundId($round->getId());
+
+        $this->gameDao->update($game);
+
+        return $round;
+    }
+
+    /**
+     * 
+     */
+    public function askQuestion($gameId, $playerId, $questionId) {
+
+    }
+
+    public function answerQuestion($gameId, $playerId, $answer) {
+
+    }
+
+    public function updateGame($gameId) {
+
+    }
+    
+    private function gameIsFull($gameId) {
+        $players = $this->playerService->getPlayers($gameId);
+
+        if($players === null) {
+            return null;
+        }
+
+        return count($players) >= self::MAX_PLAYERS;
     }
 }
 

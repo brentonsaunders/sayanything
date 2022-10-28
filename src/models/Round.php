@@ -11,7 +11,7 @@ class Round {
     public function __construct($id, $gameId, $activePlayerId, $questionId,
         $chosenAnswerId) {
         $this->id = $id;
-        $this=>gameId = $gameId;
+        $this->gameId = $gameId;
         $this->activePlayerId = $activePlayerId;
         $this->questionId = $questionId;
         $this->chosenAnswerId = $chosenAnswerId;

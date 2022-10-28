@@ -12,7 +12,13 @@ class Router {
         $controller = $controllerAndAction['controller'];
         $action = $controllerAndAction['action'];
 
-        call_user_func_array([$controller, $action], $params);
+        $controller->setRequestMethod($_SERVER["REQUEST_METHOD"]);
+
+        $controller->setParams($params);
+
+        $controller->$action();
+
+        // call_user_func_array([$controller, $action], $params);
     }
 
     private function getControllerAndAction($url) {
@@ -40,7 +46,7 @@ class Router {
         }
 
         return [
-            'controller' => new $controller($_SERVER['REQUEST_METHOD']),
+            'controller' => new $controller(),
             'action' => $action
         ];
     }

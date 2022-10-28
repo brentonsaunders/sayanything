@@ -50,7 +50,7 @@ class RoundDao {
 
         $rounds = [];
 
-        for($rows as $row) {
+        foreach($rows as $row) {
             $rounds[] = new Round(
                 $row['id'],
                 $row['game_id'],

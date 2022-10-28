@@ -2,18 +2,30 @@
 namespace Models;
 
 class Player {
+    const MARTINI_GLASS = "martini-glass";
+    const DOLLAR_SIGN   = "dollar-sign";
+    const HIGH_HEELS    = "high-heels";
+    const COMPUTER      = "computer";
+    const CAR           = "car";
+    const FOOTBALL      = "football";
+    const GUITAR        = "guitar";
+    const CLAPPERBOARD  = "clapperboard";
+
     private $id = null;
     private $gameId = null;
     private $name = null;
     private $token = null;
-    private $order = null;
+    private $turn = null;
+    private $skipTurn = null;
 
-    public function __construct($id, $gameId, $name, $token, $order) {
+    public function __construct($id, $gameId, $name, $token, $turn,
+        $skipTurn) {
         $this->id = $id;
         $this->gameId = $gameId;
         $this->name = $name;
         $this->token = $token;
-        $this->order = $order;
+        $this->turn = $turn;
+        $this->skipTurn = $skipTurn;
     }
 
     public function getId() {
@@ -32,8 +44,12 @@ class Player {
         return $this->token;
     }
 
-    public function getOrder() {
-        return $this->order;
+    public function getTurn() {
+        return $this->turn;
+    }
+
+    public function getSkipTurn() {
+        return $this->skipTurn;
     }
 
     public function setId($id) {
@@ -52,7 +68,11 @@ class Player {
         $this->token = $token;
     }
 
-    public function setOrder($order) {
-        $this->order = $order;
+    public function setTurn($turn) {
+        $this->turn = $turn;
+    }
+
+    public function setSkipTurn($skipTurn) {
+        $this->skipTurn = $skipTurn;
     }
 }

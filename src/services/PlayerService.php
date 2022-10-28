@@ -1,41 +1,87 @@
 <?php
 namespace Services;
 
+use Exception;
+use Models\Player;
 use Daos\PlayerDao;
-use Daos\RoundDao;
 
 class PlayerService {
     private PlayerDao $playerDao;
-    private RoundDao $roundDao;
 
-    public function __construct($playerDao, $roundDao) {
+    public function __construct($playerDao) {
         $this->playerDao = $playerDao;
-        $this->roundDao = $roundDao;
     }
 
-    public function orderPlayers($gameId) {
-        $players = $this->playerDao->getByGameId($gameId);
+    public function getPlayers($gameId) {
+        return $this->playerDao->getByGameId($gameId);
+    }
 
-        shuffle($players);
+    /**
+     * 
+     */
+    public function createPlayer($gameId, $playerName, $playerToken,
+        $skipTurn = false) {
+        // Make sure the token isn't already chosen
+        $players = $this->getPlayers($gameId);
 
-        foreach($players as $order => &$player) {
-            $player->setOrder($order);
+        if($players === null) {
+            $player = new Player(null, $gameId, $playerName, $playerToken,
+                0, false);
 
-            $this->playerDao->update($player);
+            return $this->playerDao->insert($player);
         }
 
-        return $players;
+        // Make sure the game isn't full
+        if(count($players) >= 8) {
+            throw new PlayerServiceException("The game is full!");
+        }
+
+        foreach($players as $player) {
+            if($player->getToken() === $playerToken) {
+                throw new PlayerServiceException("Token is already being used!");
+            }
+        }
+
+        // Determine this player's turn
+        $highestTurn = array_reduce($players, function($highestTurn, $player) {
+            return max($highestTurn, $player->getTurn());
+        }, 0);
+
+        $player = new Player(null, $gameId, $playerName, $playerToken,
+                $highestTurn + 1, $skipTurn);
+
+        return $this->playerDao->insert($player);
     }
 
-    public function nextPlayer($gameId) {
-        $game = $this->gameDao->getById($gameId);
+    public function getNextPlayer($playerId) {
+        $thisPlayer = $this->playerDao->getById($playerId);
 
-        $currentRoundId = $game->getCurrentRoundId();
+        if($thisPlayer === null) {
+            return new PlayerServiceException("Invalid player!");
+        }
 
-        $currentRound = $this->roundDao->getById($currentRoundId);
+        $gameId = $thisPlayer->getGameId();
 
-        $activePlayerId = $currentRound->getActivePlayerId();
+        $players = $this->getPlayers($gameId);
 
-        $activePlayer = $this->playerDao->getById($activePlayerId);
+        $numPlayers = count($players);
+
+        $nextTurn = ($thisPlayer->getTurn() + 1) % $numPlayers;
+
+        $player = $this->playerDao->getByGameIdAndTurn($gameId, $nextTurn);
+
+        while($player->getSkipTurn()) {
+            $player->setSkipTurn(false);
+
+            $this->playerDao->update($player);
+
+            $nextTurn = ($nextTurn + 1) % $numPlayers;
+
+            $player = $this->playerDao->getByGameIdAndTurn($gameId, $nextTurn);
+        }
+
+        return $player;
     }
 }
+
+class PlayerServiceException extends Exception {}

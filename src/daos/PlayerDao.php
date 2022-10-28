@@ -17,7 +17,8 @@ class PlayerDao {
             $row['game_id'],
             $row['name'],
             $row['token'],
-            $row['order']
+            $row['turn'],
+            $row['skip_turn']
         );
     }
 
@@ -25,13 +26,7 @@ class PlayerDao {
         $players = [];
 
         foreach($rows as $row) {
-            $players[] = new Player(
-                $row['id'],
-                $row['game_id'],
-                $row['name'],
-                $row['token'],
-                $row['order']
-            );
+            $players[] = $this->playerFromRow($row);
         }
 
         return $players;
@@ -69,15 +64,15 @@ class PlayerDao {
         return $this->playersFromRows($rows);
     }
 
-    public function getByGameIdAndToken($gameId, $token) {
+    public function getByGameIdAndTurn($gameId, $turn) {
         $query = "SELECT * " . 
                  "FROM players " . 
                  "WHERE game_id = :game_id AND " . 
-                 "token = :token";
+                 "turn = :turn";
 
         $rows = $this->db->query($query, [
             ':game_id' => $gameId,
-            ':token' => $token
+            ':turn' => $turn
         ]);
 
         if(!$rows) {
@@ -88,25 +83,18 @@ class PlayerDao {
     }
 
     public function insert(Player $player) {
-        $query = "INSERT INTO players " .
-                 "(game_id, name, token, `order`) " . 
-                 "VALUES " .
-                 "(:game_id, :name, :token, :order)";
-
-        $this->db->query($query, [
-            ':game_id' => $player->getGameId(),
-            ':name' => $player->getName(),
-            ':token' => $player->getToken(),
-            ':order' => $player->getOrder()
-        ]);
-
-        return new Player(
-            $this->db->lastInsertId(),
-            $player->getGameId(),
-            $player->getName(),
-            $player->getToken(),
-            $player->getOrder()
+        $this->db->insert(
+            'players',
+            [
+                'game_id' => $player->getGameId(),
+                'name' => $player->getName(),
+                'token' => $player->getToken(),
+                'turn' => $player->getTurn(),
+                'skip_turn' => ($player->getSkipTurn() ? 1 : 0)
+            ]
         );
+
+        return $this->getById($this->db->lastInsertId());
     }
 
     public function update(Player $player) {
@@ -114,14 +102,16 @@ class PlayerDao {
                  "SET game_id = :game_id, " . 
                  "name = :name, " . 
                  "token = :token, " . 
-                 "`order` = :order " .
+                 "turn = :turn, " .
+                 "skip_turn = :skip_turn " .
                  "WHERE id = :id";
 
         $this->db->query($query, [
             ':game_id' => $player->getGameId(),
             ':name' => $player->getName(),
             ':token' => $player->getToken(),
-            ":order" => $player->getOrder(),
+            ":turn" => $player->getTurn(),
+            ':skip_turn' => ($player->getSkipTurn() ? 1 : 0),
             ':id' => $player->getId()
         ]);
     }
