@@ -3,23 +3,25 @@ namespace Models;
 
 use Models\Answer;
 use Models\Card;
+use Models\Vote;
 
 class Round {
     private $id = null;
     private $gameId = null;
-    private $activePlayerId = null;
+    private $judgeId = null;
     private $cardId = null;
     private $questionId = null;
     private $chosenAnswerId = null;
     
     private $card = null;
     private $answers = null;
+    private $votes = null;
 
-    public function __construct($id, $gameId, $activePlayerId, $cardId,
+    public function __construct($id, $gameId, $judgeId, $cardId,
         $questionId, $chosenAnswerId) {
         $this->id = $id;
         $this->gameId = $gameId;
-        $this->activePlayerId = $activePlayerId;
+        $this->judgeId = $judgeId;
         $this->cardId = $cardId;
         $this->questionId = $questionId;
         $this->chosenAnswerId = $chosenAnswerId;
@@ -33,8 +35,8 @@ class Round {
         return $this->gameId;
     }
 
-    public function getActivePlayerId() {
-        return $this->activePlayerId;
+    public function getJudgeId() {
+        return $this->judgeId;
     }
 
     public function getCardId() {
@@ -57,6 +59,10 @@ class Round {
         return $this->answers;
     }
 
+    public function getVotes() {
+        return $this->votes;
+    }
+
     public function setId($id) {
         $this->id = $id;
     }
@@ -65,8 +71,8 @@ class Round {
         $this->gameId = $gameId;
     }
 
-    public function setActivePlayerId($activePlayerId) {
-        $this->activePlayerId = $activePlayerId;
+    public function setJudgeId($judgeId) {
+        $this->judgeId = $judgeId;
     }
 
     public function setCardId($cardId) {
@@ -87,5 +93,25 @@ class Round {
 
     public function setAnswers($answers) {
         $this->answers = $answers;
+    }
+
+    public function setVotes($votes) {
+        $this->votes = $votes;
+    }
+
+    public function addAnswer(Answer $answer) {
+        foreach($this->answers as &$otherAnswer) {
+            if($otherAnswer->getPlayerId() == $answer->getPlayerId()) {
+                $otherAnswer = $answer;
+
+                return true;
+            }
+        }
+
+        $this->answers[] = $answer;
+    }
+
+    public function addVote(Vote $vote) {
+        $this->votes[] = $vote;
     }
 }

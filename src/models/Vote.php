@@ -3,17 +3,23 @@ namespace Models;
 
 class Vote {
     private $id = null;
+    private $roundId = null;
     private $playerId = null;
     private $answerId = null;
 
-    public function __construct($id, $playerId, $answerid) {
+    public function __construct($id, $roundId, $playerId, $answerId) {
         $this->id = $id;
+        $this->roundId = $roundId;
         $this->playerId = $playerId;
-        $this->answerid = $answerId;
+        $this->answerId = $answerId;
     }
 
     public function getId() {
         return $this->id;
+    }
+
+    public function getRoundId() {
+        return $this->roundId;
     }
 
     public function getPlayerId() {
@@ -26,6 +32,10 @@ class Vote {
 
     public function setId($id) {
         $this->id = $id;
+    }
+
+    public function setRoundId($roundId) {
+        $this->roundId = $roundId;
     }
 
     public function setPlayerId($playerId) {

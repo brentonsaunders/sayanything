@@ -4,26 +4,27 @@ namespace Repositories;
 use Daos\RoundDaoInterface;
 use Models\Answer;
 use Models\Round;
+use Models\Vote;
 use Repositories\AnswerRepositoryInterface;
+use Repositories\CardRepositoryInterface;
+use Repositories\VoteRepositoryInterface;
 
 class RoundRepository implements RoundRepositoryInterface {
     private RoundDaoInterface $roundDao;
     private AnswerRepositoryInterface $answerRepository;
+    private CardRepositoryInterface $cardRepository;
+    private VoteRepositoryInterface $voteRepository;
 
-    public function __construct(RoundDaoInterface $roundDao,
-    AnswerRepositoryInterface $answerRepository) {
+    public function __construct(
+        RoundDaoInterface $roundDao,
+        AnswerRepositoryInterface $answerRepository,
+        CardRepositoryInterface $cardRepository,
+        VoteRepositoryInterface $voteRepository
+    ) {
         $this->roundDao = $roundDao;
         $this->answerRepository = $answerRepository;
-    }
-
-    private function get($round) {
-        $answers = $this->answerRepository->getByRoundId($round->getId());
-
-        $roundId = $round->getId();
-
-        $round->setAnswers($answers);
-
-        return $round;
+        $this->cardRepository = $cardRepository;
+        $this->voteRepository = $voteRepository;
     }
 
     public function getById($id) {
@@ -33,7 +34,19 @@ class RoundRepository implements RoundRepositoryInterface {
             return null;
         }
 
-        return $this->get($round);
+        $answers = $this->answerRepository->getByRoundId($round->getId());
+
+        $round->setAnswers($answers);
+
+        $votes = $this->voteRepository->getByRoundId($round->getId());
+
+        $round->setVotes($votes);
+
+        $card = $this->cardRepository->getById($round->getCardId());
+
+        $round->setCard($card);
+
+        return $round;
     }
 
     public function getByGameId($gameId) {
@@ -46,7 +59,7 @@ class RoundRepository implements RoundRepositoryInterface {
         $arr = [];
 
         foreach($rounds as $round) {
-            $arr[] = $this->get($round);
+            $arr[] = $this->getById($round->getId());
         }
 
         return $arr;
@@ -59,6 +72,12 @@ class RoundRepository implements RoundRepositoryInterface {
 
         if($answers) {
             $round->setAnswers($this->answerRepository->insertAnswers($answers));
+        }
+
+        $votes = $round->getVotes();
+
+        if($votes) {
+            $round->setVotes($this->answerRepository->insertVotes($votes));
         }
 
         return $round;
@@ -87,6 +106,12 @@ class RoundRepository implements RoundRepositoryInterface {
             $round->setAnswers($this->answerRepository->updateAnswers($answers));
         }
 
+        $votes = $round->getVotes();
+
+        if($votes) {
+            $round->setVotes($this->voteRepository->updateVotes($votes));
+        }
+
         return $round;
     }
 
@@ -105,6 +130,12 @@ class RoundRepository implements RoundRepositoryInterface {
 
         if($answers) {
             $round->setAnswers($this->answerRepository->deleteAnswers($answers));
+        }
+
+        $votes = $round->getVotes();
+
+        if($votes) {
+            $round->setVotes($this->voteRepository->deleteVotes($votes));
         }
 
         $round = $this->roundDao->delete($round);

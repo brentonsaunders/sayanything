@@ -4,11 +4,30 @@ namespace Daos;
 use DatabaseHelper;
 use Models\Vote;
 
-class VoteDao {
+class VoteDao implements VoteDaoInterface {
     private DatabaseHelper $db;
 
     public function __construct(DatabaseHelper $db) {
         $this->db = $db;
+    }
+
+    private function voteFromRow($row) {
+        return new Vote(
+            $row['id'],
+            $row['round_id'],
+            $row['player_id'],
+            $row['answer_id']
+        );
+    }
+
+    private function votesFromRows($rows) {
+        $votes = [];
+
+        foreach($rows as $row) {
+            $votes[] = $this->voteFromRow($row);
+        }
+
+        return $votes;
     }
 
     public function getById($id) {
@@ -24,48 +43,33 @@ class VoteDao {
             return null;
         }
 
-        $row = $rows[0];
-
-        return new Vote(
-            $row['id'],
-            $row['player_id'],
-            $row['answer_id']
-        );
+        return $this->voteFromRow($rows[0]);
     }
 
-    public function getByPlayerIdAndRoundId($playerId, $roundId) {
+    public function getByRoundId($roundId) {
         $query = "SELECT * " . 
                  "FROM votes " . 
-                 "WHERE id = :id";
+                 "WHERE round_id = :round_id";
 
         $rows = $this->db->query($query, [
-            ':id' => $id
+            ':round_id' => $roundId
         ]);
 
         if(!$rows) {
             return null;
         }
 
-        $votes = [];
-
-        for($rows as $row) {
-            $votes[] = new Vote(
-                $row['id'],
-                $row['player_id'],
-                $row['answer_id']
-            );
-        }
-
-        return $votes;
+        return $this->votesFromRows($rows);
     }
 
-    public function insert(Vote $vote) {
+    public function insert(Vote $vote) : Vote {
         $query = "INSERT INTO votes " . 
-                 "(player_id, answer_id) " . 
+                 "(round_id, player_id, answer_id) " . 
                  "VALUES " . 
-                 "(:player_id, :answer_id)";
+                 "(:round_id, :player_id, :answer_id)";
 
         $this->db->query($query, [
+            ':round_id' => $vote->getRoundId(),
             ':player_id' => $vote->getPlayerId(),
             ':answer_id' => $vote->getAnswerId()
         ]);
@@ -73,24 +77,30 @@ class VoteDao {
         return $this->getById($this->db->lastInsertId());
     }
 
-    public function update(Vote $vote) {
+    public function update(Vote $vote) : Vote {
         $query = "UPDATE votes " . 
-                 "SET player_id = :player_id, " . 
+                 "SET round_id = :round_id, " .
+                 "player_id = :player_id, " . 
                  "answer_id = :answer_id " . 
                  "WHERE id = :id";
 
         $this->db->query($query, [
+            ":round_id" => $vote->getRoundId(),
             ':player_id' => $vote->getPlayerId(),
             ':answer_id' => $vote->getAnswerId(),
             ':id' => $vote->getId()
         ]);
+
+        return $vote;
     }
 
-    public function delete(Vote $vote) {
+    public function delete(Vote $vote) : Vote {
         $query = "DELETE FROM votes WHERE id = :id";
 
         $this->db->query($query, [
             ':id' => $id
         ]);
+
+        return $vote;
     }
 }

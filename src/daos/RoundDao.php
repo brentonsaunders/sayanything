@@ -15,7 +15,7 @@ class RoundDao implements RoundDaoInterface {
         return new Round(
             $row['id'],
             $row['game_id'],
-            $row['active_player_id'],
+            $row['judge_id'],
             $row['card_id'],
             $row['question_id'],
             $row['chosen_answer_id']
@@ -66,13 +66,13 @@ class RoundDao implements RoundDaoInterface {
 
     public function insert(Round $round) : Round {
         $query = "INSERT INTO rounds " . 
-                 "(game_id, active_player_id, card_id, question_id, chosen_answer_id) " .
+                 "(game_id, judge_id, card_id, question_id, chosen_answer_id) " .
                  "VALUES " . 
-                 "(:game_id, :active_player_id, :card_id, :question_id, :chosen_answer_id)";
+                 "(:game_id, :judge_id, :card_id, :question_id, :chosen_answer_id)";
 
         $this->db->query($query, [
             ':game_id' => $round->getGameId(),
-            ':active_player_id' => $round->getActivePlayerId(),
+            ':judge_id' => $round->getJudgeId(),
             ':card_id' => $round->getCardId(),
             ':question_id' => $round->getQuestionId(),
             ":chosen_answer_id" => $round->getChosenAnswerId()
@@ -84,7 +84,7 @@ class RoundDao implements RoundDaoInterface {
     public function update(Round $round) : Round {
         $query = "UPDATE rounds " . 
                  "SET game_id = :game_id, " . 
-                 "active_player_id = :active_player_id, " . 
+                 "judge_id = :judge_id, " . 
                  "card_id = :card_id, " . 
                  "question_id = :question_id, " .
                  "chosen_answer_id = :chosen_answer_id " . 
@@ -92,7 +92,7 @@ class RoundDao implements RoundDaoInterface {
 
         $this->db->query($query, [
             ':game_id' => $round->getGameId(),
-            ':active_player_id' => $round->getActivePlayerId(),
+            ':judge_id' => $round->getJudgeId(),
             ':card_id' => $round->getCardId(),
             ':question_id' => $round->getQuestionId(),
             ":chosen_answer_id" => $round->getChosenAnswerId(),

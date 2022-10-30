@@ -4,7 +4,7 @@ namespace Daos;
 use DatabaseHelper;
 use Models\Card;
 
-class CardDao {
+class CardDao implements CardDaoInterface {
     private DatabaseHelper $db;
 
     public function __construct(DatabaseHelper $db) {
@@ -23,15 +23,17 @@ class CardDao {
         return $cards;
     }
 
-    public function insert(Card $card) {
+    public function insert(Card $card) : Card {
         $this->db->insert("cards", []);
 
         return new Card($this->db->lastInsertId(), $card->getQuestions());
     }
 
-    public function delete(Card $card) {
+    public function delete(Card $card) : Card {
         $this->db->query("DELETE FROM cards WHERE id = :id", [
             ":id" => $card->getId()
         ]);
+
+        return $card;
     }
 }

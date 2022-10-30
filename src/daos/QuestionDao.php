@@ -4,7 +4,7 @@ namespace Daos;
 use DatabaseHelper;
 use Models\Question;
 
-class QuestionDao {
+class QuestionDao implements QuestionDaoInterface {
     private DatabaseHelper $db;
 
     public function __construct(DatabaseHelper $db) {
@@ -61,7 +61,7 @@ class QuestionDao {
         return $this->questionsFromRows($rows);
     }
 
-    public function insert(Question $question) {
+    public function insert(Question $question) : Question {
         $query = "INSERT INTO questions (card_id, question) " . 
                  "VALUES (:card_id, :question)";
 
@@ -73,7 +73,7 @@ class QuestionDao {
         return $this->getById($this->db->lastInsertId());
     }
 
-    public function update(Question $question) {
+    public function update(Question $question) : Question {
         $query = "UPDATE questions " . 
                  "SET card_id = :card_id, " .
                  "question = :question " . 
@@ -84,11 +84,15 @@ class QuestionDao {
             ':question' => $question->getQuestion(),
             ':id' => $question->getId()
         ]);
+
+        return $question;
     }
 
-    public function delete(Question $question) {
+    public function delete(Question $question) : Question {
         $query = "DELETE FROM questions WHERE id = :id";
 
         $this->db->query($query, [':id' => $question->getId()]);
+
+        return $question;
     }
 }
