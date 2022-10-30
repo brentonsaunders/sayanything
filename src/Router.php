@@ -1,6 +1,12 @@
 <?php
 class Router {
-    public function __construct($request) {
+    private App $app;
+
+    public function __construct(App $app) {
+        $this->app = $app;
+    }
+
+    public function route($request) {
         $url = $request['url'] ?? null;
 
         unset($request['url']);
@@ -16,9 +22,9 @@ class Router {
 
         $controller->setParams($params);
 
-        $controller->$action();
+        $controller->setRouter($this);
 
-        // call_user_func_array([$controller, $action], $params);
+        $controller->$action();
     }
 
     private function getControllerAndAction($url) {
@@ -46,7 +52,7 @@ class Router {
         }
 
         return [
-            'controller' => new $controller(),
+            'controller' => new $controller($this->app),
             'action' => $action
         ];
     }

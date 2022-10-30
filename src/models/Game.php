@@ -2,34 +2,35 @@
 namespace Models;
 
 class Game {
+    const WAITING_FOR_PLAYERS = "waiting-for-players";
+    const GAME_STARTED = "game-started";
+    const ASKING_QUESTION = "asking-question";
+    const ANSWERING_QUESTION = "answering-question";
+    
     private $id = null;
-    private $friendlyId = null;
     private $name = null;
     private $creatorId = null;
     private $currentRoundId = null;
     private $state = null;
     private $timeUpdated = null;
-    private $dateCreated = null;
-    private $players = null;
+    private $timeCreated = null;
 
-    public function __construct($id, $friendlyId, $name, $creatorId, $currentRoundId,
-        $state, $timeUpdated, $dateCreated) {
+    private $players = null;
+    private $rounds = null;
+
+    public function __construct($id, $name, $creatorId, $currentRoundId,
+        $state, $timeUpdated, $timeCreated) {
         $this->id = $id;
-        $this->friendlyId = $friendlyId;
         $this->name = $name;
         $this->creatorId = $creatorId;
         $this->currentRoundId = $currentRoundId;
         $this->state = $state;
         $this->timeUpdated = $timeUpdated;
-        $this->dateCreated = $dateCreated;
+        $this->timeCreated = $timeCreated;
     }
 
     public function getId() {
         return $this->id;
-    }
-
-    public function getFriendlyId() {
-        return $this->friendlyId;
     }
 
     public function getName() {
@@ -52,20 +53,20 @@ class Game {
         return $this->updateTime;
     }
 
-    public function getDateCreated() {
-        return $this->dateCreated;
+    public function getTimeCreated() {
+        return $this->timeCreated;
     }
 
     public function getPlayers() {
         return $this->players;
     }
 
-    public function setId($id) {
-        $this->id = $id;
+    public function getRounds() {
+        return $this->rounds;
     }
 
-    public function setFriendlyId($friendlyId) {
-        $this->friendlyId = $friendlyId;
+    public function setId($id) {
+        $this->id = $id;
     }
 
     public function setName($name) {
@@ -88,11 +89,15 @@ class Game {
         $this->updateTime = $updateTime;
     }
 
-    public function setDateCreated($dateCreated) {
-        $this->dateCreated = $dateCreated;
+    public function setTimeCreated($timeCreated) {
+        $this->timeCreated = $timeCreated;
     }
 
     public function setPlayers($players) {
         $this->players = $players;
+    }
+
+    public function setRounds($rounds) {
+        $this->rounds = $rounds;
     }
 }

@@ -11,6 +11,24 @@ class QuestionDao {
         $this->db = $db;
     }
 
+    private function questionFromRow($row) {
+        return new Question(
+            $row["id"],
+            $row["card_id"],
+             $row["question"]
+        );
+    }
+
+    private function questionsFromRows($rows) {
+        $questions = [];
+
+        foreach($rows as $row) {
+            $questions[] = $this->questionFromRow($row);
+        }
+
+        return $questions;
+    }
+
     public function getById($id) {
         $query = "SELECT * " . 
                  "FROM questions " . 
@@ -24,17 +42,28 @@ class QuestionDao {
             return null;
         }
 
-        $row = $rows[0];
+        return $this->questionFromRow($rows[0]);
+    }
 
-        return new Question(
-            $row['id'],
-            $row['question']
-        );
+    public function getByCardId($cardId) {
+        $query = "SELECT * " . 
+                 "FROM questions " . 
+                 "WHERE card_id = :card_id";
+
+        $rows = $this->db->query($query, [
+            ':card_id' => $cardId
+        ]);
+
+        if(!$rows) {
+            return null;
+        }
+
+        return $this->questionsFromRows($rows);
     }
 
     public function insert(Question $question) {
         $query = "INSERT INTO questions (card_id, question) " . 
-                 "VALUES (:question)";
+                 "VALUES (:card_id, :question)";
 
         $this->db->query($query, [
             ':card_id' => $question->getCardId(),
@@ -46,7 +75,7 @@ class QuestionDao {
 
     public function update(Question $question) {
         $query = "UPDATE questions " . 
-                 "SET card_id = :card_id, "
+                 "SET card_id = :card_id, " .
                  "question = :question " . 
                  "WHERE id = :id";
 

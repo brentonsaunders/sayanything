@@ -4,7 +4,7 @@ namespace Daos;
 use DatabaseHelper;
 use Models\Player;
 
-class PlayerDao {
+class PlayerDao implements PlayerDaoInterface {
     private DatabaseHelper $db;
 
     public function __construct(DatabaseHelper $db) {
@@ -64,25 +64,7 @@ class PlayerDao {
         return $this->playersFromRows($rows);
     }
 
-    public function getByGameIdAndTurn($gameId, $turn) {
-        $query = "SELECT * " . 
-                 "FROM players " . 
-                 "WHERE game_id = :game_id AND " . 
-                 "turn = :turn";
-
-        $rows = $this->db->query($query, [
-            ':game_id' => $gameId,
-            ':turn' => $turn
-        ]);
-
-        if(!$rows) {
-            return null;
-        }
-
-        return $this->playerFromRow($rows[0]);
-    }
-
-    public function insert(Player $player) {
+    public function insert(Player $player) : Player {
         $this->db->insert(
             'players',
             [
@@ -97,7 +79,7 @@ class PlayerDao {
         return $this->getById($this->db->lastInsertId());
     }
 
-    public function update(Player $player) {
+    public function update(Player $player) : Player {
         $query = "UPDATE players " . 
                  "SET game_id = :game_id, " . 
                  "name = :name, " . 
@@ -114,11 +96,15 @@ class PlayerDao {
             ':skip_turn' => ($player->getSkipTurn() ? 1 : 0),
             ':id' => $player->getId()
         ]);
+
+        return $player;
     }
 
-    public function delete(Player $player) {
+    public function delete(Player $player) : Player {
         $query = "DELETE FROM players WHERE id = :id";
 
         $this->db->query($query, [':id' => $player->getId()]);
+
+        return $player;
     }
 }

@@ -29,7 +29,6 @@ class VoteDao {
         return new Vote(
             $row['id'],
             $row['player_id'],
-            $row['round_id'],
             $row['answer_id']
         );
     }
@@ -53,7 +52,6 @@ class VoteDao {
             $votes[] = new Vote(
                 $row['id'],
                 $row['player_id'],
-                $row['round_id'],
                 $row['answer_id']
             );
         }
@@ -63,13 +61,12 @@ class VoteDao {
 
     public function insert(Vote $vote) {
         $query = "INSERT INTO votes " . 
-                 "(player_id, round_id, answer_id) " . 
+                 "(player_id, answer_id) " . 
                  "VALUES " . 
-                 "(:player_id, :round_id, :answer_id)";
+                 "(:player_id, :answer_id)";
 
         $this->db->query($query, [
             ':player_id' => $vote->getPlayerId(),
-            ':round_id' => $vote->getRoundId(),
             ':answer_id' => $vote->getAnswerId()
         ]);
 
@@ -79,13 +76,11 @@ class VoteDao {
     public function update(Vote $vote) {
         $query = "UPDATE votes " . 
                  "SET player_id = :player_id, " . 
-                 "round_id = :round_id, " . 
                  "answer_id = :answer_id " . 
                  "WHERE id = :id";
 
         $this->db->query($query, [
             ':player_id' => $vote->getPlayerId(),
-            ':round_id' => $vote->getRoundId(),
             ':answer_id' => $vote->getAnswerId(),
             ':id' => $vote->getId()
         ]);

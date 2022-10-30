@@ -4,11 +4,30 @@ namespace Daos;
 use DatabaseHelper;
 use Models\Answer;
 
-class AnswerDao {
+class AnswerDao implements AnswerDaoInterface {
     private DatabaseHelper $db;
 
     public function __construct(DatabaseHelper $db) {
         $this->db = $db;
+    }
+
+    private function answerFromRow($row) {
+        return new Answer(
+            $row['id'],
+            $row['player_id'],
+            $row['round_id'],
+            $row['answer']
+        );
+    }
+
+    private function answersFromRows($rows) {
+        $answers = [];
+
+        foreach($rows as $row) {
+            $answers[] = $this->answerFromRow($row);
+        }
+
+        return $answers;
     }
 
     public function getById($id) {
@@ -24,14 +43,7 @@ class AnswerDao {
             return null;
         }
 
-        $row = $rows[0];
-
-        return new Answer(
-            $row['id'],
-            $row['player_id'],
-            $row['round_id'],
-            $row['question']
-        );
+        return $this->answerFromRow($rows[0]);
     }
 
     public function getByRoundId($roundId) {
@@ -47,21 +59,10 @@ class AnswerDao {
             return null;
         }
 
-        $rounds = [];
-
-        for($rows as $row) {
-            $rounds[] = new Answer(
-                $row['id'],
-                $row['player_id'],
-                $row['round_id'],
-                $row['question']
-            );
-        }
-
-        return $rounds;
+        return $this->answersFromRows($rows);
     }
 
-    public function insert(Answer $answer) {
+    public function insert(Answer $answer) : Answer {
         $query = "INSERT INTO answers " . 
                  "(player_id, round_id, answer) " . 
                  "VALUES " . 
@@ -76,12 +77,12 @@ class AnswerDao {
         return $this->getById($this->db->lastInsertId());
     }
 
-    public function update(Answer $answer) {
+    public function update(Answer $answer) : Answer {
         $query = "UPDATE answers " . 
                  "SET player_id = :player_id, " . 
                  "round_id = :round_id, " . 
                  "answer = :answer " . 
-                 "SET id = :id";
+                 "WHERE id = :id";
 
         $this->db->query($query, [
             ':player_id' => $answer->getPlayerId(),
@@ -89,13 +90,17 @@ class AnswerDao {
             ":answer" => $answer->getAnswer(),
             ':id' => $answer->getId()
         ]);
+
+        return $answer;
     }
 
-    public function delete(Answer $answer) {
+    public function delete(Answer $answer) : Answer {
         $query = "DELETE FROM answers WHERE id = :id";
 
         $this->db->query($query, [
             ':id' => $answer->getId()
         ]);
+
+        return $answer;
     }
 }

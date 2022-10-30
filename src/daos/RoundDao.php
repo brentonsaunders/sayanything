@@ -4,11 +4,32 @@ namespace Daos;
 use DatabaseHelper;
 use Models\Round;
 
-class RoundDao {
+class RoundDao implements RoundDaoInterface {
     private DatabaseHelper $db;
 
     public function __construct(DatabaseHelper $db) {
         $this->db = $db;
+    }
+
+    private function roundFromRow($row) {
+        return new Round(
+            $row['id'],
+            $row['game_id'],
+            $row['active_player_id'],
+            $row['card_id'],
+            $row['question_id'],
+            $row['chosen_answer_id']
+        );
+    }
+
+    private function roundsFromRows($rows) {
+        $rounds = [];
+
+        foreach($rows as $row) {
+            $rounds[] = $this->roundFromRow($row);
+        }
+
+        return $rounds;
     }
 
     public function getById($id) {
@@ -24,15 +45,7 @@ class RoundDao {
             return null;
         }
 
-        $row = $rows[0];
-
-        return new Round(
-            $row['id'],
-            $row['game_id'],
-            $row['active_player_id'],
-            $row['question_id'],
-            $row['chosen_answer_id']
-        );
+        return $this->roundFromRow($rows[0]);
     }
 
     public function getByGameId($gameId) {
@@ -48,30 +61,19 @@ class RoundDao {
             return null;
         }
 
-        $rounds = [];
-
-        foreach($rows as $row) {
-            $rounds[] = new Round(
-                $row['id'],
-                $row['game_id'],
-                $row['active_player_id'],
-                $row['question_id'],
-                $row['chosen_answer_id']
-            );
-        }
-
-        return $rounds;
+        return $this->roundsFromRows($rows);
     }
 
-    public function insert(Round $round) {
+    public function insert(Round $round) : Round {
         $query = "INSERT INTO rounds " . 
-                 "(game_id, active_player_id, question_id, chosen_answer_id) " .
+                 "(game_id, active_player_id, card_id, question_id, chosen_answer_id) " .
                  "VALUES " . 
-                 "(:game_id, :active_player_id, :question_id, :chosen_answer_id)";
+                 "(:game_id, :active_player_id, :card_id, :question_id, :chosen_answer_id)";
 
         $this->db->query($query, [
             ':game_id' => $round->getGameId(),
             ':active_player_id' => $round->getActivePlayerId(),
+            ':card_id' => $round->getCardId(),
             ':question_id' => $round->getQuestionId(),
             ":chosen_answer_id" => $round->getChosenAnswerId()
         ]);
@@ -79,28 +81,34 @@ class RoundDao {
         return $this->getById($this->db->lastInsertId());
     }
 
-    public function update(Round $round) {
+    public function update(Round $round) : Round {
         $query = "UPDATE rounds " . 
                  "SET game_id = :game_id, " . 
                  "active_player_id = :active_player_id, " . 
-                 "question_id = :question_id, " . 
+                 "card_id = :card_id, " . 
+                 "question_id = :question_id, " .
                  "chosen_answer_id = :chosen_answer_id " . 
                  "WHERE id = :id";
 
         $this->db->query($query, [
             ':game_id' => $round->getGameId(),
             ':active_player_id' => $round->getActivePlayerId(),
+            ':card_id' => $round->getCardId(),
             ':question_id' => $round->getQuestionId(),
             ":chosen_answer_id" => $round->getChosenAnswerId(),
             ':id' => $round->getId()
         ]);
+
+        return $round;
     }
 
-    public function delete(Round $round) {
+    public function delete(Round $round) : Round {
         $query = "DELETE FROM rounds WHERE id = :id";
 
         $this->db->query($query, [
             ':id' => $round->getId()
         ]);
+
+        return $round;
     }
 }

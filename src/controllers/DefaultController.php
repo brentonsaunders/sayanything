@@ -4,8 +4,8 @@ namespace Controllers;
 use Views\View;
 
 class DefaultController extends Controller {
-    public function __construct() {
-        parent::__construct();
+    public function __construct(App $app) {
+        parent::__construct($app);
     }
 
     public function index() {

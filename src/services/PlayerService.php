@@ -8,79 +8,92 @@ use Daos\PlayerDao;
 class PlayerService {
     private PlayerDao $playerDao;
 
-    public function __construct($playerDao) {
+    public function __construct(PlayerDao $playerDao) {
         $this->playerDao = $playerDao;
     }
 
-    public function getPlayers($gameId) {
-        return $this->playerDao->getByGameId($gameId);
-    }
+    public function createPlayer($gameId, $playerName, $playerToken, $skipTurn) {
+        $players = $this->playerDao->getByGameId($gameId);
 
-    /**
-     * 
-     */
-    public function createPlayer($gameId, $playerName, $playerToken,
-        $skipTurn = false) {
-        // Make sure the token isn't already chosen
-        $players = $this->getPlayers($gameId);
+        $numPlayers = 0;
 
-        if($players === null) {
-            $player = new Player(null, $gameId, $playerName, $playerToken,
-                0, false);
+        if($players) {
+            $numPlayers = count($players);
 
-            return $this->playerDao->insert($player);
-        }
+            if($numPlayers >= 8) {
+                throw new PlayerServiceException("The game is full!");
+            }
 
-        // Make sure the game isn't full
-        if(count($players) >= 8) {
-            throw new PlayerServiceException("The game is full!");
-        }
+            $usedTokens = array_map(function($player) {
+                return $player->getToken();
+            }, $players);
 
-        foreach($players as $player) {
-            if($player->getToken() === $playerToken) {
+            if(in_array($playerToken, $usedTokens)) {
                 throw new PlayerServiceException("Token is already being used!");
             }
         }
 
-        // Determine this player's turn
-        $highestTurn = array_reduce($players, function($highestTurn, $player) {
-            return max($highestTurn, $player->getTurn());
-        }, 0);
+        $player = new Player(null, $gameId, $playerName, $playerToken, $numPlayers + 1,
+            $skipTurn);
+        
+        $player = $this->playerDao->insert($player);
 
-        $player = new Player(null, $gameId, $playerName, $playerToken,
-                $highestTurn + 1, $skipTurn);
-
-        return $this->playerDao->insert($player);
+        return $player;
     }
 
-    public function getNextPlayer($playerId) {
-        $thisPlayer = $this->playerDao->getById($playerId);
+    public function getFirstPlayer($gameId) {
+        $player = $this->playerDao->getByGameIdAndTurn($gameId, 1);
 
-        if($thisPlayer === null) {
-            return new PlayerServiceException("Invalid player!");
-        }
-
-        $gameId = $thisPlayer->getGameId();
-
-        $players = $this->getPlayers($gameId);
-
-        $numPlayers = count($players);
-
-        $nextTurn = ($thisPlayer->getTurn() + 1) % $numPlayers;
-
-        $player = $this->playerDao->getByGameIdAndTurn($gameId, $nextTurn);
-
-        while($player->getSkipTurn()) {
-            $player->setSkipTurn(false);
-
-            $this->playerDao->update($player);
-
-            $nextTurn = ($nextTurn + 1) % $numPlayers;
-
-            $player = $this->playerDao->getByGameIdAndTurn($gameId, $nextTurn);
+        if(!$player) {
+            throw new PlayerServiceException("Game doesn't have any players!");
         }
 
         return $player;
+    }
+
+    public function getNextPlayer($playerId) {
+        $player = $this->playerDao->getById($playerId);
+
+        if(!$player) {
+            throw new PlayerServiceException("Player doesn't exist!");
+        }
+
+        $gameId = $player->getGameId();
+        $turn = $player->getTurn();
+        
+        $players = $this->playerDao->getByGameId($gameId);
+
+        $numPlayers = count($players);
+
+        $nextTurn = ($turn + 1) % $numPlayers;
+
+        $nextPlayer = $this->playerWithTurn($players, $nextTurn);
+
+        while($nextPlayer->getSkipTurn()) {
+            $nextPlayer->setSkipTurn(false);
+
+            $this->playerDao->update($nextPlayer);
+
+            $nextTurn = ($nextTurn + 1) % $numPlayers;
+
+            $nextPlayer = $this->playerWithTurn($players, $nextTurn);
+        }
+
+        return $nextPlayer;
+    }
+
+    private function playerWithTurn($players, $turn) {
+        foreach($players as $player) {
+            if($player->getTurn() == $turn) {
+                return $player;
+            }
+        }
+
+        return null;
+    }
+
+    private function skipPlayer($player) {
+
     }
 }
 
