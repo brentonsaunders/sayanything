@@ -1,6 +1,7 @@
 <?php
 namespace Controllers;
 
+use App;
 use Views\View;
 
 class DefaultController extends Controller {

@@ -1,30 +1,55 @@
 <?php
+use Daos\AnswerDao;
+use Daos\CardDao;
 use Daos\GameDao;
 use Daos\PlayerDao;
+use Daos\QuestionDao;
+use Daos\VoteDao;
+use Daos\RoundDao;
 use Daos\TokensDao;
+use Repositories\AnswerRepository;
+use Repositories\CardRepository;
 use Repositories\GameRepository;
+use Repositories\PlayerRepository;
+use Repositories\RoundRepository;
+use Repositories\VoteRepository;
+use Services\CardService;
 use Services\GameService;
-use Services\PlayerService;
 
 class App {
-    private GameService $gameService;
+    private $gameService = null;
 
     public function __construct() {
-        $db = new DatabaseHelper('localhost', 'sayanything', 'root', null);
+        date_default_timezone_set("US/Eastern");
 
-        $playerDao = new PlayerDao($db);
-        $gameDao = new GameDao($db);
-        $tokensDao = new TokensDao($db);
-
-        $playerService = new PlayerService(new PlayerDao($db));
-
-        $gameRepository = new GameRepository($gameDao, $playerDao, $tokensDao);
-
-        $this->gameService = new GameService($gameDao, $gameRepository, $playerService);
+        $this->initGameService(new DatabaseHelper('localhost', 'sayanything', 'root', null));
 
         $router = new Router($this);
 
         $router->route($_REQUEST);
+    }
+
+    private function initGameService(DatabaseHelper $db) {
+        $answerDao = new AnswerDao($db);
+        $cardDao = new CardDao($db);
+        $gameDao = new GameDao($db);
+        $playerDao = new PlayerDao($db);
+        $questionDao = new QuestionDao($db);
+        $roundDao = new RoundDao($db);
+        $tokensDao = new TokensDao($db);
+        $voteDao = new VoteDao($db);
+
+        $answerRepository = new AnswerRepository($answerDao);
+        $cardRepository = new CardRepository($cardDao, $questionDao);
+        $playerRepository = new PlayerRepository($playerDao);
+        $voteRepository = new VoteRepository($voteDao);
+        $roundRepository = new RoundRepository($roundDao, $answerRepository, $cardRepository,
+            $voteRepository);
+        $gameRepository = new GameRepository($gameDao, $playerRepository, $roundRepository);
+
+        $cardService = new CardService($cardRepository);
+
+        $this->gameService = new GameService($gameRepository, $cardService);
     }
 
     public function getGameService() {

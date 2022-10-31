@@ -2,8 +2,8 @@
 namespace Controllers;
 
 use App;
-use Repositories\GameRepository;
 use Services\GameService;
+use Services\GameServiceException;
 
 class GameController extends Controller {
     private GameService $gameService;
@@ -16,24 +16,31 @@ class GameController extends Controller {
 
     public function index() {
         $params = $this->getParams();
-        
+
         if(!array_key_exists("gameId", $params)) {
             $this->badRequest();
         }
 
         $gameId = $params["gameId"];
-        $playerId = $params["playerId"] ?? null;
 
-        $dto = $this->gameService->getDto($gameId, $playerId);
+        try {
+            $game = $this->gameService->getGame($gameId);
+        } catch(GameServiceException $e) {
+            $this->badRequest();
+        }
 
-        $this->jsonResponse($dto->toArray());
+        echo "<pre>";
+
+        print_r($game);
+
+        echo "</pre>";
     }
 
     public function create() {
         $params = $this->getParams();
 
         if(!(array_key_exists("gameName", $params) &&
-             array_key_exists("playerName", $params) && 
+             array_key_exists("playerName", $params) &&
              array_key_exists("playerToken", $params))) {
             $this->badRequest();
         }
@@ -42,15 +49,141 @@ class GameController extends Controller {
         $playerName = $params["playerName"];
         $playerToken = $params["playerToken"];
 
-        $dto = $this->gameService->createGame($gameName, $playerName, $playerToken);
+        $game = $this->gameService->createGame($gameName, $playerName, $playerToken);
 
-        $this->jsonResponse($dto->toArray());
+        echo "<pre>";
+
+        print_r($game);
+
+        echo "</pre>";
     }
 
     public function join() {
-        
+        $params = $this->getParams();
+
+        if(!(array_key_exists("gameId", $params) &&
+             array_key_exists("playerName", $params) &&
+             array_key_exists("playerToken", $params))) {
+            $this->badRequest();
+        }
+
+        $gameId = $params["gameId"];
+        $playerName = $params["playerName"];
+        $playerToken = $params["playerToken"];
+
+        $game = $this->gameService->joinGame($gameId, $playerName, $playerToken);
+
+        echo "<pre>";
+
+        print_r($game);
+
+        echo "</pre>";
     }
 
-    public function test() {
+    public function start() {
+        $params = $this->getParams();
+
+        if(!(array_key_exists("gameId", $params) &&
+             array_key_exists("playerId", $params))) {
+            $this->badRequest();
+        }
+
+        $gameId = $params["gameId"];
+        $playerId = $params["playerId"];
+
+        $game = $this->gameService->startGame($gameId, $playerId);
+
+        echo "<pre>";
+
+        print_r($game);
+
+        echo "</pre>";
+    }
+
+    public function newRound() {
+        $params = $this->getParams();
+
+        if(!array_key_exists("gameId", $params)) {
+            $this->badRequest();
+        }
+
+        $gameId = $params["gameId"];
+
+        $game = $this->gameService->newRound($gameId);
+
+        echo "<pre>";
+
+        print_r($game);
+
+        echo "</pre>";
+    }
+
+    public function askQuestion() {
+        $params = $this->getParams();
+
+        if(!(array_key_exists("gameId", $params) && 
+             array_key_exists("playerId", $params) &&
+             array_key_exists("questionId", $params))) {
+            $this->badRequest();
+        }
+
+        $gameId = $params["gameId"];
+        $playerId = $params["playerId"];
+        $questionId = $params["questionId"];
+
+        $game = $this->gameService->askQuestion($gameId, $playerId, $questionId);
+
+        echo "<pre>";
+
+        print_r($game);
+
+        echo "</pre>";
+    }
+
+    public function answerQuestion() {
+        $params = $this->getParams();
+
+        if(!(array_key_exists("gameId", $params) && 
+             array_key_exists("playerId", $params) &&
+             array_key_exists("answer", $params))) {
+            $this->badRequest();
+        }
+
+        $gameId = $params["gameId"];
+        $playerId = $params["playerId"];
+        $answer = $params["answer"];
+
+        $game = $this->gameService->answerQuestion($gameId, $playerId, $answer);
+
+        echo "<pre>";
+
+        print_r($game);
+
+        echo "</pre>";
+    }
+
+    public function vote() {
+        $params = $this->getParams();
+
+        if(!(array_key_exists("gameId", $params) && 
+             array_key_exists("playerId", $params) &&
+             array_key_exists("answerId1", $params) &&
+             array_key_exists("answerId2", $params))) {
+            $this->badRequest();
+        }
+
+        $gameId = $params["gameId"];
+        $playerId = $params["playerId"];
+        $answerId1 = $params["answerId1"];
+        $answerId2 = $params["answerId2"];
+
+        $game = $this->gameService->vote($gameId, $playerId, $answerId1,
+            $answerId2);
+
+        echo "<pre>";
+
+        print_r($game);
+
+        echo "</pre>";
     }
 }

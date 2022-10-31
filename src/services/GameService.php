@@ -2,23 +2,35 @@
 namespace Services;
 
 use Exception;
+use Models\Answer;
+use Models\Card;
 use Models\Game;
 use Models\Player;
-use Models\Round;
+use Models\Question;
+use Models\Vote;
 use Repositories\GameRepository;
-use Services\PlayerService;
-use Services\RoundService;
+use Services\CardService;
 
 class GameService {
-    private PlayerService $playerService;
-    private RoundService $roundService;
+    const MIN_PLAYERS = 4;
+
     private GameRepository $gameRepository;
+    private CardService $cardService;
 
     public function __construct(GameRepository $gameRepository,
-        PlayerService $playerService, RoundService $roundService) {
+        CardService $cardService) {
         $this->gameRepository = $gameRepository;
-        $this->playerService = $playerService;
-        $this->roundService = $roundService;
+        $this->cardService = $cardService;
+    }
+
+    public function getGame($gameId) {
+        try {
+            $this->updateGame($gameId);
+        } catch(GameServiceException $e) {
+            throw $e;
+        }
+
+        return $this->gameRepository->getById($gameId);
     }
 
     public function createGame($gameName, $playerName, $playerToken) {
@@ -27,66 +39,66 @@ class GameService {
         $game = new Game($id, $gameName, null, null, Game::WAITING_FOR_PLAYERS,
             null, null);
 
+        $player = new Player(null, $id, $playerName, $playerToken, null, null);
+
+        $game->addPlayer($player);
+
         $game = $this->gameRepository->insert($game);
 
-        $player = $this->playerService->createPlayer($game->getId(), $playerName, $playerToken,
-            false);
+        $game->setCreatorId($game->getPlayers()[0]->getId());
 
-        $game->setCreatorId($player->getId());
+        $game = $this->gameRepository->update($game);
 
-        $this->gameRepository->update($game);
-
-        return [
-            "gameId" => $id,
-            "playerId" => $player->getId()
-        ];
+        return $game;
     }
 
     public function joinGame($gameId, $playerName, $playerToken) {
         $game = $this->gameRepository->getById($gameId);
 
         if(!$game) {
-            throw new GameServiceException("Game doesn't exist!");
+            throw new GameServiceException("Invalid game!");
         }
 
         if(count($game->getPlayers()) >= 8) {
             throw new GameServiceException("Game is full!");
         }
 
-        $skipTurn = false;
-
-        if($game->getState() !== Game::WAITING_FOR_PLAYERS) {
-            $skipTurn = true;
+        if(in_array($playerToken, $game->getUsedTokens())) {
+            throw new TokenAlreadyBeingUsedException("Token is already being used!");
         }
 
-        $player = $this->playerService->createPlayer($gameId, $playerName, $playerToken,
-            $skipTurn);
+        if($game->getState() === Game::WAITING_FOR_PLAYERS) {
+        }
 
-        return $player->getId();
+        $game->addPlayer($playerName, $playerToken);
+
+        $game = $this->gameRepository->update($game);
+
+        return $game;
     }
 
     public function startGame($gameId, $playerId) {
         $game = $this->gameRepository->getById($gameId);
 
         if(!$game) {
-            throw new GameServiceException("Game doesn't exist!");
-        }
-
-        if($game->getCreatorId() !== $playerId) {
-            throw new GameServiceException("Only the player who created the game can start the game!");
+            throw new GameServiceException("Invalid game!");
         }
 
         if($game->getState() !== Game::WAITING_FOR_PLAYERS) {
             throw new GameServiceException("Game has already started!");
         }
 
-        if(count($game->getPlayers()) < 4) {
-            throw new GameServiceException("Not enough players to start game!");
+        if($playerId !== $game->getCreatorId()) {
+            throw new GameServiceException("Only the creator of the game can start the game!");
+        }
+
+        if(count($game->getPlayers()) < self::MIN_PLAYERS) {
+            throw new GameServiceException("Not enough players to start the game!");
         }
 
         $game->setState(Game::GAME_STARTED);
 
-        $this->gameRepository->update($game);
+        $game = $this->gameRepository->update($game);
 
         return $this->newRound($gameId);
     }
@@ -95,104 +107,148 @@ class GameService {
         $game = $this->gameRepository->getById($gameId);
 
         if(!$game) {
-            throw new GameServiceException("Game doesn't exist!");
+            throw new GameServiceException("Invalid game!");
         }
 
-        if($game->getState() === Game::WAITING_FOR_PLAYERS) {
-            throw new GameServiceException("Game hasn't started yet!");
-        }
+        $firstRound = $game->getRounds() === null;
 
-        $currentRound = $game->getCurrentRound();
+        $card = $this->cardService->getRandomCard();
 
-        if(!$currentRound) {
-            $player = $this->playerService->getFirstPlayer($gameId);
+        if($firstRound) {
+            $game->addRound($game->getCreatorId(), $card->getId());
         } else {
-            $player = $this->playerService->getNextPlayer($currentRound->getActivePlayerId());
+            $nextPlayer = $game->getNextPlayer();
+
+            $game->addRound($nextPlayer->getId(), $card->getId());
         }
-
-        $round = $this->roundService->createRound($gameId, $player->getId());
-
-        $game->setCurrentRoundId($round->getId());
 
         $game->setState(Game::ASKING_QUESTION);
 
-        $this->gameRepository->update($game);
+        $game = $this->gameRepository->update($game);
+
+        return $game;
     }
 
     public function askQuestion($gameId, $playerId, $questionId) {
         $game = $this->gameRepository->getById($gameId);
 
         if(!$game) {
-            throw new GameServiceException("Game doesn't exist!");
+            throw new GameServiceException("Invalid game!");
         }
 
         if($game->getState() !== Game::ASKING_QUESTION) {
-            throw new GameServiceException("Game is not looking for questions right now!");
+            throw new GameServiceException("Game isn't looking for questions at this time!");
         }
 
-        $currentRoundId = $game->getCurrentRoundId();
+        if(!$game->hasPlayer($playerId)) {
+            throw new GameServiceException("Player doesn't belong to this game!");
+        }
 
-        $this->roundService->askQuestion($currentRoundId, $playerId, $questionId);
+        if(!$game->isJudge($playerId)) {
+            throw new GameServiceException("Only the judge can ask a question!");
+        }
+
+        $currentRound = $game->getCurrentRound();
+
+        if(!$currentRound->hasQuestion($questionId)) {
+            throw new GameServiceException("Invalid question!");
+        }
+
+        $currentRound->setQuestionId($questionId);
 
         $game->setState(Game::ANSWERING_QUESTION);
 
-        $this->gameRepository->update($game);
+        $game = $this->gameRepository->update($game);
+
+        return $game;
     }
 
     public function answerQuestion($gameId, $playerId, $answer) {
         $game = $this->gameRepository->getById($gameId);
 
         if(!$game) {
-            throw new GameServiceException("Game doesn't exist!");
+            throw new GameServiceException("Invalid game!");
         }
 
         if($game->getState() !== Game::ANSWERING_QUESTION) {
-            throw new GameServiceException("Game is not looking for answers right now!");
+            throw new GameServiceException("Game isn't looking for answers at this time!");
         }
 
         if(!$game->hasPlayer($playerId)) {
-            throw new GameServiceException("Not a valid player!");
+            throw new GameServiceException("Player doesn't belong to this game!");
         }
 
-        $currentRoundId = $game->getCurrentRoundId();
+        if($game->isJudge($playerId)) {
+            throw new GameServiceException("The judge can't answer the question!");
+        }
 
-        $this->roundService->answerQuestion($currentRoundId, $playerId, $answer);
+        $currentRound = $game->getCurrentRound();
+
+        $currentRound->addAnswer($playerId, $answer);
+
+        $game = $this->gameRepository->update($game);
+
+        return $game;
     }
 
-    public function startVoting($gameId) {
+    public function vote($gameId, $playerId, $answerId1, $answerId2) {
         $game = $this->gameRepository->getById($gameId);
 
         if(!$game) {
-            throw new GameServiceException("Game doesn't exist!");
-        }
-
-        if($game->getState() !== Game::ANSWERING_QUESTION) {
-            throw new GameServiceException("Voting can't happen at this time!");
-        }
-
-        $game->setState(Game::VOTING);
-
-        $this->gameRepository->update($game);
-    }
-
-    public function vote($gameId, $playerId, $answerId) {
-        $game = $this->gameRepository->getById($gameId);
-
-        if(!$game) {
-            throw new GameServiceException("Game doesn't exist!");
+            throw new GameServiceException("Invalid game!");
         }
 
         if($game->getState() !== Game::VOTING) {
-            throw new GameServiceException("Voting can't happen at this time!");
+            throw new GameServiceException("Voting isn't happening right now!");
         }
 
         if(!$game->hasPlayer($playerId)) {
-            throw new GameServiceException("Not a valid player!");
+            throw new GameServiceException("Player doesn't belong to this game!");
         }
 
-        $currentRoundId = $game->getCurrentRoundId();
+        if($game->getJudge()->getId() === $playerId) {
+            throw new GameServiceException("The judge isn't allowed to vote!");
+        }
 
-        $this->roundService->vote($currentRoundId, $playerId, $answerId);
+        $currentRound = $game->getCurrentRound();
+
+        if(!$currentRound->hasAnswer($answerId1) || !$currentRound->hasAnswer($answerId2)) {
+            throw new GameServiceException("Invalid answer!");
+        }
+
+        $currentRound->addVotes($playerId, $answerId1, $answerId2);
+
+        $game = $this->gameRepository->update($game);
+
+        return $game;
+    }
+
+    public function updateGame($gameId) {
+        $game = $this->gameRepository->getById($gameId);
+
+        if(!$game) {
+            throw new GameServiceException("Invalid game!");
+        }
+
+        $seconds = $game->secondsSinceLastUpdate();
+
+        echo "<pre>Seconds since last update: $seconds</pre>";
+
+        $state = $game->getState();
+
+        if($state === Game::ASKING_QUESTION) {
+            if($game->secondsSinceLastUpdate() >= 120) {
+                $game->getCurrentRound()->askRandomQuestion();
+                $game->setState(Game::ANSWERING_QUESTION);
+            }
+        } else if($state === Game::ANSWERING_QUESTION) {
+            if($game->everyPlayerHasAnswered() ||
+               $game->secondsSinceLastUpdate() >= 120) {
+                $game->setState(Game::VOTING);
+            }
+        }
+
+        $game = $this->gameRepository->update($game);
     }
 
     private function generateId() {
@@ -211,7 +267,7 @@ class GameService {
         $digits = "";
 
         for($i = 0; $i < 10; ++$i) {
-            $digits .= strval(rand(0, 9));
+            $digits .= rand(0, 9);
         }
 
         return $digits;
@@ -219,3 +275,4 @@ class GameService {
 }
 
 class GameServiceException extends Exception {}
+class TokenAlreadyBeingUsedException extends Exception {}

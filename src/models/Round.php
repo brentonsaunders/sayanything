@@ -3,6 +3,7 @@ namespace Models;
 
 use Models\Answer;
 use Models\Card;
+use Models\Question;
 use Models\Vote;
 
 class Round {
@@ -99,19 +100,73 @@ class Round {
         $this->votes = $votes;
     }
 
-    public function addAnswer(Answer $answer) {
-        foreach($this->answers as &$otherAnswer) {
-            if($otherAnswer->getPlayerId() == $answer->getPlayerId()) {
-                $otherAnswer = $answer;
+    public function addAnswer($playerId, $answer) {
+        if(!$this->answers) {
+            $this->answers = [];
+        }
+
+        foreach($this->answers as $key => $otherAnswer) {
+            if($otherAnswer->getPlayerId() == $playerId) {
+                $this->answers[$key]->setAnswer($answer);
 
                 return true;
             }
         }
 
-        $this->answers[] = $answer;
+        $this->answers[] = new Answer(null, $playerId, $this->id, $answer);
     }
 
-    public function addVote(Vote $vote) {
-        $this->votes[] = $vote;
+    public function addVotes($playerId, $answerId1, $answerId2) {
+        // $this->votes[] = $vote;
+    }
+
+    public function hasQuestion($questionId) {
+        if(!$this->card) {
+            return false;
+        }
+
+        $questions = $this->card->getQuestions();
+
+        if(!$questions) {
+            return false;
+        }
+
+        foreach($questions as $question) {
+            if($question->getId() === $questionId) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    public function hasAnswer($answerId) {
+        if(!$this->answers) {
+            return false;
+        }
+
+        foreach($this->answers as $answer) {
+            if($answer->getId() === $answerId) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    public function askRandomQuestion() {
+        if($this->questionId) {
+            return;
+        }
+
+        $questions = $this->card->getQuestions();
+
+        shuffle($questions);
+
+        $this->questionId = $questions[0]->getId();
+    }
+
+    public function chooseAnswer($answerId) {
+        $this->chosenAnswerId = $answerId;
     }
 }

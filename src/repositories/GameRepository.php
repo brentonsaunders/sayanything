@@ -23,7 +23,7 @@ class GameRepository {
         $this->roundRepository = $roundRepository;
     }
 
-    public function getById($id) : Game {
+    public function getById($id) {
         $game = $this->gameDao->getById($id);
 
         if(!$game) {
@@ -42,8 +42,6 @@ class GameRepository {
     }
 
     public function insert(Game $game) : Game {
-        $game = $this->gameDao->insert($game);
-
         $players = $game->getPlayers();
 
         if($players) {
@@ -56,7 +54,9 @@ class GameRepository {
             $game->setRounds($this->roundRepository->insertRounds($rounds));
         }
 
-        return $game;
+        $game = $this->gameDao->insert($game);
+
+        return $this->getById($game->getId());
     }
 
     public function update(Game $game) {
@@ -76,7 +76,7 @@ class GameRepository {
             $game->setRounds($this->roundRepository->updateRounds($rounds));
         }
 
-        return $game;
+        return $this->getById($game->getId());
     }
 
     public function delete(Game $game) {
