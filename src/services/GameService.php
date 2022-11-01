@@ -10,6 +10,7 @@ use Models\Question;
 use Models\Vote;
 use Repositories\GameRepository;
 use Services\CardService;
+use Services\ScoreService;
 
 class GameService {
     const MIN_PLAYERS = 4;
@@ -268,6 +269,8 @@ class GameService {
         if(!$game) {
             throw new GameServiceException("Invalid game!");
         }
+
+        $scoreService = new ScoreService($game);
 
         $seconds = $game->secondsSinceLastUpdate();
 

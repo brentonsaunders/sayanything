@@ -105,6 +105,16 @@ class Game {
         return $tokens;
     }
 
+    public function getAvailableTokens() {
+        $allTokens = Player::getTokens();
+    
+        $usedTokens = $this->getUsedTokens();
+
+        $remainingTokens = array_diff($allTokens, $usedTokens);
+
+        return $remainingTokens;
+    }
+
     public function addPlayer($playerName, $playerToken) {
         if($this->players) {
             $numPlayers = count($this->players);

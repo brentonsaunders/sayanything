@@ -28,6 +28,19 @@ class Player {
         $this->skipTurn = $skipTurn;
     }
 
+    public static function getTokens() {
+        return [
+            self::MARTINI_GLASS,
+            self::DOLLAR_SIGN,
+            self::HIGH_HEELS,
+            self::COMPUTER,
+            self::CAR,
+            self::FOOTBALL,
+            self::GUITAR,
+            self::CLAPPERBOARD
+        ];
+    }
+
     public function getId() {
         return $this->id;
     }

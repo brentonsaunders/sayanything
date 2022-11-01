@@ -187,6 +187,10 @@ class Round {
 
         $questions = $this->card->getQuestions();
 
+        if(!$questions) {
+            return null;
+        }
+
         shuffle($questions);
 
         $this->questionId = $questions[0]->getId();
