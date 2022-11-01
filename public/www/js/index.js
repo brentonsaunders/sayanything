@@ -1,2 +1,1 @@
-$(function() {
-});
+const app = new App();

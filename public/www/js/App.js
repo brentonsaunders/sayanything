@@ -1,7 +1,20 @@
 class App {
     constructor() {
-        const router = new Router();
+    }
 
-        router.route('main', 'index', new Map(), true);
+    game(gameId) {
+        const updateGame = function() {
+            $.get(
+                `/game?gameId=${gameId}`,
+                function(data) {
+                }
+            ).fail(function() {
+                window.location = "/";
+            });
+        };
+
+        updateGame();
+
+        setInterval(updateGame, 2000);
     }
 }

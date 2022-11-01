@@ -3,6 +3,7 @@ namespace Controllers;
 
 use App;
 use Views\LobbyView;
+use Views\GameView;
 
 class DefaultController extends Controller {
     public function __construct(App $app) {
@@ -10,8 +11,18 @@ class DefaultController extends Controller {
     }
 
     public function index() {
-        $view = new LobbyView();
+        $params = $this->getParams();
 
-        $view->render();
+        $gameId = $params["gameId"] ?? null;
+
+        if(!$gameId) {
+            $view = new LobbyView();
+
+            $view->render();
+        } else {
+            $view = new GameView($gameId);
+
+            $view->render();
+        }
     }
 }

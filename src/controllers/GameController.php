@@ -4,6 +4,7 @@ namespace Controllers;
 use App;
 use Services\GameService;
 use Services\GameServiceException;
+use Views\GameView;
 
 class GameController extends Controller {
     private GameService $gameService;
@@ -51,11 +52,15 @@ class GameController extends Controller {
 
         $game = $this->gameService->createGame($gameName, $playerName, $playerToken);
 
+        $this->redirect("../?gameId={$game->getId()}");
+
+        /*
         echo "<pre>";
 
         print_r($game);
 
         echo "</pre>";
+        */
     }
 
     public function join() {

@@ -1,55 +1,40 @@
-<!DOCTYPE html>
-<html>
-    <head>
-        <title>Say Anything</title>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <link rel="stylesheet" href="css/index.css">
-        <script src="js/jquery-3.6.1.min.js"></script>
-        <script src="js/index.js"></script>
-    </head>
-    <body>
-        <div id="app">
-            <div id="lobby">
-                <h1>Say Anything</h1>
-                <div id="games">
-                    <h2>Games</h2>
-                </div>
-                <div id="create-game">
-                    <h2>Create Game</h2>
-                    <form action="game/create" method="get">
-                        <input name="gameName" placeholder="Game Name" type="text">
-                        <input name="playerName" placeholder="Player Name" type="text">
-                        <div id="tokens">
-                            <label class="martini-glass">
-                                <input name="playerToken" type="radio" value="martini-glass">
-                            </label>
-                            <label class="dollar-sign">
-                                <input name="playerToken" type="radio" value="dollar-sign">
-                            </label>
-                            <label class="high-heels">
-                                <input name="playerToken" type="radio" value="high-heels">
-                            </label>
-                            <label class="computer">
-                                <input name="playerToken" type="radio" value="computer">
-                            </label>
-                            <label class="car">
-                                <input name="playerToken" type="radio" value="car">
-                            </label>
-                            <label class="football">
-                                <input name="playerToken" type="radio" value="football">
-                            </label>
-                            <label class="guitar">
-                                <input name="playerToken" type="radio" value="guitar">
-                            </label>
-                            <label class="clapperboard">
-                                <input name="playerToken" type="radio" value="clapperboard">
-                            </label>
-                        </div>
-                        <input type="submit">
-                    </form>
-                </div>
+<div id="lobby">
+    <h1>Say Anything</h1>
+    <div id="games">
+        <h2>Games</h2>
+    </div>
+    <div id="create-game">
+        <h2>Create Game</h2>
+        <form action="game/create" method="get">
+            <input name="gameName" placeholder="Game Name" type="text">
+            <input name="playerName" placeholder="Player Name" type="text">
+            <div id="tokens">
+                <label class="martini-glass">
+                    <input name="playerToken" type="radio" value="martini-glass">
+                </label>
+                <label class="dollar-sign">
+                    <input name="playerToken" type="radio" value="dollar-sign">
+                </label>
+                <label class="high-heels">
+                    <input name="playerToken" type="radio" value="high-heels">
+                </label>
+                <label class="computer">
+                    <input name="playerToken" type="radio" value="computer">
+                </label>
+                <label class="car">
+                    <input name="playerToken" type="radio" value="car">
+                </label>
+                <label class="football">
+                    <input name="playerToken" type="radio" value="football">
+                </label>
+                <label class="guitar">
+                    <input name="playerToken" type="radio" value="guitar">
+                </label>
+                <label class="clapperboard">
+                    <input name="playerToken" type="radio" value="clapperboard">
+                </label>
             </div>
-        </div>
-    </body>
-</html>
+            <input type="submit">
+        </form>
+    </div>
+</div>

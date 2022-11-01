@@ -50,4 +50,10 @@ abstract class Controller {
 
         exit;
     }
+
+    protected function redirect($url) {
+        header("Location: $url");
+
+        exit;
+    }
 }
