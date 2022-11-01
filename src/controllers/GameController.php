@@ -103,13 +103,15 @@ class GameController extends Controller {
     public function newRound() {
         $params = $this->getParams();
 
-        if(!array_key_exists("gameId", $params)) {
+        if(!(array_key_exists("gameId", $params) &&
+             array_key_exists("playerId", $params))) {
             $this->badRequest();
         }
 
         $gameId = $params["gameId"];
+        $playerId = $params["playerId"];
 
-        $game = $this->gameService->newRound($gameId);
+        $game = $this->gameService->newRound($gameId, $playerId);
 
         echo "<pre>";
 
@@ -179,6 +181,28 @@ class GameController extends Controller {
 
         $game = $this->gameService->vote($gameId, $playerId, $answerId1,
             $answerId2);
+
+        echo "<pre>";
+
+        print_r($game);
+
+        echo "</pre>";
+    }
+
+    public function chooseAnswer() {
+        $params = $this->getParams();
+
+        if(!(array_key_exists("gameId", $params) && 
+             array_key_exists("playerId", $params) &&
+             array_key_exists("answerId", $params))) {
+            $this->badRequest();
+        }
+
+        $gameId = $params["gameId"];
+        $playerId = $params["playerId"];
+        $answerId = $params["answerId"];
+
+        $game = $this->gameService->chooseAnswer($gameId, $playerId, $answerId);
 
         echo "<pre>";
 

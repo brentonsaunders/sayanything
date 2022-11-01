@@ -16,7 +16,6 @@ class GameDao implements GameDaoInterface {
             $row['id'],
             $row['name'],
             $row['creator_id'],
-            $row['current_round_id'],
             $row['state'],
             $row['time_updated'],
             $row['time_created']
@@ -41,17 +40,16 @@ class GameDao implements GameDaoInterface {
 
     public function insert(Game $game) : Game {
         $query = "INSERT INTO games " .
-                 "(id, name, creator_id, current_round_id, state, time_updated, " . 
+                 "(id, name, creator_id, state, time_updated, " . 
                  "time_created) " . 
                  "VALUES " . 
-                 "(:id, :name, :creator_id, :current_round_id, :state, NOW(), " . 
+                 "(:id, :name, :creator_id, :state, NOW(), " . 
                  "NOW())";
 
         $this->db->query($query, [
             ':id' => $game->getId(),
             ':name' => $game->getName(),
             ':creator_id' => $game->getCreatorId(),
-            ":current_round_id" => $game->getCurrentRoundId(),
             ':state' => $game->getState()
         ]);
 
@@ -62,7 +60,6 @@ class GameDao implements GameDaoInterface {
         $query = "UPDATE games " .
                  "SET name = :name, " . 
                  "creator_id = :creator_id, " . 
-                 "current_round_id = :current_round_id, " . 
                  "state = :state, " . 
                  'time_updated = NOW(), ' .
                  "time_created = :time_created " . 
@@ -71,7 +68,6 @@ class GameDao implements GameDaoInterface {
         $this->db->query($query, [
             ':name' => $game->getName(),
             ':creator_id' => $game->getCreatorId(),
-            ":current_round_id" => $game->getCurrentRoundId(),
             ':state' => $game->getState(),
             ':time_created' => $game->getTimeCreated(),
             ':id' => $game->getId()

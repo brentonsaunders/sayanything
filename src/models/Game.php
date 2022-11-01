@@ -7,11 +7,11 @@ class Game {
     const ASKING_QUESTION = "asking-question";
     const ANSWERING_QUESTION = "answering-question";
     const VOTING = "voting";
+    const RESULTS = "results";
     
     private $id = null;
     private $name = null;
     private $creatorId = null;
-    private $currentRoundId = null;
     private $state = null;
     private $timeUpdated = null;
     private $timeCreated = null;
@@ -19,12 +19,11 @@ class Game {
     private $players = null;
     private $rounds = null;
 
-    public function __construct($id, $name, $creatorId, $currentRoundId,
-        $state, $timeUpdated, $timeCreated) {
+    public function __construct($id, $name, $creatorId, $state, $timeUpdated,
+        $timeCreated) {
         $this->id = $id;
         $this->name = $name;
         $this->creatorId = $creatorId;
-        $this->currentRoundId = $currentRoundId;
         $this->state = $state;
         $this->timeUpdated = $timeUpdated;
         $this->timeCreated = $timeCreated;
@@ -40,10 +39,6 @@ class Game {
 
     public function getCreatorId() {
         return $this->creatorId;
-    }
-
-    public function getCurrentRoundId() {
-        return $this->currentRoundId;
     }
 
     public function getState() {
@@ -76,10 +71,6 @@ class Game {
 
     public function setCreatorId($creatorId) {
         $this->creatorId = $creatorId;
-    }
-
-    public function setCurrentRoundId($currentRoundId) {
-        $this->currentRoundId = $currentRoundId;
     }
 
     public function setState($state) {
@@ -213,6 +204,36 @@ class Game {
         $numAnswers = count($answers);
 
         return $numAnswers === $numPlayers - 1;
+    }
+
+    public function everyPlayerHasVoted() {
+        $round = $this->getCurrentRound();
+
+        if(!$round) {
+            return false;
+        }
+
+        $numPlayers = count($this->players);
+
+        $votes = $round->getVotes();
+
+        if(!$votes) {
+            return false;
+        }
+
+        $numVotes = count($votes);
+
+        return $numVotes === 2 * ($numPlayers - 1);
+    }
+
+    public function judgeHasChosenAnswer() {
+        $round = $this->getCurrentRound();
+
+        if(!$round) {
+            return false;
+        }
+
+        return $round->getChosenAnswerId() !== null;
     }
 
     public function secondsSinceLastUpdate() {

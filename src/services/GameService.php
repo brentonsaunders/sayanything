@@ -13,6 +13,7 @@ use Services\CardService;
 
 class GameService {
     const MIN_PLAYERS = 4;
+    const MAX_PLAYERS = 8;
 
     private GameRepository $gameRepository;
     private CardService $cardService;
@@ -36,7 +37,7 @@ class GameService {
     public function createGame($gameName, $playerName, $playerToken) {
         $id = $this->generateId();
 
-        $game = new Game($id, $gameName, null, null, Game::WAITING_FOR_PLAYERS,
+        $game = new Game($id, $gameName, null, Game::WAITING_FOR_PLAYERS,
             null, null);
 
         $player = new Player(null, $id, $playerName, $playerToken, null, null);
@@ -59,7 +60,7 @@ class GameService {
             throw new GameServiceException("Invalid game!");
         }
 
-        if(count($game->getPlayers()) >= 8) {
+        if(count($game->getPlayers()) >= self::MAX_PLAYERS) {
             throw new GameServiceException("Game is full!");
         }
 
@@ -100,14 +101,24 @@ class GameService {
 
         $game = $this->gameRepository->update($game);
 
-        return $this->newRound($gameId);
+        return $this->newRound($gameId, $playerId);
     }
 
-    public function newRound($gameId) {
+    public function newRound($gameId, $playerId) {
         $game = $this->gameRepository->getById($gameId);
 
         if(!$game) {
             throw new GameServiceException("Invalid game!");
+        }
+
+        $state = $game->getState();
+
+        if($state !== Game::GAME_STARTED && $state !== Game::RESULTS) {
+            throw new GameServiceException("Can't start a new round!");
+        }
+
+        if($playerId !== $game->getCreatorId()) {
+            throw new GameServiceException("Only the creator of the game can start a new round!");
         }
 
         $firstRound = $game->getRounds() === null;
@@ -216,7 +227,35 @@ class GameService {
             throw new GameServiceException("Invalid answer!");
         }
 
-        $currentRound->addVotes($playerId, $answerId1, $answerId2);
+        $currentRound->vote($playerId, $answerId1, $answerId2);
+
+        $game = $this->gameRepository->update($game);
+
+        return $game;
+    }
+
+    public function chooseAnswer($gameId, $playerId, $answerId) {
+        $game = $this->gameRepository->getById($gameId);
+
+        if(!$game) {
+            throw new GameServiceException("Invalid game!");
+        }
+
+        if($game->getState() !== Game::VOTING) {
+            throw new GameServiceException("Voting isn't happening right now!");
+        }
+
+        if($game->getJudge()->getId() !== $playerId) {
+            throw new GameServiceException("Only the judge can choose an answer!");
+        }
+
+        $currentRound = $game->getCurrentRound();
+
+        if(!$currentRound->hasAnswer($answerId)) {
+            throw new GameServiceException("Invalid answer!");
+        }
+
+        $currentRound->chooseAnswer($answerId);
 
         $game = $this->gameRepository->update($game);
 
@@ -232,19 +271,24 @@ class GameService {
 
         $seconds = $game->secondsSinceLastUpdate();
 
-        echo "<pre>Seconds since last update: $seconds</pre>";
-
         $state = $game->getState();
 
         if($state === Game::ASKING_QUESTION) {
             if($game->secondsSinceLastUpdate() >= 120) {
                 $game->getCurrentRound()->askRandomQuestion();
+
                 $game->setState(Game::ANSWERING_QUESTION);
             }
         } else if($state === Game::ANSWERING_QUESTION) {
             if($game->everyPlayerHasAnswered() ||
                $game->secondsSinceLastUpdate() >= 120) {
                 $game->setState(Game::VOTING);
+            }
+        } else if($state === Game::VOTING) {
+            if(($game->everyPlayerHasVoted() &&
+               $game->judgeHasChosenAnswer()) ||
+               $game->secondsSinceLastUpdate() >= 120) {
+                $game->setState(Game::RESULTS);
             }
         }
 

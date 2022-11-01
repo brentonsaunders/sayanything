@@ -116,8 +116,34 @@ class Round {
         $this->answers[] = new Answer(null, $playerId, $this->id, $answer);
     }
 
-    public function addVotes($playerId, $answerId1, $answerId2) {
-        // $this->votes[] = $vote;
+    private function getPlayerVotes($playerId) {
+        if(!$this->votes) {
+            return null;
+        }
+
+        $playerVotes = [];
+
+        foreach($this->votes as $vote) {
+            if($vote->getPlayerId() === $playerId) {
+                $playerVotes[] = $vote;
+            }
+        }
+
+        return $playerVotes;
+    }
+
+    public function vote($playerId, $answerId1, $answerId2) {
+        $votes = $this->getPlayerVotes($playerId);
+
+        if($votes) {
+            $votes[0]->setAnswerId($answerId1);
+            $votes[1]->setAnswerId($answerId2);
+
+            return;
+        }
+
+        $this->votes[] = new Vote(null, $this->id, $playerId, $answerId1);
+        $this->votes[] = new Vote(null, $this->id, $playerId, $answerId2);
     }
 
     public function hasQuestion($questionId) {
