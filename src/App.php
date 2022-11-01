@@ -6,7 +6,6 @@ use Daos\PlayerDao;
 use Daos\QuestionDao;
 use Daos\VoteDao;
 use Daos\RoundDao;
-use Daos\TokensDao;
 use Repositories\AnswerRepository;
 use Repositories\CardRepository;
 use Repositories\GameRepository;
@@ -36,7 +35,6 @@ class App {
         $playerDao = new PlayerDao($db);
         $questionDao = new QuestionDao($db);
         $roundDao = new RoundDao($db);
-        $tokensDao = new TokensDao($db);
         $voteDao = new VoteDao($db);
 
         $answerRepository = new AnswerRepository($answerDao);

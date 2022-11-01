@@ -272,6 +272,12 @@ class GameService {
 
         $scoreService = new ScoreService($game);
 
+        echo "<pre>";
+
+        print_r($scoreService->getScoreBoard());
+
+        echo "</pre>";
+
         $seconds = $game->secondsSinceLastUpdate();
 
         $state = $game->getState();

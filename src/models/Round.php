@@ -116,7 +116,7 @@ class Round {
         $this->answers[] = new Answer(null, $playerId, $this->id, $answer);
     }
 
-    private function getPlayerVotes($playerId) {
+    public function getPlayerVotes($playerId) {
         if(!$this->votes) {
             return null;
         }
@@ -198,5 +198,23 @@ class Round {
 
     public function chooseAnswer($answerId) {
         $this->chosenAnswerId = $answerId;
+    }
+
+    public function isJudge($playerId) {
+        return $playerId === $this->judgeId;
+    }
+
+    public function wroteChosenAnswer($playerId) {
+        if(!$this->answers) {
+            return false;
+        }
+
+        foreach($this->answers as $answer) {
+            if($answer->getId() === $this->chosenAnswerId) {
+                return $answer->getPlayerId() === $playerId;
+            }
+        }
+
+        return false;
     }
 }
