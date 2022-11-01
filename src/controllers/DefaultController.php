@@ -2,7 +2,7 @@
 namespace Controllers;
 
 use App;
-use Views\View;
+use Views\LobbyView;
 
 class DefaultController extends Controller {
     public function __construct(App $app) {
@@ -10,8 +10,8 @@ class DefaultController extends Controller {
     }
 
     public function index() {
-        header("Content-Type: application/json");
+        $view = new LobbyView();
 
-        echo json_encode(["success" => true]);
+        $view->render();
     }
 }

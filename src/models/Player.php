@@ -41,6 +41,10 @@ class Player {
         ];
     }
 
+    public static function isToken($token) {
+        return in_array($token, self::getTokens());
+    }
+
     public function getId() {
         return $this->id;
     }

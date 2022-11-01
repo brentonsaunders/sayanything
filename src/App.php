@@ -15,6 +15,8 @@ use Repositories\VoteRepository;
 use Services\CardService;
 use Services\GameService;
 
+define('ROOT_DIR', realpath(__DIR__ . '/..'));
+
 class App {
     private $gameService = null;
 

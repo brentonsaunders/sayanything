@@ -36,6 +36,12 @@ class GameService {
     }
 
     public function createGame($gameName, $playerName, $playerToken) {
+        if(empty($gameName) ||
+           empty($playerName) ||
+           !Player::isToken($playerToken)) {
+            throw new GameServiceException("Game name, player name, and player token must be given!");
+        }
+
         $id = $this->generateId();
 
         $game = new Game($id, $gameName, null, Game::WAITING_FOR_PLAYERS,
@@ -43,7 +49,7 @@ class GameService {
 
         $player = new Player(null, $id, $playerName, $playerToken, null, null);
 
-        $game->addPlayer($player);
+        $game->addPlayer($playerName, $playerToken);
 
         $game = $this->gameRepository->insert($game);
 
@@ -55,6 +61,11 @@ class GameService {
     }
 
     public function joinGame($gameId, $playerName, $playerToken) {
+        if(empty($playerName) ||
+           !Player::isToken($playerToken)) {
+            throw new GameServiceException("Player name and player token must be given!");
+        }
+
         $game = $this->gameRepository->getById($gameId);
 
         if(!$game) {
@@ -269,14 +280,6 @@ class GameService {
         if(!$game) {
             throw new GameServiceException("Invalid game!");
         }
-
-        $scoreService = new ScoreService($game);
-
-        echo "<pre>";
-
-        print_r($scoreService->getScoreBoard());
-
-        echo "</pre>";
 
         $seconds = $game->secondsSinceLastUpdate();
 
