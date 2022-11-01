@@ -2,7 +2,7 @@
 namespace Controllers;
 
 use App;
-use Views\LobbyView;
+use Views\HomeView;
 use Views\GameView;
 
 class DefaultController extends Controller {
@@ -16,7 +16,7 @@ class DefaultController extends Controller {
         $gameId = $params["gameId"] ?? null;
 
         if(!$gameId) {
-            $view = new LobbyView();
+            $view = new HomeView();
 
             $view->render();
         } else {

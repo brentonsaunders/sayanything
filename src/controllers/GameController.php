@@ -4,6 +4,7 @@ namespace Controllers;
 use App;
 use Services\GameService;
 use Services\GameServiceException;
+use Services\GameViewMapper;
 use Views\GameView;
 
 class GameController extends Controller {
@@ -30,11 +31,11 @@ class GameController extends Controller {
             $this->badRequest();
         }
 
-        echo "<pre>";
+        $mapper = new GameViewMapper($game, null);
 
-        print_r($game);
+        $view = $mapper->getView();
 
-        echo "</pre>";
+        $view->render();
     }
 
     public function create() {
