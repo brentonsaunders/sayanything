@@ -16,7 +16,7 @@ $(function() {
     }
 
     const loadGame = async() => {
-        const $dontRefresh = $('*[data-dont-refresh="true"]');
+        const $dontRefresh = $('*[data-dont-refresh="true"]:visible');
         const $focus = $(":focus");
         const focusId = ($focus.length > 0) ? $focus.attr("id") : null;
 

@@ -85,7 +85,7 @@ class GamePartial implements View {
 
         if($gameState === Game::WAITING_FOR_PLAYERS) {
             if($this->playerId === null) {
-                echo "<button onclick=\"showModal('create-game');\">Join Game</button>";
+                echo "<button onclick=\"showModal('join-game');\">Join Game</button>";
             }
             
             if($this->game->getNumberOfPlayers() >= Game::MIN_PLAYERS &&
@@ -95,6 +95,32 @@ class GamePartial implements View {
         }
 
         echo "</div>";
+    }
+
+    private function joinGame() {
+        echo <<<EOD
+<div data-dont-refresh="true" id="join-game" class="modal-overlay">
+    <div class="modal">
+        <form>
+            <h2>Join Game</h2>
+            <input id="player-name" placeholder="Your Name" type="text">
+            <h2>Your Token</h2>
+            <div id="tokens">
+EOD;
+
+        $tokens = $this->game->getAvailableTokens();
+
+        foreach($tokens as $token) {
+            echo "<label><input type=\"radio\" name=\"token\"><div class=\"token $token\"></div></label>";
+        }
+        
+        echo <<<EOD
+            </div>
+            <button>OK</button>
+        </form>
+    </div>
+</div>
+EOD;
     }
 
     public function render() {
@@ -112,25 +138,6 @@ class GamePartial implements View {
 
         echo "</div>";
 
-        echo <<<EOD
-<div data-dont-refresh="true" id="create-game" class="modal-overlay">
-    <div class="modal">
-        <form>
-            <input id="player-name" placeholder="Player Name" type="text">
-            <div id="tokens">
-                <div class="token martini-glass"></div>
-                <div class="token dollar-sign"></div>
-                <div class="token high-heels"></div>
-                <div class="token computer"></div>
-                <div class="token car"></div>
-                <div class="token football"></div>
-                <div class="token guitar"></div>
-                <div class="token clapperboard"></div>
-            </div>
-            <button>OK</button>
-        </form>
-    </div>
-</div>
-EOD;
+        $this->joinGame();
     }
 }
