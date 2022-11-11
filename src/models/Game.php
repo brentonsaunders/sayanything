@@ -8,6 +8,9 @@ class Game {
     const ANSWERING_QUESTION = "answering-question";
     const VOTING = "voting";
     const RESULTS = "results";
+
+    const MIN_PLAYERS = 4;
+    const MAX_PLAYERS = 8;
     
     private $id = null;
     private $name = null;
@@ -93,6 +96,18 @@ class Game {
         $this->rounds = $rounds;
     }
 
+    public function getCreator() {
+        return $this->getPlayer($this->creatorId);
+    }
+
+    public function getNumberOfPlayers() {
+        return count($this->players);
+    }
+
+    public function isCreator($playerId) {
+        return $playerId == $this->creatorId;
+    }
+
     public function getRoundNumber() {
         if(!$this->rounds) {
             return null;
@@ -146,7 +161,7 @@ class Game {
         }
 
         foreach($this->players as $player) {
-            if($player->getId() === $playerId) {
+            if($player->getId() == $playerId) {
                 return $player;
             }
         }

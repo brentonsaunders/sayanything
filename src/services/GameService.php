@@ -13,9 +13,6 @@ use Services\CardService;
 use Services\ScoreService;
 
 class GameService {
-    const MIN_PLAYERS = 4;
-    const MAX_PLAYERS = 8;
-
     private GameRepository $gameRepository;
     private CardService $cardService;
 
@@ -72,7 +69,7 @@ class GameService {
             throw new GameServiceException("Invalid game!");
         }
 
-        if(count($game->getPlayers()) >= self::MAX_PLAYERS) {
+        if(count($game->getPlayers()) >= Game::MAX_PLAYERS) {
             throw new GameServiceException("Game is full!");
         }
 
@@ -105,7 +102,7 @@ class GameService {
             throw new GameServiceException("Only the creator of the game can start the game!");
         }
 
-        if(count($game->getPlayers()) < self::MIN_PLAYERS) {
+        if(count($game->getPlayers()) < Game::MIN_PLAYERS) {
             throw new GameServiceException("Not enough players to start the game!");
         }
 

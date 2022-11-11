@@ -1,32 +1,17 @@
 $(function() {
-    const games = [
-        {
-            gameId: 4,
-            gameName: "Redbud Ballers",
-            playerToken: "guitar",
-            numPlayers: 4,
-            round: 3,
-            secondsSinceCreated: 60 
-        },
-        {
-            gameId: 4,
-            gameName: "Redbud Ballers",
-            playerToken: "car",
-            numPlayers: 4,
-            round: 3,
-            secondsSinceCreated: 60 
-        },
-        {
-            gameId: 4,
-            gameName: "Redbud Ballers",
-            playerToken: "computer",
-            numPlayers: 4,
-            round: 3,
-            secondsSinceCreated: 60 
+    $('main').load("game?gameId=1126843686", () => {
+        const $countdownTimer = $("#countdown-timer");
+
+        if($countdownTimer.length > 0) {
+            const countdown = () => setTimeout(() => {
+                const startTime = parseInt($countdownTimer.text());
+
+                $countdownTimer.text(startTime - 1);
+
+                countdown();
+            }, 1000);
+
+            countdown();
         }
-    ];
-
-    // const view = new LobbyView(games);
-
-    const view = new JoinGameView();
+    });
 });

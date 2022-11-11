@@ -7,6 +7,7 @@ use Services\GameService;
 use Services\GameServiceException;
 use Services\GameViewMapper;
 use Views\GameView;
+use Views\GamePartial;
 
 class GameController extends Controller {
     private GameService $gameService;
@@ -21,7 +22,7 @@ class GameController extends Controller {
         $params = $this->getParams();
 
         if(!array_key_exists("gameId", $params)) {
-            $this->all();
+            $this->badRequest();
         }
 
         $gameId = $params["gameId"];
@@ -32,9 +33,7 @@ class GameController extends Controller {
             $this->badRequest();
         }
 
-        $mapper = new GameViewMapper($game, null);
-
-        $view = $mapper->getView();
+        $view = new GamePartial($game, 11);
 
         $view->render();
     }

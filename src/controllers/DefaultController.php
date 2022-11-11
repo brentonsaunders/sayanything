@@ -2,9 +2,7 @@
 namespace Controllers;
 
 use App;
-use Views\HomeView;
-use Views\GameView;
-use Views\TemplateView;
+use Views\MainView;
 
 class DefaultController extends Controller {
     public function __construct(App $app) {
@@ -28,7 +26,7 @@ class DefaultController extends Controller {
         }
         */
 
-        $view = new TemplateView(ROOT_DIR . "/templates/playground.html");
+        $view = new MainView();
 
         $view->render();
     }
