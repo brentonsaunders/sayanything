@@ -33,7 +33,7 @@ class GameController extends Controller {
             $this->badRequest();
         }
 
-        $view = new GamePartial($game, 11);
+        $view = new GamePartial($game, null);
 
         $view->render();
     }

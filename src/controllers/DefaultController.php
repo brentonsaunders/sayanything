@@ -3,6 +3,7 @@ namespace Controllers;
 
 use App;
 use Views\MainView;
+use Views\TemplateView;
 
 class DefaultController extends Controller {
     public function __construct(App $app) {

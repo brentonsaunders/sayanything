@@ -79,18 +79,21 @@ class GamePartial implements View {
     }
 
     private function playArea() {
+        $gameState = $this->game->getState();
+
         echo "<div id=\"play-area\">";
-        echo "<form>";
 
-        if($this->playerId === null) {
-            echo "<button type=\"submit\">Join Game</button>";
+        if($gameState === Game::WAITING_FOR_PLAYERS) {
+            if($this->playerId === null) {
+                echo "<button onclick=\"showModal('create-game');\">Join Game</button>";
+            }
+            
+            if($this->game->getNumberOfPlayers() >= Game::MIN_PLAYERS &&
+                $this->game->isCreator($this->playerId)) {
+                echo "<button>Start Game</button>";
+            }
         }
 
-        if($this->game->isCreator($this->playerId)) {
-            echo "<button type=\"submit\">Start Game</button>";
-        }
-
-        echo "</form>";
         echo "</div>";
     }
 
@@ -108,5 +111,26 @@ class GamePartial implements View {
         $this->playArea();
 
         echo "</div>";
+
+        echo <<<EOD
+<div data-dont-refresh="true" id="create-game" class="modal-overlay">
+    <div class="modal">
+        <form>
+            <input id="player-name" placeholder="Player Name" type="text">
+            <div id="tokens">
+                <div class="token martini-glass"></div>
+                <div class="token dollar-sign"></div>
+                <div class="token high-heels"></div>
+                <div class="token computer"></div>
+                <div class="token car"></div>
+                <div class="token football"></div>
+                <div class="token guitar"></div>
+                <div class="token clapperboard"></div>
+            </div>
+            <button>OK</button>
+        </form>
+    </div>
+</div>
+EOD;
     }
 }
