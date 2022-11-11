@@ -93,6 +93,14 @@ class Game {
         $this->rounds = $rounds;
     }
 
+    public function getRoundNumber() {
+        if(!$this->rounds) {
+            return null;
+        }
+
+        return count($this->rounds);
+    }
+
     public function getUsedTokens() {
         $tokens = [];
 
@@ -132,18 +140,22 @@ class Game {
         $this->rounds[] = new Round(null, $this->id, $judgeId, $cardId, null, null);
     }
 
-    public function hasPlayer($playerId) {
+    public function getPlayer($playerId) {
         if(!$this->players) {
-            return false;
+            return null;
         }
 
         foreach($this->players as $player) {
             if($player->getId() === $playerId) {
-                return true;
+                return $player;
             }
         }
 
-        return false;
+        return null;
+    }
+
+    public function hasPlayer($playerId) {
+        return $this->getPlayer($playerId) !== null;
     }
 
     public function getNextPlayer() {
@@ -244,6 +256,10 @@ class Game {
         }
 
         return $round->getChosenAnswerId() !== null;
+    }
+
+    public function secondsSinceCreated() {
+        return strtotime("now") - strtotime($this->timeCreated);
     }
 
     public function secondsSinceLastUpdate() {

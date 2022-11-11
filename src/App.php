@@ -25,6 +25,12 @@ class App {
 
         $this->initGameService(new DatabaseHelper('localhost', 'sayanything', 'root', null));
 
+        session_start();
+        
+        if(empty($_SESSION["games"])) {
+            $_SESSION["games"] = [];
+        }
+
         $router = new Router($this);
 
         $router->route($_REQUEST);

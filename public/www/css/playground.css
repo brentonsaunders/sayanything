@@ -1,0 +1,215 @@
+@import url('https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap');
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+ul {
+    list-style-type: none;
+}
+
+a {
+    text-decoration: none;
+}
+
+html, body {
+    width: 100%;
+    height: 100%;
+}
+
+#app {
+    font-family: 'Roboto', sans-serif;
+    font-size: 14px;
+    user-select: none;
+}
+
+header {
+    display: flex;
+    height: 56px;
+}
+
+header .left {
+    width: 56px;
+}
+
+header .right {
+    width: 56px;
+}
+
+header .center {
+    flex: 1;
+}
+
+#menu {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    width: 56px;
+    height: 56px;
+}
+
+#menu div {
+    width: 22px;
+    height: 3px;
+    margin: 2px 0;
+    background-color: black;
+}
+
+#title {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex: 1;
+    height: 56px;
+    font-size: 150%;
+    font-weight: bold;
+    color: rgb(181, 230, 29);
+    text-shadow: 2px 0 2px #000, 0 -2px 2px #000, 0 2px 2px #000, -2px 0 2px #000;
+}
+
+main {
+    padding: 20px;
+}
+
+#game {
+    max-width: 400px;
+    margin: auto;
+}
+
+#game h1 {
+    text-align: center;
+    font-size: 100%;
+    margin-bottom: 20px;
+}
+
+#players {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 5px;
+}
+
+#game .player {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    width: 60px;
+    height: 60px;
+    text-align: center;
+    font-size: 80%;
+    font-weight: bold;
+}
+
+#game .token {
+    position: relative;
+    width: 40px;
+    height: 40px;
+    border-radius: 40px;
+    margin-bottom: 5px;
+}
+
+#game .token.martini-glass {
+    background-color: rgb(255, 201, 14);
+}
+
+#game .token.dollar-sign {
+    background-color: rgb(0, 186, 0);
+}
+
+#game .token.high-heels {
+    background-color: rgb(148, 0, 148);
+}
+
+#game .token.computer {
+    background-color: rgb(255, 128, 0);
+}
+
+#game .token.token.car {
+    background-color: rgb(0, 162, 232);
+}
+
+#game .token.football {
+    background-color: rgb(94, 53, 17);
+}
+
+#game .token.guitar {
+    background-color: rgb(217, 0, 0);
+}
+
+#game .token.clapperboard {
+    background-color: rgb(112, 112, 112);
+}
+
+#game .player.judge .token::before {
+    position: absolute;
+    display: block;
+    content: "";
+    width: 40px;
+    height: 40px;
+    background-size: 40px 40px;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-image: url("../img/judge-wig.png");
+}
+
+#game .token::after {
+    position: absolute;
+    display: block;
+    content: "";
+    width: 40px;
+    height: 40px;
+    background-size: 50%;
+    background-position: center;
+    background-repeat: no-repeat;
+}
+
+#game .token.martini-glass::after {
+    background-image: url("../img/martini-glass.png");
+}
+
+#game .token.dollar-sign::after {
+    background-image: url("../img/dollar-sign.png");
+}
+
+#game .token.high-heels::after {
+    background-image: url("../img/high-heels.png");
+}
+
+#game .token.computer::after {
+    background-image: url("../img/computer.png");
+}
+
+#game .token.car::after {
+    background-image: url("../img/car.png");
+}
+
+#game .token.football::after {
+    background-image: url("../img/football.png");
+}
+
+#game .token.guitar::after {
+    background-image: url("../img/guitar.png");
+}
+
+#game .token.clapperboard::after {
+    background-image: url("../img/clapperboard.png");
+}
+
+#game .player .name {
+    display: flex;
+    align-items: center;
+}
+
+#game .player.me .name::after {
+    display: block;
+    content: "";
+    width: 10px;
+    height: 10px;
+    background-image: url("../img/star.png");
+    background-size: 10px;
+    margin-left: 2px;
+}

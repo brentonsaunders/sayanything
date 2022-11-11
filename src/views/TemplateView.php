@@ -1,8 +1,14 @@
 <?php
 namespace Views;
 
-class TemplateView extends MainView {
+class TemplateView implements View {
+    private $contents = null;
+
     public function __construct($file) {
-        $this->setContents(file_get_contents($file));
+        $this->contents = file_get_contents($file);
+    }
+
+    public function render() {
+        echo $this->contents;
     }
 }

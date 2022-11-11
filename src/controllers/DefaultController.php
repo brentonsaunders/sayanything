@@ -4,6 +4,7 @@ namespace Controllers;
 use App;
 use Views\HomeView;
 use Views\GameView;
+use Views\TemplateView;
 
 class DefaultController extends Controller {
     public function __construct(App $app) {
@@ -11,6 +12,7 @@ class DefaultController extends Controller {
     }
 
     public function index() {
+        /*
         $params = $this->getParams();
 
         $gameId = $params["gameId"] ?? null;
@@ -24,5 +26,10 @@ class DefaultController extends Controller {
 
             $view->render();
         }
+        */
+
+        $view = new TemplateView(ROOT_DIR . "/templates/playground.html");
+
+        $view->render();
     }
 }

@@ -2,6 +2,7 @@
 namespace Controllers;
 
 use App;
+use Dtos\GameDto;
 use Services\GameService;
 use Services\GameServiceException;
 use Services\GameViewMapper;
@@ -20,7 +21,7 @@ class GameController extends Controller {
         $params = $this->getParams();
 
         if(!array_key_exists("gameId", $params)) {
-            $this->badRequest();
+            $this->all();
         }
 
         $gameId = $params["gameId"];
@@ -38,6 +39,26 @@ class GameController extends Controller {
         $view->render();
     }
 
+    private function all() {
+        $myGames = $_SESSION["games"];
+
+        if(count($myGames) === 0) {
+            $this->badRequest();
+        }
+
+        $gameDtos = [];
+
+        foreach($myGames as $myGame) {
+            $game = $this->gameService->getGame($myGame["gameId"]);
+
+            if($game) {
+                $gameDtos[] = new GameDto($game, $myGame["playerId"]);
+            }
+        }
+
+        $this->jsonResponse(GameDto::getArray($gameDtos));
+    }
+
     public function create() {
         $params = $this->getParams();
 
@@ -53,15 +74,14 @@ class GameController extends Controller {
 
         $game = $this->gameService->createGame($gameName, $playerName, $playerToken);
 
-        $this->redirect("../?gameId={$game->getId()}");
+        $_SESSION["games"][] = [
+            "gameId" => $game->getId(),
+            "playerId" => $game->getCreatorId()
+        ];
 
-        /*
-        echo "<pre>";
+        // $this->redirect("../?gameId={$game->getId()}");
 
-        print_r($game);
-
-        echo "</pre>";
-        */
+        $this->redirect("..");
     }
 
     public function join() {
