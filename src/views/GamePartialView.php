@@ -32,12 +32,14 @@ class GamePartialView implements View {
     private function players() {
         $state = $this->game->getState();
 
-        if($state === Game::ASKING_QUESTION &&  $this->game->isJudge($this->playerId)) {
-            return;
-        }
+        if($this->playerId) {
+            if($state === Game::ASKING_QUESTION &&  $this->game->isJudge($this->playerId)) {
+                return;
+            }
 
-        if($state === Game::VOTING) {
-            return;
+            if($state === Game::VOTING) {
+                return;
+            }
         }
 
         $players = $this->game->getPlayers();
@@ -190,7 +192,7 @@ class GamePartialView implements View {
 
                 $disabled = ($answer) ? "disabled" : "";
 
-                echo "<form data-dont-refresh=\"true\" id=\"answer-answer\" action=\"game/answer\">";
+                echo "<form data-dont-refresh=\"true\" id=\"answer-question\" action=\"game/answer\">";
                 echo "<input type=\"hidden\" name=\"gameId\" value=\"$gameId\">";
                 echo "<textarea $disabled id=\"answer\" name=\"answer\">$answer</textarea>";
                 
@@ -203,7 +205,25 @@ class GamePartialView implements View {
 
                 echo "</form>";
             }
-        }
+        } else if($state === Game::VOTING) {
+            if($this->game->isJudge($this->playerId)) {
+            } else {
+                $answers = $this->game->getCurrentRound()->getAnswers();
+
+                echo "<form data-dont-refresh=\"true\" id=\"vote\" action=\"game/vote\">";
+                echo "<input type=\"hidden\" name=\"gameId\" value=\"$gameId\">";
+                echo "<div id=\"picked-answer\"></div>";
+                echo "<div id=\"answer-picker\">";
+
+                for($i = 0; $i < count($answers); ++$i) {
+                    echo "<div class=\"answer-picker-column\"><label><input name=\"picked-answer\" type=\"radio\"><span>$i</span></label></div>";
+                }
+
+                echo "</div>";
+                echo "<button type=\"submit\">Vote</button>";
+                echo "</form>";
+            }
+        } 
 
         echo "</div>";
     }
