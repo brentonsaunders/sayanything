@@ -387,21 +387,60 @@ button:hover {
     background-color: white;
 }
 
+button.edit {
+    background-color: rgb(200, 200, 200);
+}
+
+button.edit:hover {
+    background-color: rgb(175, 175, 175);
+}
+
+#vote button.edit {
+    display: none;
+}
+
+#vote.disabled button.edit {
+    display: block;
+}
+
+#vote.disabled button[type=submit] {
+    display: none;
+}
+
+#vote.disabled label.vote {
+    background-color: white;
+    pointer-events: none;
+}
+
 #answers {
-    margin-bottom: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    height: 150px;
+    border: 2px solid black;
+    margin-bottom: 20px;
+    font-weight: bold;
+    line-height: 150%;
+}
+
+#answers .answer.instructions {
+    display: block;
 }
 
 #answers .answer {
-    height: 24px;
-    border: 2px solid black;
-    
-    overflow: hidden;
+    display: none;
 }
 
-#answers .answer.expanded {
-    height: 100px;
-    padding: 20px;
-    font-size: 80%;
+input[type=radio].answer1:checked ~ #answers .answer.answer1,
+input[type=radio].answer2:checked ~ #answers .answer.answer2,
+input[type=radio].answer3:checked ~ #answers .answer.answer3,
+input[type=radio].answer4:checked ~ #answers .answer.answer4,
+input[type=radio].answer5:checked ~ #answers .answer.answer5,
+input[type=radio].answer6:checked ~ #answers .answer.answer6,
+input[type=radio].answer7:checked ~ #answers .answer.answer7,
+input[type=radio].answer8:checked ~ #answers .answer.answer8 {
+    display: block;
 }
 
 #answer-picker {
@@ -410,36 +449,50 @@ button:hover {
     margin-bottom: 20px;
 }
 
-#answer-picker .answer-picker-column {
+#answer-picker .col {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
     width: 40px;
 }
 
-#answer-picker label {
+#answer-picker label.vote {
+    display: block;
+    background-color: rgb(200, 200, 200);
+    width: 40px;
+    height: 40px;
+    border-radius: 40px;
+}
+
+#answer-picker input[type=checkbox] {
+    display: none;
+}
+
+#answer-picker input[type=checkbox] + .token {
+    display: none;
+}
+
+#answer-picker input[type=checkbox]:checked + .token {
+    display: flex;
 }
 
 #answer-picker input[type=radio] {
     display: none;
 }
 
-#answer-picker span {
+#answer-picker input[type=radio] + div {
     display: flex;
-    align-items: center;
     justify-content: center;
+    align-items: center;
     width: 40px;
     height: 40px;
-    border-radius: 40px;
-    border: 2px solid rgb(127, 127, 127);
-    color: rgb(127, 127, 127);
     font-weight: bold;
+    color: rgb(127, 127, 127);
+    border: 2px solid rgb(127, 127, 127);
+    border-radius: 40px;
 }
 
-#answer-picker input[type=radio]:checked + span {
-    background-color: rgb(127, 127, 127);
+#answer-picker input[type=radio]:checked + div {
     color: white;
-}
-
-#picked-answer {
-    height: 150px;
-    border: 2px solid black;
-    margin-bottom: 20px;
+    background-color: rgb(127, 127, 127);
 }

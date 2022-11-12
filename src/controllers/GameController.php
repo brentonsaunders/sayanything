@@ -178,26 +178,26 @@ class GameController extends Controller {
     public function vote() {
         $params = $this->getParams();
 
-        if(!(array_key_exists("gameId", $params) && 
-             array_key_exists("playerId", $params) &&
-             array_key_exists("answerId1", $params) &&
-             array_key_exists("answerId2", $params))) {
+        if(!array_key_exists("gameId", $params) || 
+           !array_key_exists("votes", $params)) {
             $this->badRequest();
         }
 
         $gameId = $params["gameId"];
-        $playerId = $params["playerId"];
-        $answerId1 = $params["answerId1"];
-        $answerId2 = $params["answerId2"];
+        $votes = $params["votes"];
 
-        $game = $this->gameService->vote($gameId, $playerId, $answerId1,
-            $answerId2);
+        if(count($votes) !== 2) {
+            $this->badRequest();
+        }
 
-        echo "<pre>";
+        if(!array_key_exists($gameId, $_SESSION["games"])) {
+            $this->badRequest();
+        }
+        
+        $playerId = $_SESSION["games"][$gameId];
 
-        print_r($game);
-
-        echo "</pre>";
+        $game = $this->gameService->vote($gameId, $playerId, $votes[0],
+            $votes[1]);
     }
 
     public function chooseAnswer() {

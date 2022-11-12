@@ -46,6 +46,20 @@ $(function() {
         loadGame();
     }, 5000);
 
+    $(document).on("click", "#answer-picker input[type=checkbox]", function() {
+        if($('#answer-picker input[type=checkbox]:checked').length > 2) {
+            $(this).prop('checked', false);
+        }
+    });
+
+    $(document).on("click", "#answer-picker input[type=radio]", function() {
+        const value = $(this).val();
+
+        $('#answers .answer').hide();
+
+        $(`#answers .answer.${value}`).show();
+    });
+
     $(document).on("click", "div.modal", e => {
         e.stopPropagation();
     });
@@ -64,6 +78,7 @@ $(function() {
             url: actionUrl,
             data: $(this).serialize(),
             success: function(data) {
+                console.log(data);
                 loadGame(true);
             }
         });
