@@ -7,7 +7,7 @@ use Services\GameService;
 use Services\GameServiceException;
 use Services\GameViewMapper;
 use Views\GameView;
-use Views\GamePartial;
+use Views\GamePartialView;
 
 class GameController extends Controller {
     private GameService $gameService;
@@ -33,29 +33,19 @@ class GameController extends Controller {
             $this->badRequest();
         }
 
-        $view = new GamePartial($game, null);
+        $playerId = null;
 
-        $view->render();
-    }
+        if(array_key_exists($gameId, $_SESSION["games"])) {
+            $playerId = $_SESSION["games"][$gameId];
 
-    private function all() {
-        $myGames = $_SESSION["games"];
-
-        if(count($myGames) === 0) {
-            $this->badRequest();
-        }
-
-        $gameDtos = [];
-
-        foreach($myGames as $myGame) {
-            $game = $this->gameService->getGame($myGame["gameId"]);
-
-            if($game) {
-                $gameDtos[] = new GameDto($game, $myGame["playerId"]);
+            if(!$game->hasPlayer($playerId)) {
+                $playerId = null;
             }
         }
 
-        $this->jsonResponse(GameDto::getArray($gameDtos));
+        $view = new GamePartialView($game, $playerId);
+
+        $view->render();
     }
 
     public function create() {
@@ -73,10 +63,7 @@ class GameController extends Controller {
 
         $game = $this->gameService->createGame($gameName, $playerName, $playerToken);
 
-        $_SESSION["games"][] = [
-            "gameId" => $game->getId(),
-            "playerId" => $game->getCreatorId()
-        ];
+        $_SESSION["games"][$game->getId()] = $game->getCreatorId();
 
         // $this->redirect("../?gameId={$game->getId()}");
 
@@ -96,33 +83,36 @@ class GameController extends Controller {
         $playerName = $params["playerName"];
         $playerToken = $params["playerToken"];
 
-        $game = $this->gameService->joinGame($gameId, $playerName, $playerToken);
+        if(array_key_exists($gameId, $_SESSION["games"])) {
+            $this->badRequest();
+        }
 
-        echo "<pre>";
+        $playerIdAndGame = $this->gameService->joinGame($gameId, $playerName, $playerToken);
 
-        print_r($game);
+        $playerId = $playerIdAndGame["playerId"];
+        $game = $playerIdAndGame["game"];
 
-        echo "</pre>";
+        $_SESSION["games"][$gameId] = $playerId;
+
+        $this->redirect("..?gameId=" . $game->getId());
     }
 
     public function start() {
         $params = $this->getParams();
 
-        if(!(array_key_exists("gameId", $params) &&
-             array_key_exists("playerId", $params))) {
+        if(!array_key_exists("gameId", $params)) {
             $this->badRequest();
         }
 
         $gameId = $params["gameId"];
-        $playerId = $params["playerId"];
+
+        if(!array_key_exists($gameId, $_SESSION["games"])) {
+            $this->badRequest();
+        }
+        
+        $playerId = $_SESSION["games"][$gameId];
 
         $game = $this->gameService->startGame($gameId, $playerId);
-
-        echo "<pre>";
-
-        print_r($game);
-
-        echo "</pre>";
     }
 
     public function newRound() {
@@ -145,26 +135,24 @@ class GameController extends Controller {
         echo "</pre>";
     }
 
-    public function askQuestion() {
+    public function ask() {
         $params = $this->getParams();
 
-        if(!(array_key_exists("gameId", $params) && 
-             array_key_exists("playerId", $params) &&
-             array_key_exists("questionId", $params))) {
+        if(!array_key_exists("gameId", $params) ||
+           !array_key_exists("questionId", $params)) {
             $this->badRequest();
         }
 
         $gameId = $params["gameId"];
-        $playerId = $params["playerId"];
         $questionId = $params["questionId"];
 
+        if(!array_key_exists($gameId, $_SESSION["games"])) {
+            $this->badRequest();
+        }
+        
+        $playerId = $_SESSION["games"][$gameId];
+
         $game = $this->gameService->askQuestion($gameId, $playerId, $questionId);
-
-        echo "<pre>";
-
-        print_r($game);
-
-        echo "</pre>";
     }
 
     public function answerQuestion() {

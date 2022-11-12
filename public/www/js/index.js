@@ -15,21 +15,23 @@ $(function() {
         }
     }
 
-    const loadGame = async() => {
+    const loadGame = async(forceRefresh = false) => {
         const $dontRefresh = $('*[data-dont-refresh="true"]:visible');
         const $focus = $(":focus");
         const focusId = ($focus.length > 0) ? $focus.attr("id") : null;
 
-        await new Promise(resolve => $('main').load("game?gameId=1126843686", () => resolve()));
+        await new Promise(resolve => $('main').load(`game?gameId=${GAME_ID}`, () => resolve()));
 
-        // Restore all the elements that aren't supposed to be refreshed
-        $dontRefresh.each(function() {
-            const id = $(this).attr("id");
+        if(!forceRefresh) {
+            // Restore all the elements that aren't supposed to be refreshed
+            $dontRefresh.each(function() {
+                const id = $(this).attr("id");
 
-            $(`#${id}`).replaceWith($(this));
-        });
+                $(`#${id}`).replaceWith($(this));
+            });
 
-        $(`#${focusId}`).focus();
+            $(`#${focusId}`).focus();
+        }
 
         updateGame();
     }
@@ -46,6 +48,21 @@ $(function() {
 
     $(document).on("click", "div.modal-overlay", function() {
         $(this).hide();
+    });
+
+    $(document).on("submit", "form", function(e) {
+        e.preventDefault();
+
+        const actionUrl = $(this).attr("action");
+
+        $.ajax({
+            type: "POST",
+            url: actionUrl,
+            data: $(this).serialize(),
+            success: function(data) {
+                loadGame(true);
+            }
+        });
     });
 });
 

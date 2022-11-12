@@ -24,7 +24,7 @@ class GameService {
 
     public function getGame($gameId) {
         try {
-            $this->updateGame($gameId);
+            // $this->updateGame($gameId);
         } catch(GameServiceException $e) {
             throw $e;
         }
@@ -77,6 +77,7 @@ class GameService {
             throw new TokenAlreadyBeingUsedException("Token is already being used!");
         }
 
+        // TODO: Handle case of player joining after game has started
         if($game->getState() === Game::WAITING_FOR_PLAYERS) {
         }
 
@@ -84,7 +85,12 @@ class GameService {
 
         $game = $this->gameRepository->update($game);
 
-        return $game;
+        $player = $game->getPlayerByToken($playerToken);
+
+        return [
+            "playerId" => $player->getId(),
+            "game" => $game
+        ];
     }
 
     public function startGame($gameId, $playerId) {
@@ -283,20 +289,20 @@ class GameService {
         $state = $game->getState();
 
         if($state === Game::ASKING_QUESTION) {
-            if($game->secondsSinceLastUpdate() >= 120) {
+            if($game->secondsSinceLastUpdate() >= Game::SECONDS_TO_ASK_QUESTION) {
                 $game->getCurrentRound()->askRandomQuestion();
 
                 $game->setState(Game::ANSWERING_QUESTION);
             }
         } else if($state === Game::ANSWERING_QUESTION) {
             if($game->everyPlayerHasAnswered() ||
-               $game->secondsSinceLastUpdate() >= 120) {
+               $game->secondsSinceLastUpdate() >= Game::SECONDS_TO_ANSWER_QUESTION) {
                 $game->setState(Game::VOTING);
             }
         } else if($state === Game::VOTING) {
             if(($game->everyPlayerHasVoted() &&
                $game->judgeHasChosenAnswer()) ||
-               $game->secondsSinceLastUpdate() >= 120) {
+               $game->secondsSinceLastUpdate() >= Game::SECONDS_TO_VOTE) {
                 $game->setState(Game::RESULTS);
             }
         }

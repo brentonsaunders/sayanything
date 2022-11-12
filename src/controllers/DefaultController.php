@@ -11,23 +11,11 @@ class DefaultController extends Controller {
     }
 
     public function index() {
-        /*
         $params = $this->getParams();
 
         $gameId = $params["gameId"] ?? null;
 
-        if(!$gameId) {
-            $view = new HomeView();
-
-            $view->render();
-        } else {
-            $view = new GameView($gameId);
-
-            $view->render();
-        }
-        */
-
-        $view = new MainView();
+        $view = new MainView($gameId);
 
         $view->render();
     }

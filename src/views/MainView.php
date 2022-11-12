@@ -2,11 +2,15 @@
 namespace Views;
 
 class MainView implements View {
-    public function __construct() {
+    private $gameId;
 
+    public function __construct($gameId = null) {
+        $this->gameId = $gameId;
     }
 
     public function render() {
+        $gameId = ($this->gameId) ? "\"{$this->gameId}\"" : "null";
+
         echo <<<EOD
 <!DOCTYPE html>
 <html>
@@ -16,6 +20,9 @@ class MainView implements View {
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <link rel="stylesheet" href="css/index.css">
         <script src="js/jquery-3.6.1.min.js"></script>
+        <script>
+            const GAME_ID = $gameId;
+        </script>
         <script src="js/index.js"></script>
     </head>
     <body>

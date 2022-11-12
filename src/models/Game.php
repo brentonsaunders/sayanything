@@ -11,6 +11,10 @@ class Game {
 
     const MIN_PLAYERS = 4;
     const MAX_PLAYERS = 8;
+
+    const SECONDS_TO_ASK_QUESTION = 120;
+    const SECONDS_TO_ANSWER_QUESTION = 120;
+    const SECONDS_TO_VOTE = 120;
     
     private $id = null;
     private $name = null;
@@ -18,6 +22,8 @@ class Game {
     private $state = null;
     private $timeUpdated = null;
     private $timeCreated = null;
+
+    private $stateChanged = false;
 
     private $players = null;
     private $rounds = null;
@@ -48,8 +54,8 @@ class Game {
         return $this->state;
     }
 
-    public function getUpdateTime() {
-        return $this->updateTime;
+    public function getTimeUpdated() {
+        return $this->timeUpdated;
     }
 
     public function getTimeCreated() {
@@ -77,11 +83,15 @@ class Game {
     }
 
     public function setState($state) {
+        if($state !== $this->state) {
+            $this->stateChanged = true;
+        }
+
         $this->state = $state;
     }
 
-    public function setUpdateTime($updateTime) {
-        $this->updateTime = $updateTime;
+    public function setTimeUpdated($timeUpdated) {
+        $this->timeUpdated = $timeUpdated;
     }
 
     public function setTimeCreated($timeCreated) {
@@ -94,6 +104,10 @@ class Game {
 
     public function setRounds($rounds) {
         $this->rounds = $rounds;
+    }
+
+    public function stateHasChanged() {
+        return $this->stateChanged;
     }
 
     public function getCreator() {
@@ -162,6 +176,20 @@ class Game {
 
         foreach($this->players as $player) {
             if($player->getId() == $playerId) {
+                return $player;
+            }
+        }
+
+        return null;
+    }
+
+    public function getPlayerByToken($token) {
+        if(!$this->players) {
+            return null;
+        }
+
+        foreach($this->players as $player) {
+            if($player->getToken() == $token) {
                 return $player;
             }
         }

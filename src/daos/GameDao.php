@@ -57,21 +57,33 @@ class GameDao implements GameDaoInterface {
     }
 
     public function update(Game $game) : Game {
-        $query = "UPDATE games " .
-                 "SET name = :name, " . 
-                 "creator_id = :creator_id, " . 
-                 "state = :state, " . 
-                 'time_updated = NOW(), ' .
-                 "time_created = :time_created " . 
-                 "WHERE id = :id";
-
-        $this->db->query($query, [
+        $params = [
             ':name' => $game->getName(),
             ':creator_id' => $game->getCreatorId(),
             ':state' => $game->getState(),
             ':time_created' => $game->getTimeCreated(),
             ':id' => $game->getId()
-        ]);
+        ];
+
+        $timeUpdated = ":time_updated";
+
+        if($game->stateHasChanged()) {
+            $timeUpdated = "NOW()";
+        }
+
+        $query = "UPDATE games " .
+                 "SET name = :name, " . 
+                 "creator_id = :creator_id, " . 
+                 "state = :state, " . 
+                 "time_updated = $timeUpdated, " .
+                 "time_created = :time_created " . 
+                 "WHERE id = :id";
+
+        if(!$game->stateHasChanged()) {
+            $params[':time_updated'] = $game->getTimeUpdated();
+        }
+
+        $this->db->query($query, $params);
 
         return $game;
     }

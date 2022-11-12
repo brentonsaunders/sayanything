@@ -250,7 +250,7 @@ main {
     justify-content: center;
     font-size: 120%;
     font-weight: bold;
-    margin-top: 40px;
+    margin-top: 20px;
 }
 
 #countdown-timer {
@@ -336,4 +336,30 @@ button:hover {
 #join-game #tokens input[type=radio]:checked + .token {
     width: 60px;
     height: 60px;
+}
+
+#questions {
+    margin-bottom: 40px;
+}
+
+#questions label {
+    display: block;
+    height: 48px;
+    border: 2px dotted black;
+}
+
+#questions input[type=radio] {
+    display: none;
+}
+
+#questions .question {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+}
+
+#questions input[type=radio]:checked + .question {
+    background-color: lightgrey;
+    font-weight: bold;
 }
