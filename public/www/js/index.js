@@ -6,7 +6,11 @@ $(function() {
             const countdown = () => setTimeout(() => {
                 const startTime = parseInt($countdownTimer.text());
 
-                $countdownTimer.text(startTime - 1);
+                if(startTime <= 0) {
+                    $countdownTimer.text(0);
+                } else {
+                    $countdownTimer.text(startTime - 1);
+                }
 
                 countdown();
             }, 1000);

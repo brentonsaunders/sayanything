@@ -116,6 +116,20 @@ class Round {
         $this->answers[] = new Answer(null, $playerId, $this->id, $answer);
     }
 
+    public function getPlayerAnswer($playerId) {
+        if(!$this->answers) {
+            return null;
+        }
+
+        foreach($this->answers as $answer) {
+            if($answer->getPlayerId() == $playerId) {
+                return $answer->getAnswer();
+            }
+        }
+
+        return null;
+    }
+
     public function getPlayerVotes($playerId) {
         if(!$this->votes) {
             return null;
@@ -216,5 +230,19 @@ class Round {
         }
 
         return false;
+    }
+
+    public function getAskedQuestion() {
+        if(!$this->questionId) {
+            return null;
+        }
+
+        foreach($this->card->getQuestions() as $question) {
+            if($question->getId() === $this->questionId) {
+                return $question->getQuestion();
+            }
+        }
+
+        return null;
     }
 }

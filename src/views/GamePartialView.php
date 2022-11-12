@@ -32,10 +32,12 @@ class GamePartialView implements View {
     private function players() {
         $state = $this->game->getState();
 
-        if($state === Game::ASKING_QUESTION) {
-            if($this->game->isJudge($this->playerId)) {
-                return;
-            }
+        if($state === Game::ASKING_QUESTION &&  $this->game->isJudge($this->playerId)) {
+            return;
+        }
+
+        if($state === Game::VOTING) {
+            return;
         }
 
         $players = $this->game->getPlayers();
@@ -124,6 +126,22 @@ class GamePartialView implements View {
             } else {
                 $gameState = "Waiting for " . $judge->getName() . " to ask a question ...";
             }
+        } else if($state === Game::ANSWERING_QUESTION) {
+            $question = $this->game->getCurrentRound()->getAskedQuestion();
+
+            if($this->game->isJudge($this->playerId)) {
+                $gameState = "Waiting for players to answer the question<br>$question ...";
+            } else {
+                $gameState = "In " . $judge->getName() . "'s Opinion ...<br>$question";
+            }
+        } else if($state === Game::VOTING) {
+            $question = $this->game->getCurrentRound()->getAskedQuestion();
+
+            if($this->game->isJudge($this->playerId)) {
+                $gameState = "What's the best answer to ...<br>$question";
+            } else {
+                $gameState = "Vote on the best answer to ...<br>$question";
+            }
         }
 
         echo "<div id=\"game-state\">$gameState</div>";
@@ -164,6 +182,25 @@ class GamePartialView implements View {
 
                 echo "</div>";
                 echo "<button type=\"submit\">Ask</button>";
+                echo "</form>";
+            }
+        } else if($state === Game::ANSWERING_QUESTION) {
+            if(!$this->game->isJudge($this->playerId)) {
+                $answer = $this->game->getCurrentRound()->getPlayerAnswer($this->playerId);
+
+                $disabled = ($answer) ? "disabled" : "";
+
+                echo "<form data-dont-refresh=\"true\" id=\"answer-answer\" action=\"game/answer\">";
+                echo "<input type=\"hidden\" name=\"gameId\" value=\"$gameId\">";
+                echo "<textarea $disabled id=\"answer\" name=\"answer\">$answer</textarea>";
+                
+                if($answer) {
+                    echo "<button onclick=\"$(this).hide(); $(this).next().show(); $('#answer').prop('disabled', false);\" type=\"button\">Edit</button>";
+                    echo "<button style=\"display: none;\" type=\"submit\">Answer</button>";
+                } else {
+                    echo "<button type=\"submit\">Answer</button>";
+                }
+
                 echo "</form>";
             }
         }

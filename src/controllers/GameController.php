@@ -155,26 +155,24 @@ class GameController extends Controller {
         $game = $this->gameService->askQuestion($gameId, $playerId, $questionId);
     }
 
-    public function answerQuestion() {
+    public function answer() {
         $params = $this->getParams();
 
-        if(!(array_key_exists("gameId", $params) && 
-             array_key_exists("playerId", $params) &&
-             array_key_exists("answer", $params))) {
+        if(!array_key_exists("gameId", $params) ||
+          !array_key_exists("answer", $params)) {
             $this->badRequest();
         }
 
         $gameId = $params["gameId"];
-        $playerId = $params["playerId"];
         $answer = $params["answer"];
 
+        if(!array_key_exists($gameId, $_SESSION["games"])) {
+            $this->badRequest();
+        }
+
+        $playerId = $_SESSION["games"][$gameId];
+
         $game = $this->gameService->answerQuestion($gameId, $playerId, $answer);
-
-        echo "<pre>";
-
-        print_r($game);
-
-        echo "</pre>";
     }
 
     public function vote() {
