@@ -15,6 +15,7 @@ class Game {
     const SECONDS_TO_ASK_QUESTION = 120;
     const SECONDS_TO_ANSWER_QUESTION = 120;
     const SECONDS_TO_VOTE = 120;
+    const SECONDS_UNTIL_NEW_ROUND = 120;
     
     private $id = null;
     private $name = null;
@@ -224,13 +225,27 @@ class Game {
     }
 
     public function getCurrentRound() {
+        if(!$this->rounds) {
+            return null;
+        }
+
+        usort($this->rounds, function($a, $b) {
+            if($a->getId() < $b->getId()) {
+                return -1;
+            } else if($a->getId() > $b->getId()) {
+                return 1;
+            }
+
+            return 0;
+        });
+
         return end($this->rounds);
     }
 
     public function isJudge($playerId) {
         $judge = $this->getJudge();
 
-        return $judge !== null && $judge->getId() === $playerId;
+        return $judge !== null && $judge->getId() == $playerId;
     }
 
     public function getJudge() {

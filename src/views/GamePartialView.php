@@ -77,7 +77,8 @@ class GamePartialView implements View {
 
         if($state !== Game::ASKING_QUESTION &&
            $state !== Game::ANSWERING_QUESTION &&
-           $state !== Game::VOTING) {
+           $state !== Game::VOTING &&
+           $state !== Game::RESULTS) {
             return;
         }
 
@@ -93,6 +94,9 @@ class GamePartialView implements View {
                 break;
             case Game::VOTING:
                 $secondsGiven = Game::SECONDS_TO_VOTE;
+                break;
+            case Game::RESULTS:
+                $secondsGiven = Game::SECONDS_UNTIL_NEW_ROUND;
                 break;
         }
 
@@ -140,20 +144,21 @@ class GamePartialView implements View {
             $question = $this->game->getCurrentRound()->getAskedQuestion();
 
             if($this->game->isJudge($this->playerId)) {
-                $gameState = "What's the best answer to ...<br>$question";
+                $gameState = "What's your favorite answer to ...<br>$question";
             } else {
                 $gameState = "Vote on the best answer to ...<br>$question";
             }
+        } else if($state === Game::RESULTS) {
+            $gameState = "Waiting for the next round to begin ...";
         }
 
         echo "<div id=\"game-state\">$gameState</div>";
     }
 
     private function playArea() {
-        
-
         $state = $this->game->getState();
         $gameId = $this->game->getId();
+        $isJudge = $this->game->isJudge($this->playerId);
 
         echo "<div id=\"play-area\">";
 
@@ -169,7 +174,7 @@ class GamePartialView implements View {
                 echo "</form>";
             }
         } else if($state === Game::ASKING_QUESTION) {
-            if($this->game->isJudge($this->playerId)) {
+            if($isJudge) {
                 $card = $this->game->getCurrentRound()->getCard();
 
                 $questions = $card->getQuestions();
@@ -187,7 +192,7 @@ class GamePartialView implements View {
                 echo "</form>";
             }
         } else if($state === Game::ANSWERING_QUESTION) {
-            if(!$this->game->isJudge($this->playerId)) {
+            if(!$isJudge) {
                 $answer = $this->game->getCurrentRound()->getPlayerAnswer($this->playerId);
 
                 $disabled = ($answer) ? "disabled" : "";
@@ -206,13 +211,65 @@ class GamePartialView implements View {
                 echo "</form>";
             }
         } else if($state === Game::VOTING) {
-            if($this->game->isJudge($this->playerId)) {
-            } else {
-                $answers = $this->game->getCurrentRound()->getAnswers();
+            $answers = $this->game->getCurrentRound()->getAnswers();
 
+            if($isJudge) {
+                $chosenAnswerId = $this->game->getCurrentRound()->getChosenAnswerId();
+
+                echo '<form disabled="true" ';
+
+                if($chosenAnswerId !== null) {
+                    echo 'class="disabled" ';
+                }
+
+                echo 'data-dont-refresh="true" id="vote" action="game/chooseAnswer">';
+                echo '<input type="hidden" name="gameId" value="' . $gameId . '">';
+
+                echo '<div id="answers">';
+                echo '<div class="answer instructions">Tap the numbered buttons below to view answers, and tap the bubbles above to pick your favorite answer.</div>';
+
+                $count = 1;
+
+                foreach($answers as $answer) {
+                    echo '<div class="answer answer' . $count . '">' . $answer->getAnswer() . '</div>';
+                
+                    ++$count;
+                }
+
+                echo "</div>";
+
+                echo '<div id="answer-picker">';
+
+                $count = 1;
+
+                $player = $this->game->getPlayer($this->playerId);
+                $token = $player->getToken();
+
+                foreach($answers as $answer) {
+                    echo '<div class="col">';
+                    echo '<label class="vote"><input ';
+
+                    if($answer->getId() === $chosenAnswerId) {
+                        echo 'checked ';
+                    }
+
+                    echo 'name="answerId" type="radio" value="' . $answer->getId() . '"><div class="token ' . $token . '"></div></label>';
+
+                    echo '<label class="answer-number"><input name="answer" type="radio" value="answer' . $count . '"><div>' . $count. '</div></label>';
+                    echo '</div>';
+
+                    ++$count;
+                }
+
+                echo '</div>';
+
+                echo '<button class="edit" type="button" onclick="$(\'#vote\').removeClass(\'disabled\');">Edit</button>';
+                echo '<button type="submit">Choose</button>';
+                echo '</form>';
+            } else {
                 $votes = $this->game->getCurrentRound()->getPlayerVotes($this->playerId);
 
-                echo '<form ';
+                echo '<form disabled="true" ';
 
                 if($votes !== null) {
                     echo 'class="disabled" ';
@@ -249,15 +306,15 @@ class GamePartialView implements View {
                         echo 'checked ';
                     }
 
-                    echo 'name="votes[]" type="checkbox" value="' . $answer->getId() . '"><div class="token ' . $token . '"></div></label>';
+                    echo 'name="vote1" type="radio" value="' . $answer->getId() . '"><div class="token ' . $token . '"></div></label>';
                     echo '<label class="vote"><input ';
 
                     if($votes && $answer->getId() === $votes[1]->getAnswerId()) {
                         echo 'checked ';
                     }
 
-                    echo 'name="votes[]" type="checkbox" value="' . $answer->getId() . '"><div class="token ' . $token . '"></div></label>';
-                    echo '<label><input name="answer" type="radio" value="answer' . $count . '"><div>' . $count. '</div></label>';
+                    echo 'name="vote2" type="radio" value="' . $answer->getId() . '"><div class="token ' . $token . '"></div></label>';
+                    echo '<label class="answer-number"><input name="answer" type="radio" value="answer' . $count . '"><div>' . $count. '</div></label>';
                     echo '</div>';
 
                     ++$count;
@@ -269,10 +326,20 @@ class GamePartialView implements View {
                 echo '<button type="submit">Vote</button>';
                 echo '</form>';
             }
+        } else if($state === Game::RESULTS) {
+            if($this->game->isCreator($this->playerId)) {
+                if($this->game->secondsSinceLastUpdate() >= 30) {
+                    echo '<form action="game/newRound">';
+                    echo '<input type="hidden" name="gameId" value="' . $gameId . '">';
+                    echo '<input type="hidden" name="playerId" value="' . $this->playerId . '">';
+                    echo '<button type="submit">Next Round</button>';
+                    echo '</form>';
+                }
+            }
         } 
 
         echo "</div>";
-    }
+    } 
 
     private function joinGame() {
         $gameId = $this->game->getId();

@@ -464,23 +464,23 @@ input[type=radio].answer8:checked ~ #answers .answer.answer8 {
     border-radius: 40px;
 }
 
-#answer-picker input[type=checkbox] {
+#answer-picker label.vote input[type=radio] {
     display: none;
 }
 
-#answer-picker input[type=checkbox] + .token {
+#answer-picker label.vote input[type=radio] + .token {
     display: none;
 }
 
-#answer-picker input[type=checkbox]:checked + .token {
+#answer-picker label.vote input[type=radio]:checked + .token {
     display: flex;
 }
 
-#answer-picker input[type=radio] {
+#answer-picker label.answer-number input[type=radio] {
     display: none;
 }
 
-#answer-picker input[type=radio] + div {
+#answer-picker label.answer-number input[type=radio] + div {
     display: flex;
     justify-content: center;
     align-items: center;
@@ -492,7 +492,11 @@ input[type=radio].answer8:checked ~ #answers .answer.answer8 {
     border-radius: 40px;
 }
 
-#answer-picker input[type=radio]:checked + div {
+#answer-picker label.answer-number input[type=radio]:checked + div {
     color: white;
     background-color: rgb(127, 127, 127);
+}
+
+form:disabled {
+    background-color: green;
 }

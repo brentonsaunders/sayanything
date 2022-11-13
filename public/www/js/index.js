@@ -46,13 +46,7 @@ $(function() {
         loadGame();
     }, 5000);
 
-    $(document).on("click", "#answer-picker input[type=checkbox]", function() {
-        if($('#answer-picker input[type=checkbox]:checked').length > 2) {
-            $(this).prop('checked', false);
-        }
-    });
-
-    $(document).on("click", "#answer-picker input[type=radio]", function() {
+    $(document).on("click", "#answer-picker label.answer-number input[type=radio]", function() {
         const value = $(this).val();
 
         $('#answers .answer').hide();

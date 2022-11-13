@@ -118,21 +118,19 @@ class GameController extends Controller {
     public function newRound() {
         $params = $this->getParams();
 
-        if(!(array_key_exists("gameId", $params) &&
-             array_key_exists("playerId", $params))) {
+        if(!array_key_exists("gameId", $params)) {
             $this->badRequest();
         }
 
         $gameId = $params["gameId"];
-        $playerId = $params["playerId"];
+
+        if(!array_key_exists($gameId, $_SESSION["games"])) {
+            $this->badRequest();
+        }
+
+        $playerId = $_SESSION["games"][$gameId];
 
         $game = $this->gameService->newRound($gameId, $playerId);
-
-        echo "<pre>";
-
-        print_r($game);
-
-        echo "</pre>";
     }
 
     public function ask() {
@@ -179,16 +177,14 @@ class GameController extends Controller {
         $params = $this->getParams();
 
         if(!array_key_exists("gameId", $params) || 
-           !array_key_exists("votes", $params)) {
+           !array_key_exists("vote1", $params) ||
+           !array_key_exists("vote2", $params)) {
             $this->badRequest();
         }
 
         $gameId = $params["gameId"];
-        $votes = $params["votes"];
-
-        if(count($votes) !== 2) {
-            $this->badRequest();
-        }
+        $vote1 = $params["vote1"];
+        $vote2 = $params["vote2"];
 
         if(!array_key_exists($gameId, $_SESSION["games"])) {
             $this->badRequest();
@@ -196,29 +192,27 @@ class GameController extends Controller {
         
         $playerId = $_SESSION["games"][$gameId];
 
-        $game = $this->gameService->vote($gameId, $playerId, $votes[0],
-            $votes[1]);
+        $game = $this->gameService->vote($gameId, $playerId, $vote1,
+            $vote2);
     }
 
     public function chooseAnswer() {
         $params = $this->getParams();
 
-        if(!(array_key_exists("gameId", $params) && 
-             array_key_exists("playerId", $params) &&
-             array_key_exists("answerId", $params))) {
+        if(!array_key_exists("gameId", $params) ||
+           !array_key_exists("answerId", $params)) {
             $this->badRequest();
         }
 
         $gameId = $params["gameId"];
-        $playerId = $params["playerId"];
         $answerId = $params["answerId"];
 
+        if(!array_key_exists($gameId, $_SESSION["games"])) {
+            $this->badRequest();
+        }
+
+        $playerId = $_SESSION["games"][$gameId];
+
         $game = $this->gameService->chooseAnswer($gameId, $playerId, $answerId);
-
-        echo "<pre>";
-
-        print_r($game);
-
-        echo "</pre>";
     }
 }

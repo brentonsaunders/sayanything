@@ -24,12 +24,14 @@ class GameService {
 
     public function getGame($gameId) {
         try {
-            // $this->updateGame($gameId);
+            $this->updateGame($gameId);
         } catch(GameServiceException $e) {
             throw $e;
         }
 
-        return $this->gameRepository->getById($gameId);
+        $game =  $this->gameRepository->getById($gameId);
+
+        return $game;
     }
 
     public function createGame($gameName, $playerName, $playerToken) {
@@ -260,7 +262,7 @@ class GameService {
             throw new GameServiceException("Voting isn't happening right now!");
         }
 
-        if($game->getJudge()->getId() !== $playerId) {
+        if(!$game->isJudge($playerId)) {
             throw new GameServiceException("Only the judge can choose an answer!");
         }
 
@@ -304,6 +306,12 @@ class GameService {
                $game->judgeHasChosenAnswer()) ||
                $game->secondsSinceLastUpdate() >= Game::SECONDS_TO_VOTE) {
                 $game->setState(Game::RESULTS);
+            }
+        } else if($state === Game::RESULTS) {
+            if($game->secondsSinceLastUpdate() >= Game::SECONDS_UNTIL_NEW_ROUND) {
+                $this->newRound($gameId, $game->getCreatorId());
+
+                return;
             }
         }
 
