@@ -1,6 +1,32 @@
 <?php
 class Router {
     private App $app;
+    private $routes = [
+        [
+            "method" => "GET",
+            "pattern" => "/",
+            "controller" => "Controllers\\DefaultController",
+            "action" => "lobby"
+        ],
+        [
+            "method" => "GET",
+            "pattern" => "/{gameId}",
+            "controller" => "Controllers\\DefaultController",
+            "action" => "game"
+        ],
+        [
+            "method" => "POST",
+            "pattern" => "/{gameId}/{gameName}/{playerName}/{playerToken}",
+            "controller" => "Controllers\\DefaultController",
+            "action" => "create"
+        ],
+        [
+            "method" => "POST",
+            "pattern" => "/{gameId}/ask",
+            "controller" => "Controllers\\DefaultController",
+            "action" => "ask"
+        ]
+    ];
 
     public function __construct(App $app) {
         $this->app = $app;
@@ -11,49 +37,76 @@ class Router {
 
         unset($request['url']);
 
-        $params = $request;
+        $urlParts = explode("/", $url);
 
-        $controllerAndAction = $this->getControllerAndAction($url);
+        foreach($this->routes as $route) {
+            $method = $route["method"];
+            $pattern = $route["pattern"];
 
-        $controller = $controllerAndAction['controller'];
-        $action = $controllerAndAction['action'];
-
-        $controller->setRequestMethod($_SERVER["REQUEST_METHOD"]);
-
-        $controller->setParams($params);
-
-        $controller->setRouter($this);
-
-        $controller->$action();
-    }
-
-    private function getControllerAndAction($url) {
-        if(!$url) {
-            $controller = "Controllers\\DefaultController";
-            $action = "index";
-        } else {
-            $parts = explode('/', $url);
-
-            if(count($parts) === 2) {
-                $controller = "Controllers\\{$parts[0]}Controller";
-                $action = $parts[1];
-            } else {
-                $controller = "Controllers\\{$parts[0]}Controller";
-                $action = "index";
+            if(strtolower($method) !== strtolower($_SERVER["REQUEST_METHOD"])) {
+                continue;
             }
-        }
 
-        if(!class_exists($controller)) {
-            $controller = "Controllers\\DefaultController";
-        }
+            if($pattern[0] !== "/") {
+                throw new Exception("Route patterns must begin with a slash!");
+            }
 
-        if(!method_exists($controller, $action)) {
-            $action = "index";
-        }
+            if($pattern === "/") {
+                if(empty($url)) {
+                    $controllerClass = $route["controller"];
+                    $action = $route["action"];
 
-        return [
-            'controller' => new $controller($this->app),
-            'action' => $action
-        ];
+                    $controller = new $controllerClass($this->app, $_SERVER["REQUEST_METHOD"],
+                        $_POST);
+
+                    $controller->$action();
+
+                    return;
+                }
+
+                continue;
+            }
+
+            $pattern = substr($pattern, 1);
+
+            $patternParts = explode("/", $pattern);
+
+            if(count($patternParts) !== count($urlParts)) {
+                continue;
+            }
+
+            $numParts = count($patternParts);
+
+            $match = true;
+
+            $params = [];
+
+            for($i = 0; $match && $i < $numParts; ++$i) {
+                $firstChar = $patternParts[$i][0];
+                $lastChar = $patternParts[$i][strlen($patternParts[$i]) - 1];
+
+                if($firstChar === "{" && $lastChar === "}") {
+                    $name = substr($patternParts[$i], 1, -1);
+
+                    $params[$name] = $urlParts[$i];
+                } else if($urlParts[$i] !== $patternParts[$i]) {
+                    $match = false;
+                }
+            }
+
+            if(!$match) {
+                continue;
+            }
+
+            $controllerClass = $route["controller"];
+            $action = $route["action"];
+
+            $controller = new $controllerClass($this->app, $_SERVER["REQUEST_METHOD"],
+                $_POST);
+
+            call_user_func_array([$controller, $action], $params);
+
+            return;
+        }
     }
 }
