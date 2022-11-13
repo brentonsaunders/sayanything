@@ -64,10 +64,6 @@ class GameController extends Controller {
         $game = $this->gameService->createGame($gameName, $playerName, $playerToken);
 
         $_SESSION["games"][$game->getId()] = $game->getCreatorId();
-
-        // $this->redirect("../?gameId={$game->getId()}");
-
-        $this->redirect("..");
     }
 
     public function join() {

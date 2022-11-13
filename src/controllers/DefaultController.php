@@ -6,6 +6,7 @@ use Services\GameService;
 use Services\GameServiceException;
 use Views\MainView;
 use Views\GamePartialView;
+use Views\LobbyView;
 
 class DefaultController extends Controller {
     private GameService $gameService;
@@ -17,7 +18,7 @@ class DefaultController extends Controller {
     }
 
     public function lobby() {
-        $view = new MainView();
+        $view = new LobbyView($_SESSION["games"]);
 
         $view->render();
     }
@@ -51,7 +52,25 @@ class DefaultController extends Controller {
     }
 
     public function create() {
-        print_r($this->getPostData());
+        $post = $this->getPostData();
+
+        if(!(array_key_exists("gameName", $post) &&
+             array_key_exists("playerName", $post) &&
+             array_key_exists("playerToken", $post))) {
+            $this->badRequest();
+        }
+
+        $gameName = $post["gameName"];
+        $playerName = $post["playerName"];
+        $playerToken = $post["playerToken"];
+
+        echo "$gameName<br>$playerName<br>$playerToken<br>";
+
+        $game = $this->gameService->createGame($gameName, $playerName, $playerToken);
+
+        $_SESSION["games"][$game->getId()] = $game->getCreatorId();
+
+        $this->redirect($game->getId());
     }
 
     public function join($gameId) {
