@@ -198,6 +198,20 @@ class Game {
         return null;
     }
 
+    public function getPlayerByTurn($turn) {
+        if(!$this->players) {
+            return null;
+        }
+
+        foreach($this->players as $player) {
+            if($player->getTurn() == $turn) {
+                return $player;
+            }
+        }
+
+        return null;
+    }
+
     public function hasPlayer($playerId) {
         return $this->getPlayer($playerId) !== null;
     }
@@ -215,13 +229,17 @@ class Game {
 
         $nextTurn = ($turn + 1) % $numPlayers;
 
-        while($this->players[$nextTurn]->getSkipTurn()) {
-            $this->players[$nextTurn]->setSkipTurn(false);
+        $nextPlayer = $this->getPlayerByTurn($nextTurn);
+
+        while($nextPlayer->getSkipTurn()) {
+            $nextPlayer->setSkipTurn(false);
 
             $nextTurn = ($nextTurn + 1) % $numPlayers;
+
+            $nextPlayer = $this->getPlayerByTurn($nextTurn);
         }
 
-        return $this->players[$nextTurn];
+        return $nextPlayer;
     }
 
     public function getCurrentRound() {
@@ -314,6 +332,20 @@ class Game {
         }
 
         return $round->getChosenAnswerId() !== null;
+    }
+
+    public function getPlayedCards() {
+        if(!$this->rounds) {
+            return null;
+        }
+
+        $cards = [];
+
+        foreach($this->rounds as $round) {
+            $cards[] = $round->getCard();
+        }
+
+        return $cards;
     }
 
     public function secondsSinceCreated() {
