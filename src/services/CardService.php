@@ -11,8 +11,16 @@ class CardService {
         $this->cardRepository = $cardRepository;
     }
 
-    public function getRandomCard() : Card {
+    public function getRandomCard($otherThanCards) : Card {
         $cards = $this->cardRepository->getAll();
+
+        $cardIds = array_map(function($card) {
+            return $card->getId();
+        }, $otherThanCards);
+
+        $cards = array_filter($cards, function($card) use($cardIds) {
+            return !in_array($card->getId(), $cardIds);
+        });
 
         shuffle($cards);
 

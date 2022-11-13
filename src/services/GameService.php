@@ -140,7 +140,9 @@ class GameService {
 
         $firstRound = $game->getRounds() === null;
 
-        $card = $this->cardService->getRandomCard();
+        $playedCards = $game->getPlayedCards();
+
+        $card = $this->cardService->getRandomCard($playedCards);
 
         if($firstRound) {
             $game->addRound($game->getCreatorId(), $card->getId());
