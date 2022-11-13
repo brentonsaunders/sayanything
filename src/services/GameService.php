@@ -301,7 +301,11 @@ class GameService {
         } else if($state === Game::ANSWERING_QUESTION) {
             if($game->everyPlayerHasAnswered() ||
                $game->secondsSinceLastUpdate() >= Game::SECONDS_TO_ANSWER_QUESTION) {
-                $game->setState(Game::VOTING);
+                if($game->lessThanTwoPlayersHaveAnswered()) {
+                    $game->setState(Game::RESULTS);
+                } else {
+                    $game->setState(Game::VOTING);
+                }
             }
         } else if($state === Game::VOTING) {
             if(($game->everyPlayerHasVoted() &&

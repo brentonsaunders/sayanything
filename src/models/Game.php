@@ -284,6 +284,20 @@ class Game {
         return null;
     }
 
+    public function lessThanTwoPlayersHaveAnswered() {
+        $round = $this->getCurrentRound();
+
+        if(!$round) {
+            return false;
+        }
+
+        $answers = $round->getAnswers();
+
+        $numAnswers = count($answers);
+
+        return $numAnswers < 2;
+    }
+
     public function everyPlayerHasAnswered() {
         $round = $this->getCurrentRound();
 
