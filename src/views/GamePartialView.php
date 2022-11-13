@@ -160,18 +160,17 @@ class GamePartialView implements View {
         $gameId = $this->game->getId();
         $isJudge = $this->game->isJudge($this->playerId);
 
-        echo "<div id=\"play-area\">";
+        echo '<div id="play-area">';
 
         if($this->playerId === null && $this->game->getNumberOfPlayers() < Game::MAX_PLAYERS) {
-            echo "<button onclick=\"showModal('join-game');\">Join Game</button>";
+            echo '<button onclick="showModal(\'join-game\');">Join Game</button>';
         }
         else if($state === Game::WAITING_FOR_PLAYERS) {
             if($this->game->getNumberOfPlayers() >= Game::MIN_PLAYERS &&
                 $this->game->isCreator($this->playerId)) {
-                echo "<form action=\"game/start\">";
-                echo "<input type=\"hidden\" name=\"gameId\" value=\"$gameId\">";
-                echo "<button type=\"submit\">Start Game</button>";
-                echo "</form>";
+                echo '<form action="' . $gameId . '/start" method="post">';
+                echo '<button type="submit">Start Game</button>';
+                echo '</form>';
             }
         } else if($state === Game::ASKING_QUESTION) {
             if($isJudge) {
@@ -179,17 +178,16 @@ class GamePartialView implements View {
 
                 $questions = $card->getQuestions();
 
-                echo "<form action=\"game/ask\">";
-                echo "<input type=\"hidden\" name=\"gameId\" value=\"$gameId\">";
-                echo "<div data-dont-refresh=\"true\" id=\"questions\">";
+                echo '<form action="' . $gameId . '/ask" method="post">';
+                echo '<div data-dont-refresh="true" id="questions">';
 
                 foreach($questions as $question) {
-                    echo "<label><input name=\"questionId\" type=\"radio\" value=\"{$question->getId()}\"><div class=\"question\">{$question->getQuestion()}</div></label>";
+                    echo '<label><input name="questionId" type="radio" value="' . $question->getId() . '"><div class="question">' . $question->getQuestion(). '</div></label>';
                 }
 
-                echo "</div>";
-                echo "<button type=\"submit\">Ask</button>";
-                echo "</form>";
+                echo '</div>';
+                echo '<button type="submit">Ask</button>';
+                echo '</form>';
             }
         } else if($state === Game::ANSWERING_QUESTION) {
             if(!$isJudge) {
@@ -197,18 +195,17 @@ class GamePartialView implements View {
 
                 $disabled = ($answer) ? "disabled" : "";
 
-                echo "<form data-dont-refresh=\"true\" id=\"answer-question\" action=\"game/answer\">";
-                echo "<input type=\"hidden\" name=\"gameId\" value=\"$gameId\">";
-                echo "<textarea $disabled id=\"answer\" name=\"answer\">$answer</textarea>";
+                echo '<form data-dont-refresh="true" id="answer-question" action="' . $gameId . '/answer">';
+                echo '<textarea ' . $disabled . ' id="answer" name="answer">' . $answer . '</textarea>';
                 
                 if($answer) {
-                    echo "<button onclick=\"$(this).hide(); $(this).next().show(); $('#answer').prop('disabled', false);\" type=\"button\">Edit</button>";
-                    echo "<button style=\"display: none;\" type=\"submit\">Answer</button>";
+                    echo '<button onclick="$(this).hide(); $(this).next().show(); $(\'#answer\').prop(\'disabled\', false);" type="button">Edit</button>';
+                    echo '<button style="display: none;" type="submit">Answer</button>';
                 } else {
-                    echo "<button type=\"submit\">Answer</button>";
+                    echo '<button type="submit">Answer</button>';
                 }
 
-                echo "</form>";
+                echo '</form>';
             }
         } else if($state === Game::VOTING) {
             $answers = $this->game->getCurrentRound()->getAnswers();
@@ -222,7 +219,7 @@ class GamePartialView implements View {
                     echo 'class="disabled" ';
                 }
 
-                echo 'data-dont-refresh="true" id="vote" action="game/chooseAnswer">';
+                echo 'data-dont-refresh="true" id="vote" action="' . $gameId .'/chooseAnswer">';
                 echo '<input type="hidden" name="gameId" value="' . $gameId . '">';
 
                 echo '<div id="answers">';
@@ -275,7 +272,7 @@ class GamePartialView implements View {
                     echo 'class="disabled" ';
                 }
 
-                echo 'data-dont-refresh="true" id="vote" action="game/vote">';
+                echo 'data-dont-refresh="true" id="vote" action="' . $gameId . '/vote">';
                 echo '<input type="hidden" name="gameId" value="' . $gameId . '">';
 
                 echo '<div id="answers">';
@@ -329,9 +326,7 @@ class GamePartialView implements View {
         } else if($state === Game::RESULTS) {
             if($this->game->isCreator($this->playerId)) {
                 if($this->game->secondsSinceLastUpdate() >= 30) {
-                    echo '<form action="game/newRound">';
-                    echo '<input type="hidden" name="gameId" value="' . $gameId . '">';
-                    echo '<input type="hidden" name="playerId" value="' . $this->playerId . '">';
+                    echo '<form action="' . $gameId . '/nextRound" method="post">';
                     echo '<button type="submit">Next Round</button>';
                     echo '</form>';
                 }
@@ -347,8 +342,7 @@ class GamePartialView implements View {
         echo <<<EOD
 <div data-dont-refresh="true" id="join-game" class="modal-overlay">
     <div class="modal">
-        <form action="game/join" method="get">
-            <input type="hidden" name="gameId" value="$gameId">
+        <form action="$gameId/join" method="post">
             <h2>Join Game</h2>
             <input id="player-name" name="playerName" placeholder="Your Name" type="text">
             <h2>Your Token</h2>

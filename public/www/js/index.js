@@ -24,7 +24,7 @@ $(function() {
         const $focus = $(":focus");
         const focusId = ($focus.length > 0) ? $focus.attr("id") : null;
 
-        await new Promise(resolve => $('main').load(`game?gameId=${GAME_ID}`, () => resolve()));
+        await new Promise(resolve => $('main').load(`${GAME_ID}/view`, () => resolve()));
 
         if(!forceRefresh) {
             // Restore all the elements that aren't supposed to be refreshed

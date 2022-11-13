@@ -9,23 +9,65 @@ class Router {
             "action" => "lobby"
         ],
         [
+            "method" => "POST",
+            "pattern" => "/",
+            "controller" => "Controllers\\DefaultController",
+            "action" => "create"
+        ],
+        [
             "method" => "GET",
             "pattern" => "/{gameId}",
             "controller" => "Controllers\\DefaultController",
             "action" => "game"
         ],
         [
-            "method" => "POST",
-            "pattern" => "/{gameId}/{gameName}/{playerName}/{playerToken}",
+            "method" => "GET",
+            "pattern" => "/{gameId}/view",
             "controller" => "Controllers\\DefaultController",
-            "action" => "create"
+            "action" => "view"
+        ],
+        [
+            "method" => "POST",
+            "pattern" => "/{gameId}/join",
+            "controller" => "Controllers\\DefaultController",
+            "action" => "join"
+        ],
+        [
+            "method" => "POST",
+            "pattern" => "/{gameId}/start",
+            "controller" => "Controllers\\DefaultController",
+            "action" => "start"
         ],
         [
             "method" => "POST",
             "pattern" => "/{gameId}/ask",
             "controller" => "Controllers\\DefaultController",
             "action" => "ask"
-        ]
+        ],
+        [
+            "method" => "POST",
+            "pattern" => "/{gameId}/nextRound",
+            "controller" => "Controllers\\DefaultController",
+            "action" => "nextRound"
+        ],
+        [
+            "method" => "POST",
+            "pattern" => "/{gameId}/answer",
+            "controller" => "Controllers\\DefaultController",
+            "action" => "answer"
+        ],
+        [
+            "method" => "POST",
+            "pattern" => "/{gameId}/vote",
+            "controller" => "Controllers\\DefaultController",
+            "action" => "vote"
+        ],
+        [
+            "method" => "POST",
+            "pattern" => "/{gameId}/chooseAnswer",
+            "controller" => "Controllers\\DefaultController",
+            "action" => "chooseAnswer"
+        ],
     ];
 
     public function __construct(App $app) {
@@ -108,5 +150,7 @@ class Router {
 
             return;
         }
+
+        throw new Exception("No routes found!");
     }
 }
