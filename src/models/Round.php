@@ -138,7 +138,7 @@ class Round {
         $playerVotes = [];
 
         foreach($this->votes as $vote) {
-            if($vote->getPlayerId() === $playerId) {
+            if($vote->getPlayerId() == $playerId) {
                 $playerVotes[] = $vote;
             }
         }

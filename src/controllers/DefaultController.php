@@ -193,6 +193,10 @@ class DefaultController extends Controller {
 
         $game = $this->gameService->vote($gameId, $playerId, $vote1,
             $vote2);
+
+        $this->jsonResponse([
+                "forceRefresh" => false
+            ]);
     }
 
     public function chooseAnswer($gameId) {

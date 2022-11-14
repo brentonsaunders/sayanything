@@ -12,7 +12,7 @@ class GamePartialView implements View {
         $this->playerId = $playerId;
 
         $game->setState(Game::VOTING);
-        $this->playerId = 59;
+        $this->playerId = 58;
     }
 
     private function gameNameRound() {
@@ -217,66 +217,35 @@ class GamePartialView implements View {
             $answers = $this->game->getCurrentRound()->getAnswers();
 
             if($isJudge) {
-                $chosenAnswerId = $this->game->getCurrentRound()->getChosenAnswerId();
-
-                echo '<form disabled="true" ';
-
-                if($chosenAnswerId !== null) {
-                    echo 'class="disabled" ';
-                }
-
-                echo 'data-dont-refresh="true" id="vote" action="' . $gameId .'/chooseAnswer">';
-                echo '<input type="hidden" name="gameId" value="' . $gameId . '">';
-
-                echo '<div id="answers">';
-                echo '<div class="answer instructions">Tap the numbered buttons below to view answers, and tap the bubbles above to pick your favorite answer.</div>';
-
-                $count = 1;
-
-                foreach($answers as $answer) {
-                    echo '<div class="answer answer' . $count . '">' . $answer->getAnswer() . '</div>';
                 
-                    ++$count;
-                }
-
-                echo "</div>";
-
-                echo '<div id="answer-picker">';
-
-                $count = 1;
-
-                $player = $this->game->getPlayer($this->playerId);
-                $token = $player->getToken();
-
-                foreach($answers as $answer) {
-                    echo '<div class="col">';
-                    echo '<label class="vote"><input ';
-
-                    if($answer->getId() === $chosenAnswerId) {
-                        echo 'checked ';
-                    }
-
-                    echo 'name="answerId" type="radio" value="' . $answer->getId() . '"><div class="token ' . $token . '"></div></label>';
-
-                    echo '<label class="answer-number"><input name="answer" type="radio" value="answer' . $count . '"><div>' . $count. '</div></label>';
-                    echo '</div>';
-
-                    ++$count;
-                }
-
-                echo '</div>';
-
-                echo '<button class="edit" type="button" onclick="$(\'#vote\').removeClass(\'disabled\');">Edit</button>';
-                echo '<button type="submit">Choose</button>';
-                echo '</form>';
             } else {
                 $votes = $this->game->getCurrentRound()->getPlayerVotes($this->playerId);
 
                 echo '<div class="middle">';
-                echo '<form data-dont-refresh="true" id="vote" action="' . $gameId . '/vote" method="post">';
+                echo '<form onchange="if($(this).find(\'input[type=radio]:checked\').length === 2) { $(this).submit(); }" data-dont-refresh="true" id="vote" action="' . $gameId . '/vote" method="post">';
                 echo '<div id="answers">';
 
-                
+                foreach($answers as $answer) {
+                    echo '<div class="answer">';
+                    echo '<div class="votes">';
+                    echo "<label><input ";
+
+                    if($votes && $votes[0]->getAnswerId() === $answer->getId()) {
+                        echo "checked ";
+                    }
+
+                    echo 'name="vote1" type="radio" value="' . $answer->getId() . '"><div class="token guitar"></div></label>';
+                    echo "<label><input ";
+
+                    if($votes && $votes[1]->getAnswerId() === $answer->getId()) {
+                        echo "checked ";
+                    }
+                    
+                    echo 'name="vote2" type="radio" value="' . $answer->getId() . '"><div class="token guitar"></div></label>';
+                    echo "</div>";
+                    echo '<div class="answer-text">' . $answer->getAnswer() . '</div>';
+                    echo "</div>";
+                }
 
                 echo "</div>";
                 echo "</form>";

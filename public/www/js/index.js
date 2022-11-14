@@ -73,7 +73,10 @@ $(function() {
             success: function(data) {
                 if(data.redirect) {
                     window.location = data.redirect;
+                    return;
+                }
 
+                if("forceRefresh" in data  && !data.forceRefresh) {
                     return;
                 }
 

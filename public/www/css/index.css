@@ -81,7 +81,8 @@ header .center {
 
 main {
     padding: 20px;
-    height: 100%;
+    flex: 1;
+    overflow: hidden;
 }
 
 #game {
@@ -410,6 +411,51 @@ button:disabled {
     visibility: hidden;
 }
 
+#answers .answer {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    border: 2px solid black;
+    padding: 15px;
+    margin-bottom: 40px;
+}
+
+#answers .votes {
+    display: flex;
+    gap: 10px;
+    padding-bottom: 15px;
+}
+
+#answers .votes label {
+    display: block;
+    width: 40px;
+    height: 40px;
+    background-color: rgb(192, 192, 192);
+    border-radius: 40px;
+}
+
+#answers .votes .token {
+    display: none;
+}
+
+#answers .votes input[type=radio] {
+    display: none;
+}
+
+#answers .votes input[type=radio]:checked + .token {
+    display: flex;
+}
+
+#answers .votes .token {
+    margin-bottom: 0;
+}
+
+#answers .answer-text {
+    border: 2px solid black;
+    height: 150px;
+    padding: 15px;
+}
+
 #my-games {
 }
 
@@ -487,6 +533,7 @@ button:disabled {
 #game {
     display: flex;
     flex-direction: column;
+    max-height: 100%;
 }
 
 #game > .top {
@@ -494,7 +541,15 @@ button:disabled {
 
 #game > .middle {
     flex: 1;
+    overflow: auto;
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+
+#game > .middle::-webkit-scrollbar {
+    display: none;
 }
 
 #game > .bottom {
 }
+
