@@ -146,7 +146,7 @@ class GamePartialView implements View {
             if($this->game->isJudge($this->playerId)) {
                 $gameState = "What's your favorite answer to ...<br>$question";
             } else {
-                $gameState = "Vote on the best answer to ...<br>$question";
+                $gameState = "Which answer do you think " . $judge->getName() . " picked for  ...<br>$question";
             }
         } else if($state === Game::RESULTS) {
             $gameState = "Waiting for the next round to begin ...";
