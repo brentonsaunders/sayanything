@@ -553,3 +553,126 @@ button:disabled {
 #game > .bottom {
 }
 
+#select-o-matic {
+    position: relative;
+    width: 250px;
+    height: 250px;
+    margin: 20px auto;
+    padding: 20px;
+    background-color: rgb(50, 50, 50);
+    border-radius: 250px;
+}
+
+#select-o-matic .arrow {
+    position: absolute;
+    left: 95px;
+    top: 105px;
+    display: block;
+    width: 60px;
+    height: 125px;
+    background-image: url("../img/arrow.png");
+    background-size: 60px 125px;
+    background-color: transparent;
+    transform-origin: 30px 20px;
+}
+
+#select-o-matic .space {
+    position: absolute;
+    left: 95px;
+    bottom: 15px;
+    transform-origin: 30px -30px;
+    width: 60px;
+    height: 80px;
+    -webkit-mask-image: url("../img/teardrop.png");
+    -webkit-mask-size: 60px 80px;
+    -webkit-mask-repeat: no-repeat;
+    background-size: 30px 30px;
+    background-repeat: no-repeat;
+    background-position: center bottom 5px;
+}
+
+#select-o-matic .space::after {
+    display: block;
+    content: "";
+    width: 60px;
+    height: 80px;
+}
+
+#select-o-matic input[type=radio] {
+    display: none;
+}
+
+#select-o-matic input[type=radio][value=clapperboard]:checked ~ .arrow {
+    transform: rotate(0deg);
+}
+
+#select-o-matic .space.football,
+#select-o-matic input[type=radio][value=football]:checked ~ .arrow {
+    transform: rotate(45deg);
+}
+
+#select-o-matic .space.guitar,
+#select-o-matic input[type=radio][value=guitar]:checked ~ .arrow {
+    transform: rotate(90deg);
+}
+
+#select-o-matic .space.computer,
+#select-o-matic input[type=radio][value=computer]:checked ~ .arrow {
+    transform: rotate(135deg);
+}
+
+#select-o-matic .space.martini-glass,
+#select-o-matic input[type=radio][value=martini-glass]:checked ~ .arrow {
+    transform: rotate(180deg);
+}
+
+#select-o-matic .space.dollar-sign,
+#select-o-matic input[type=radio][value=dollar-sign]:checked ~ .arrow {
+    transform: rotate(225deg);
+}
+
+#select-o-matic .space.car,
+#select-o-matic input[type=radio][value=car]:checked ~ .arrow {
+    transform: rotate(270deg);
+}
+
+#select-o-matic .space.high-heels,
+#select-o-matic input[type=radio][value=high-heels]:checked ~ .arrow {
+    transform: rotate(315deg);
+}
+
+#select-o-matic .space.inactive {
+    filter: brightness(25%);
+}
+
+#select-o-matic .space.martini-glass {
+    background-image: url("../img/martini-glass.png");
+}
+
+#select-o-matic .space.dollar-sign {
+    background-image: url("../img/dollar-sign.png");
+}
+
+#select-o-matic .space.high-heels {
+    background-image: url("../img/high-heels.png");
+}
+
+#select-o-matic .space.computer {
+    background-image: url("../img/computer.png");
+}
+
+#select-o-matic .space.car {
+    background-image: url("../img/car.png");
+}
+
+#select-o-matic .space.football {
+    background-image: url("../img/football.png");
+}
+
+#select-o-matic .space.guitar {
+    background-image: url("../img/guitar.png");
+}
+
+#select-o-matic .space.clapperboard {
+    background-image: url("../img/clapperboard.png");
+}

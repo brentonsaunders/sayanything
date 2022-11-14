@@ -12,7 +12,7 @@ class GamePartialView implements View {
         $this->playerId = $playerId;
 
         $game->setState(Game::VOTING);
-        $this->playerId = 58;
+        $this->playerId = 60;
     }
 
     private function gameNameRound() {
@@ -217,7 +217,21 @@ class GamePartialView implements View {
             $answers = $this->game->getCurrentRound()->getAnswers();
 
             if($isJudge) {
-                
+                echo '<div class="middle">';
+                echo '<div id="select-o-matic">';
+                echo '<input name="player" id="clapperboard" type="radio" value="clapperboard"><label for="clapperboard" class="space clapperboard inactive"></label>';
+                echo '<input name="player" id="football" type="radio" value="football"><label for="football" class="space football"></label>';
+                echo '<input name="player" id="guitar" type="radio" value="guitar"><label for="guitar" class="space guitar"></label>';
+                echo '<input name="player" id="computer" type="radio" value="computer"><label for="computer" class="space computer"></label>';
+                echo '<input name="player" id="martini-glass" type="radio" value="martini-glass"><label for="martini-glass" class="space martini-glass"></label>';
+                echo '<input name="player" id="dollar-sign" type="radio" value="dollar-sign"><label for="dollar-sign" class="space dollar-sign"></label>';
+                echo '<input name="player" id="car" type="radio" value="car"><label for="car" class="space car"></label>';
+                echo '<input name="player" id="high-heels" type="radio" value="high-heels"><label for="high-heels" class="space high-heels"></label>';
+                echo '<div class="arrow car"></div>';
+                echo "</div>";
+                echo "</div>";
+                echo '<div class="bottom">';
+                echo "</div>";
             } else {
                 $votes = $this->game->getCurrentRound()->getPlayerVotes($this->playerId);
 
