@@ -18,7 +18,29 @@ class DefaultController extends Controller {
     }
 
     public function lobby() {
-        $view = new LobbyView($_SESSION["games"]);
+        $games = [];
+
+        try {
+            foreach($_SESSION["games"] as $gameId => $playerId) {
+                $game = $this->gameService->getGame($gameId);
+
+                $player = $game->getPlayer($playerId);
+
+                $round = $game->getRoundNumber();
+
+                $games[] = [
+                    "gameId" => $gameId,
+                    "gameName" => $game->getName(),
+                    "playerName" => $player->getName(),
+                    "playerToken" => $player->getToken(),
+                    "round" => $round
+                ];
+            }
+        } catch(GameServiceException $e) {
+            $this->badRequest();
+        }
+
+        $view = new LobbyView($games);
 
         $view->render();
     }
@@ -70,7 +92,7 @@ class DefaultController extends Controller {
 
         $_SESSION["games"][$game->getId()] = $game->getCreatorId();
 
-        $this->redirect($game->getId());
+        $this->redirect("./" . $game->getId());
     }
 
     public function join($gameId) {

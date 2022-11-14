@@ -4,17 +4,50 @@ namespace Views;
 use Models\Player;
 
 class LobbyView extends MainView {
+    private $games = [];
+
     public function __construct($games) {
+        $this->games = $games;
     }
 
     protected function main() {
         echo '<div id="game">';
+
+        $this->myGames();
+
         echo '<div id="play-area">';
         echo '<button onclick="showModal(\'create-game\');">Create Game</button>';
         echo '</div>';
         echo '</div>';
 
         $this->createGameModal();
+    }
+
+    private function myGames() {
+        echo '<div id="my-games">';
+        echo "<h2>My Games</h2>";
+
+        if(count($this->games) === 0) {
+            echo "<p>No games yet</p>";
+        } else {
+            foreach($this->games as $game) {
+                echo '<a class="' . $game["playerToken"] . '" href="' . $game["gameId"] . '">';
+                echo '<div class="left"><div class="token ' . $game["playerToken"] . '"></div></div>';
+                echo '<div class="center"><div class="game-name">' . $game["gameName"] . '</div><div class="round">';
+
+                if($game["round"]) {
+                    echo $game["round"] . "/11";
+                } else {
+                    echo "Waiting for players";
+                }
+
+                echo '</div></div>';
+                echo '<div class="right"><div class="arrow"></div></div>';
+                echo "</a>";
+            }
+        }
+
+        echo "</div>";
     }
 
     private function createGameModal() {
