@@ -24,7 +24,7 @@ class GameService {
 
     public function getGame($gameId) {
         try {
-            $this->updateGame($gameId);
+            // $this->updateGame($gameId);
         } catch(GameServiceException $e) {
             throw $e;
         }
@@ -299,8 +299,7 @@ class GameService {
                 $game->setState(Game::ANSWERING_QUESTION);
             }
         } else if($state === Game::ANSWERING_QUESTION) {
-            if($game->everyPlayerHasAnswered() ||
-               $game->secondsSinceLastUpdate() >= Game::SECONDS_TO_ANSWER_QUESTION) {
+            if($game->secondsSinceLastUpdate() >= Game::SECONDS_TO_ANSWER_QUESTION) {
                 if($game->lessThanTwoPlayersHaveAnswered()) {
                     $game->setState(Game::RESULTS);
                 } else {
@@ -308,9 +307,7 @@ class GameService {
                 }
             }
         } else if($state === Game::VOTING) {
-            if(($game->everyPlayerHasVoted() &&
-               $game->judgeHasChosenAnswer()) ||
-               $game->secondsSinceLastUpdate() >= Game::SECONDS_TO_VOTE) {
+            if($game->secondsSinceLastUpdate() >= Game::SECONDS_TO_VOTE) {
                 $game->setState(Game::RESULTS);
             }
         } else if($state === Game::RESULTS) {

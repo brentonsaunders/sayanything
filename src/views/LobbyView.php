@@ -12,11 +12,15 @@ class LobbyView extends MainView {
 
     protected function main() {
         echo '<div id="game">';
+        echo '<div class="top">';
 
         $this->myGames();
 
-        echo '<div id="play-area">';
-        echo '<button onclick="showModal(\'create-game\');">Create Game</button>';
+        echo '</div>';
+        echo '<div class="middle">';
+        echo '</div>';
+        echo '<div class="bottom">';
+        echo '<button class="button" onclick="showModal(\'create-game\');">Create Game</button>';
         echo '</div>';
         echo '</div>';
 

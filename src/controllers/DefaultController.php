@@ -86,13 +86,13 @@ class DefaultController extends Controller {
         $playerName = $post["playerName"];
         $playerToken = $post["playerToken"];
 
-        echo "$gameName<br>$playerName<br>$playerToken<br>";
-
         $game = $this->gameService->createGame($gameName, $playerName, $playerToken);
 
         $_SESSION["games"][$game->getId()] = $game->getCreatorId();
 
-        $this->redirect("./" . $game->getId());
+        $this->jsonResponse([
+            "redirect" => "./" . $game->getId()
+        ]);
     }
 
     public function join($gameId) {
