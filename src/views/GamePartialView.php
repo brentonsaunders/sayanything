@@ -2,6 +2,7 @@
 namespace Views;
 
 use Models\Game;
+use Models\Player;
 
 class GamePartialView implements View {
     private Game $game;
@@ -208,7 +209,7 @@ class GamePartialView implements View {
                 echo '<div class="middle"></div>';
                 echo '<div class="bottom">';
                 echo '<form data-dont-refresh="true" action="' . $gameId . '/answer" method="post">';
-                echo '<textarea oninput="$(this).next(\'button\').prop(\'disabled\', $(this).val().length === 0);" ' . $readonly . ' id="answer" name="answer" onclick="$(this).removeAttr(\'readonly\');">' . $answer . '</textarea>';
+                echo '<textarea oninput="$(this).next(\'button\').prop(\'disabled\', $(this).val().length === 0);" ' . $readonly . ' id="answer" name="answer" onclick="$(this).removeAttr(\'readonly\');">' . $answer->getAnswer() . '</textarea>';
                 echo '<button ' . $disabled . ' type="submit">Answer</button>';
                 echo "</form>";
                 echo '</div>';
@@ -217,18 +218,50 @@ class GamePartialView implements View {
             $answers = $this->game->getCurrentRound()->getAnswers();
 
             if($isJudge) {
+                $tokens = Player::getTokens();
+
                 echo '<div class="middle">';
+
+                echo '<form onchange="$(this).submit();" data-dont-refresh="true" id="choose-answer" action="' . $gameId . '/chooseAnswer" method="post">';
+                
                 echo '<div id="select-o-matic">';
-                echo '<input name="player" id="clapperboard" type="radio" value="clapperboard"><label for="clapperboard" class="space clapperboard inactive"></label>';
-                echo '<input name="player" id="football" type="radio" value="football"><label for="football" class="space football"></label>';
-                echo '<input name="player" id="guitar" type="radio" value="guitar"><label for="guitar" class="space guitar"></label>';
-                echo '<input name="player" id="computer" type="radio" value="computer"><label for="computer" class="space computer"></label>';
-                echo '<input name="player" id="martini-glass" type="radio" value="martini-glass"><label for="martini-glass" class="space martini-glass"></label>';
-                echo '<input name="player" id="dollar-sign" type="radio" value="dollar-sign"><label for="dollar-sign" class="space dollar-sign"></label>';
-                echo '<input name="player" id="car" type="radio" value="car"><label for="car" class="space car"></label>';
-                echo '<input name="player" id="high-heels" type="radio" value="high-heels"><label for="high-heels" class="space high-heels"></label>';
+
+                $game = $this->game;
+
+                foreach($tokens as $token) {
+                    $disabled = "";
+                    $answer = null;
+
+                    $player = $this->game->getPlayerByToken($token);
+
+                    if(!$player) {
+                        $disabled = "disabled";
+                    } else {
+                        $answer = $this->game->getCurrentRound()->getPlayerAnswer($player->getId());
+
+                        if(!$answer) {
+                            $disabled = "disabled";
+                        }
+                    }
+
+                    echo '<input ' . $disabled . ' onclick="$(\'#select-o-matic\').attr(\'class\', \'' . $token . '\');" name="answerId" id="' . $token . '" type="radio" value="' . (($answer == null) ? "" : $answer->getId()) . '"><label for="' . $token . '" class="space ' . $token . '"></label>';
+                }
+
                 echo '<div class="arrow car"></div>';
                 echo "</div>";
+
+                echo '<div class="choosing-answer" id="answers">';
+
+                foreach($answers as $answer) {
+                    $token = $this->game->getPlayer($answer->getPlayerId())->getToken();
+
+                    echo '<div class="answer ' . $token. '">';
+                    echo '<div class="answer-text">' . $answer->getAnswer() . '</div>';
+                    echo "</div>";
+                }
+
+                echo "</div>";
+                echo '</form>';
                 echo "</div>";
                 echo '<div class="bottom">';
                 echo "</div>";
@@ -237,10 +270,10 @@ class GamePartialView implements View {
 
                 echo '<div class="middle">';
                 echo '<form onchange="if($(this).find(\'input[type=radio]:checked\').length === 2) { $(this).submit(); }" data-dont-refresh="true" id="vote" action="' . $gameId . '/vote" method="post">';
-                echo '<div id="answers">';
+                echo '<div class="voting" id="answers">';
 
                 foreach($answers as $answer) {
-                    echo '<div class="answer">';
+                    echo '<div class="answer voting">';
                     echo '<div class="votes">';
                     echo "<label><input ";
 

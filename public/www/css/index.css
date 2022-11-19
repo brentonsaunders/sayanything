@@ -415,22 +415,30 @@ button:disabled {
     display: flex;
     flex-direction: column;
     width: 100%;
-    border: 2px solid black;
-    padding: 15px;
+    padding: 10px;
     margin-bottom: 40px;
+    border-radius: 10px;
+}
+
+#answers.voting .answer {
+    background-color: rgb(200, 200, 200);
+}
+
+#answers.choosing-answer .answer {
+    padding: 50px 10px;
 }
 
 #answers .votes {
     display: flex;
     gap: 10px;
-    padding-bottom: 15px;
+    padding-bottom: 10px;
 }
 
 #answers .votes label {
     display: block;
     width: 40px;
     height: 40px;
-    background-color: rgb(192, 192, 192);
+    background-color: rgb(140, 140, 140);
     border-radius: 40px;
 }
 
@@ -451,9 +459,11 @@ button:disabled {
 }
 
 #answers .answer-text {
-    border: 2px solid black;
-    height: 150px;
+    height: 175px;
     padding: 15px;
+    background-color: white;
+    border-radius: 10px;
+    border: 4px solid black;
 }
 
 #my-games {
@@ -557,7 +567,7 @@ button:disabled {
     position: relative;
     width: 250px;
     height: 250px;
-    margin: 20px auto;
+    margin: 20px auto 60px;
     padding: 20px;
     background-color: rgb(50, 50, 50);
     border-radius: 250px;
@@ -567,7 +577,7 @@ button:disabled {
     position: absolute;
     left: 95px;
     top: 105px;
-    display: block;
+    display: none;
     width: 60px;
     height: 125px;
     background-image: url("../img/arrow.png");
@@ -602,46 +612,50 @@ button:disabled {
     display: none;
 }
 
-#select-o-matic input[type=radio][value=clapperboard]:checked ~ .arrow {
+#select-o-matic input[type=radio]:checked ~ .arrow {
+    display: block;
+}
+
+#select-o-matic input[type=radio]#clapperboard:checked ~ .arrow {
     transform: rotate(0deg);
 }
 
 #select-o-matic .space.football,
-#select-o-matic input[type=radio][value=football]:checked ~ .arrow {
+#select-o-matic input[type=radio]#football:checked ~ .arrow {
     transform: rotate(45deg);
 }
 
 #select-o-matic .space.guitar,
-#select-o-matic input[type=radio][value=guitar]:checked ~ .arrow {
+#select-o-matic input[type=radio]#guitar:checked ~ .arrow {
     transform: rotate(90deg);
 }
 
 #select-o-matic .space.computer,
-#select-o-matic input[type=radio][value=computer]:checked ~ .arrow {
+#select-o-matic input[type=radio]#computer:checked ~ .arrow {
     transform: rotate(135deg);
 }
 
 #select-o-matic .space.martini-glass,
-#select-o-matic input[type=radio][value=martini-glass]:checked ~ .arrow {
+#select-o-matic input[type=radio]#martini-glass:checked ~ .arrow {
     transform: rotate(180deg);
 }
 
 #select-o-matic .space.dollar-sign,
-#select-o-matic input[type=radio][value=dollar-sign]:checked ~ .arrow {
+#select-o-matic input[type=radio]#dollar-sign:checked ~ .arrow {
     transform: rotate(225deg);
 }
 
 #select-o-matic .space.car,
-#select-o-matic input[type=radio][value=car]:checked ~ .arrow {
+#select-o-matic input[type=radio]#car:checked ~ .arrow {
     transform: rotate(270deg);
 }
 
 #select-o-matic .space.high-heels,
-#select-o-matic input[type=radio][value=high-heels]:checked ~ .arrow {
+#select-o-matic input[type=radio]#high-heels:checked ~ .arrow {
     transform: rotate(315deg);
 }
 
-#select-o-matic .space.inactive {
+#select-o-matic input[type=radio]:disabled + label {
     filter: brightness(25%);
 }
 
@@ -675,4 +689,36 @@ button:disabled {
 
 #select-o-matic .space.clapperboard {
     background-image: url("../img/clapperboard.png");
+}
+
+#select-o-matic.guitar + #answers .answer.guitar {
+    border: 10px solid rgb(0, 255, 0);
+}
+
+#select-o-matic.clapperboard + #answers .answer.clapperboard {
+    border: 10px solid rgb(0, 255, 0);
+}
+
+#select-o-matic.high-heels + #answers .answer.high-heels {
+    border: 10px solid rgb(0, 255, 0);
+}
+
+#select-o-matic.computer + #answers .answer.computer {
+    border: 10px solid rgb(0, 255, 0);
+}
+
+#select-o-matic.car + #answers .answer.car {
+    border: 10px solid rgb(0, 255, 0);
+}
+
+#select-o-matic.dollar-sign + #answers .answer.dollar-sign {
+    border: 10px solid rgb(0, 255, 0);
+}
+
+#select-o-matic.football + #answers .answer.football {
+    border: 10px solid rgb(0, 255, 0);
+}
+
+#select-o-matic.martini-glass + #answers .answer.martini-glass {
+    border: 10px solid rgb(0, 255, 0);
 }

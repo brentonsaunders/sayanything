@@ -123,7 +123,7 @@ class Round {
 
         foreach($this->answers as $answer) {
             if($answer->getPlayerId() == $playerId) {
-                return $answer->getAnswer();
+                return $answer;
             }
         }
 
