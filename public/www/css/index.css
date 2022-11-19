@@ -571,6 +571,47 @@ button:disabled {
     padding: 20px;
     background-color: rgb(50, 50, 50);
     border-radius: 250px;
+    
+}
+
+@keyframes spin-to-guitar {
+    0% { transform: rotate(0deg);}
+    100% { transform: rotate(810deg); }
+}
+
+@keyframes spin-to-computer {
+    0% { transform: rotate(0deg);}
+    100% { transform: rotate(855deg); }
+}
+
+@keyframes spin-to-martini-glass {
+    0% { transform: rotate(0deg);}
+    100% { transform: rotate(900deg); }
+}
+
+@keyframes spin-to-dollar-sign {
+    0% { transform: rotate(0deg);}
+    100% { transform: rotate(945deg); }
+}
+
+@keyframes spin-to-car {
+    0% { transform: rotate(0deg);}
+    100% { transform: rotate(990deg); }
+}
+
+@keyframes spin-to-high-heels {
+    0% { transform: rotate(0deg);}
+    100% { transform: rotate(1035deg); }
+}
+
+@keyframes spin-to-clapperboard {
+    0% { transform: rotate(0deg);}
+    100% { transform: rotate(1080deg); }
+}
+
+@keyframes spin-to-football {
+    0% { transform: rotate(0deg);}
+    100% { transform: rotate(1125deg); }
 }
 
 #select-o-matic .arrow {
@@ -584,6 +625,48 @@ button:disabled {
     background-size: 60px 125px;
     background-color: transparent;
     transform-origin: 30px 20px;
+    animation-duration: 2s;
+    animation-fill-mode: forwards;
+}
+
+#select-o-matic.guitar .arrow {
+    animation-name: spin-to-guitar;
+    display: block;
+}
+
+#select-o-matic.computer .arrow {
+    animation-name: spin-to-computer;
+    display: block;
+}
+
+#select-o-matic.martini-glass .arrow {
+    animation-name: spin-to-martini-glass;
+    display: block;
+}
+
+#select-o-matic.dollar-sign .arrow {
+    animation-name: spin-to-dollar-sign;
+    display: block;
+}
+
+#select-o-matic.car .arrow {
+    animation-name: spin-to-car;
+    display: block;
+}
+
+#select-o-matic.high-heels .arrow {
+    animation-name: spin-to-high-heels;
+    display: block;
+}
+
+#select-o-matic.clapperboard .arrow {
+    animation-name: spin-to-clapperboard;
+    display: block;
+}
+
+#select-o-matic.football .arrow {
+    animation-name: spin-to-football;
+    display: block;
 }
 
 #select-o-matic .space {
@@ -614,6 +697,7 @@ button:disabled {
 
 #select-o-matic input[type=radio]:checked ~ .arrow {
     display: block;
+    animation: none;
 }
 
 #select-o-matic input[type=radio]#clapperboard:checked ~ .arrow {
