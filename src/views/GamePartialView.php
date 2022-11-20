@@ -12,7 +12,7 @@ class GamePartialView implements View {
         $this->game = $game;
         $this->playerId = $playerId;
 
-        $game->setState(Game::VOTING);
+        $game->setState(Game::RESULTS);
         $this->playerId = 60;
     }
 
@@ -218,53 +218,7 @@ class GamePartialView implements View {
             $answers = $this->game->getCurrentRound()->getAnswers();
 
             if($isJudge) {
-                $tokens = Player::getTokens();
-
-                echo '<div class="middle">';
-
-                echo '<form onchange="$(this).submit();" data-dont-refresh="true" id="choose-answer" action="' . $gameId . '/chooseAnswer" method="post">';
-                
-                echo '<div id="select-o-matic">';
-
-                $game = $this->game;
-
-                foreach($tokens as $token) {
-                    $disabled = "";
-                    $answer = null;
-
-                    $player = $this->game->getPlayerByToken($token);
-
-                    if(!$player) {
-                        $disabled = "disabled";
-                    } else {
-                        $answer = $this->game->getCurrentRound()->getPlayerAnswer($player->getId());
-
-                        if(!$answer) {
-                            $disabled = "disabled";
-                        }
-                    }
-
-                    echo '<input ' . $disabled . ' onclick="$(\'#select-o-matic\').attr(\'class\', \'' . $token . '\');" name="answerId" id="' . $token . '" type="radio" value="' . (($answer == null) ? "" : $answer->getId()) . '"><label for="' . $token . '" class="space ' . $token . '"></label>';
-                }
-
-                echo '<div class="arrow car"></div>';
-                echo "</div>";
-
-                echo '<div class="choosing-answer" id="answers">';
-
-                foreach($answers as $answer) {
-                    $token = $this->game->getPlayer($answer->getPlayerId())->getToken();
-
-                    echo '<div class="answer ' . $token. '">';
-                    echo '<div class="answer-text">' . $answer->getAnswer() . '</div>';
-                    echo "</div>";
-                }
-
-                echo "</div>";
-                echo '</form>';
-                echo "</div>";
-                echo '<div class="bottom">';
-                echo "</div>";
+                $this->selectOMaticAndAnswers($gameId, $answers, 24);
             } else {
                 $votes = $this->game->getCurrentRound()->getPlayerVotes($this->playerId);
 
@@ -300,14 +254,111 @@ class GamePartialView implements View {
                 echo '<div class="bottom"></div>';
             }
         } else if($state === Game::RESULTS) {
+            $answers = $this->game->getCurrentRound()->getAnswers();
+            $chosenAnswerId = $this->game->getCurrentRound()->getChosenAnswerId();
+
+            echo '<div class="middle">';
+
+            $this->selectOMatic($answers, $chosenAnswerId);
+            $this->answersAndResults($answers, []);
+
+            echo '</div>';
+            echo '<div class="bottom"></div>';
+            /*
             if($this->game->isCreator($this->playerId)) {
                 if($this->game->secondsSinceLastUpdate() >= 30) {
                     echo '<form action="' . $gameId . '/nextRound" method="post">';
                     echo '<button type="submit">Next Round</button>';
                     echo '</form>';
                 }
-            }
+            }*/
         }
+    }
+
+    private function selectOMatic($answers, $chosenAnswerId, $readOnly = true) {
+        $tokensOfPlayersWhoAnswered = [];
+        $spaces = [];
+        $chosenAnswerPlayerToken = '';
+
+        foreach($answers as $answer) {
+            $player = $this->game->getPlayer($answer->getPlayerId());
+
+            $token = $player->getToken();
+
+            if($answer->getId() == $chosenAnswerId) {
+                $chosenAnswerPlayerToken = $token;
+            }
+
+            $tokensOfPlayersWhoAnswered[] = $token;
+
+            $disabled = '';
+
+            if($readOnly) {
+                $disabled = 'disabled';
+            }
+
+            $spaces[] = '<input ' . $disabled . ' onclick="$(\'#select-o-matic\').attr(\'class\', \'' . $token . '\');" name="answerId" id="' . $token . '" type="radio" value="' . $answer->getId() . '"><label for="' . $token . '" class="space ' . $token . '"></label>';
+        }
+
+        $tokens = array_diff(Player::getTokens(), $tokensOfPlayersWhoAnswered);
+
+        foreach($tokens as $token) {
+            $spaces[] = '<input disabled name="answerId" id="' . $token . '" type="radio"><label for="' . $token . '" class="inactive space ' . $token . '"></label>';
+        }
+
+        echo '<div id="select-o-matic" class="' . $chosenAnswerPlayerToken . '">';
+
+        foreach($spaces as $space) {
+            echo $space;
+        }
+
+        echo '<div class="arrow"></div>';
+        echo "</div>";
+    }
+
+    private function answersAndResults($answers, $votes) {
+        echo '<div class="results" id="answers">';
+
+        foreach($answers as $answer) {
+            $token = $this->game->getPlayer($answer->getPlayerId())->getToken();
+
+            echo '<div class="answer ' . $token. '">';
+
+            echo '<div class="votes">';
+
+            echo '</div>';
+
+            echo '<div class="answer-text">' . $answer->getAnswer() . '</div>';
+            echo "</div>";
+        }
+
+        echo "</div>";
+    }
+
+    private function selectOMaticAndAnswers($gameId, $answers, $chosenAnswerId = null) {
+        $tokens = Player::getTokens();
+
+        echo '<div class="middle">';
+
+        echo '<form onchange="$(this).submit();" data-dont-refresh="true" id="choose-answer" action="' . $gameId . '/chooseAnswer" method="post">';
+
+        $this->selectOMatic($answers, $chosenAnswerId);
+
+        echo '<div class="choosing-answer" id="answers">';
+
+        foreach($answers as $answer) {
+            $token = $this->game->getPlayer($answer->getPlayerId())->getToken();
+
+            echo '<div class="answer ' . $token. '">';
+            echo '<div class="answer-text">' . $answer->getAnswer() . '</div>';
+            echo "</div>";
+        }
+
+        echo "</div>";
+        echo '</form>';
+        echo "</div>";
+        echo '<div class="bottom">';
+        echo "</div>";
     }
 
     private function joinGame() {
