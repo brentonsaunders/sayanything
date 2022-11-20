@@ -133,6 +133,7 @@ main {
     text-align: center;
     font-size: 80%;
     font-weight: bold;
+    flex-basis: 20%;
 }
 
 .token {
@@ -442,11 +443,12 @@ button:disabled {
 }
 
 #answers.results .answer {
-    padding: 0 10px 50px;
+    padding: 15px 10px;
 }
 
 #answers .votes {
     display: flex;
+    flex-wrap: wrap;
     gap: 10px;
     padding-bottom: 10px;
 }
@@ -459,7 +461,7 @@ button:disabled {
     border-radius: 40px;
 }
 
-#answers .votes .token {
+#answers .votes label .token {
     display: none;
 }
 
@@ -792,35 +794,35 @@ button:disabled {
     background-image: url("../img/clapperboard.png");
 }
 
-#select-o-matic.guitar + #answers .answer.guitar {
+#select-o-matic.guitar ~ #answers .answer.guitar {
     border: 10px solid rgb(0, 255, 0);
 }
 
-#select-o-matic.clapperboard + #answers .answer.clapperboard {
+#select-o-matic.clapperboard ~ #answers .answer.clapperboard {
     border: 10px solid rgb(0, 255, 0);
 }
 
-#select-o-matic.high-heels + #answers .answer.high-heels {
+#select-o-matic.high-heels ~ #answers .answer.high-heels {
     border: 10px solid rgb(0, 255, 0);
 }
 
-#select-o-matic.computer + #answers .answer.computer {
+#select-o-matic.computer ~ #answers .answer.computer {
     border: 10px solid rgb(0, 255, 0);
 }
 
-#select-o-matic.car + #answers .answer.car {
+#select-o-matic.car ~ #answers .answer.car {
     border: 10px solid rgb(0, 255, 0);
 }
 
-#select-o-matic.dollar-sign + #answers .answer.dollar-sign {
+#select-o-matic.dollar-sign ~ #answers .answer.dollar-sign {
     border: 10px solid rgb(0, 255, 0);
 }
 
-#select-o-matic.football + #answers .answer.football {
+#select-o-matic.football ~ #answers .answer.football {
     border: 10px solid rgb(0, 255, 0);
 }
 
-#select-o-matic.martini-glass + #answers .answer.martini-glass {
+#select-o-matic.martini-glass ~ #answers .answer.martini-glass {
     border: 10px solid rgb(0, 255, 0);
 }
 

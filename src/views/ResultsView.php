@@ -13,10 +13,17 @@ class ResultsView extends GameView {
     }
 
     public function render() {
+        $answers = $this->game->getCurrentRound()->getAnswers();
+        $chosenAnswerId = $this->game->getCurrentRound()->getChosenAnswerId();
+
         echo '<div id="game">';
-        echo '<div class="top">';
+        echo '<div class="top"></div>';
+        echo '<div class="middle">';
 
         parent::heading($this->game);
+
+        parent::selectOMatic($this->game, $answers, $chosenAnswerId, true);
+
         parent::players($this->game, $this->playerId);
 
         echo '<div id="game-state">';
@@ -32,15 +39,7 @@ class ResultsView extends GameView {
         echo 'Waiting for the next round to begin ...</div>';
 
         parent::countdown($this->game, Game::SECONDS_UNTIL_NEW_ROUND);
-
-        echo '</div>';
-        echo '<div class="middle">';
-
-        $answers = $this->game->getCurrentRound()->getAnswers();
-        $chosenAnswerId = $this->game->getCurrentRound()->getChosenAnswerId();
-
-        parent::selectOMatic($this->game, $answers, $chosenAnswerId, true);
-
+        
         $this->answers($answers, $chosenAnswerId);
         
         echo '</div>';
@@ -59,12 +58,25 @@ class ResultsView extends GameView {
     private function answers($answers, $chosenAnswerId) {
         $votes = $this->game->getCurrentRound()->getPlayerVotes($this->playerId);
 
-        usort($answers, function($a, $b) use($chosenAnswerId) {
+        $votesForAnswer = function($answerId) use($votes) {
+            return array_filter($votes, function($vote) use($answerId) {
+                return $vote->getAnswerId() == $answerId;
+            });
+        };
+
+        // Bring the chosen answer to the top, and then sort the rest by number
+        // of votes
+        usort($answers, function($a, $b) use($chosenAnswerId, $votesForAnswer) {
             if($a->getId() == $chosenAnswerId) {
                 return -1;
+            } else if($b->getId() == $chosenAnswerId) {
+                return 1;
             }
-            
-            return 1;
+
+            $numVotesForA = count($votesForAnswer($a->getId()));
+            $numVotesForB = count($votesForAnswer($b->getId()));
+
+            return $numVotesForB - $numVotesForA;
         });
 
         echo '<div class="results" id="answers">';
@@ -74,7 +86,16 @@ class ResultsView extends GameView {
 
             echo '<div class="answer ' . $player->getToken() . '">';
             echo '<div class="votes">';
-            echo "</div>";
+
+            foreach($votes as $vote) {
+                if($vote->getAnswerId() == $answer->getId()) {
+                    $player = $this->game->getPlayer($vote->getPlayerId());
+
+                    echo '<div class="token ' . $player->getToken() . '"></div>';
+                }
+            }
+
+            echo '</div>';
             echo '<div class="answer-text">' . $answer->getAnswer() . '</div>';
             echo "</div>";
         }
