@@ -24,11 +24,16 @@ abstract class GameView implements View {
         echo '<div id="players">';
 
         $players = $game->getPlayers();
-        $judgeId = $game->getCurrentRound()->getJudgeId();
         $chosenAnswerPlayerId = null;
 
         if($round = $game->getCurrentRound()) {
             $chosenAnswerPlayerId = $round->getChosenAnswerPlayerId();
+        }
+
+        $notWaiting = false;
+        
+        if($playerId) {
+            $notWaiting = $game->getPlayer($playerId)->getMustWaitForNextRound() === false;
         }
 
         foreach($players as $player) {
@@ -40,12 +45,12 @@ abstract class GameView implements View {
                 $me = 'me';
             }
 
-            if($player->getId() == $judgeId) {
+            if($game->isJudge($player->getId())) {
                 $judge = 'judge';
             }
 
             // Only show the winner of a round if the player is a part of the game
-            if($playerId !== null && $player->getId() == $chosenAnswerPlayerId) {
+            if($playerId !== null && $notWaiting && $player->getId() == $chosenAnswerPlayerId) {
                 $winner = 'winner';
             }
 

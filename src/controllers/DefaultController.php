@@ -13,6 +13,7 @@ use Views\AskingQuestionView;
 use Views\JoinGameView;
 use Views\ResultsView;
 use Views\VotingView;
+use Views\WaitingForNextRoundView;
 use Views\WaitingForPlayersView;
 
 class DefaultController extends Controller {
@@ -110,22 +111,28 @@ class DefaultController extends Controller {
         if(!$playerId) {
             $view = new JoinGameView($game);
         } else {
-            switch($state) {
-            case Game::WAITING_FOR_PLAYERS:
-                $view = new WaitingForPlayersView($game, $playerId);
-                break;
-            case Game::ASKING_QUESTION:
-                $view = new AskingQuestionView($game, $playerId);
-                break;
-            case Game::ANSWERING_QUESTION:
-                $view = new AnsweringQuestionView($game, $playerId);
-                break;
-            case Game::VOTING:
-                $view = new VotingView($game, $playerId);
-                break;
-            case Game::RESULTS:
-                $view = new ResultsView($game, $playerId);
-                break;
+            $player = $game->getPlayer($playerId);
+
+            if($player->getMustWaitForNextRound()) {
+                $view = new WaitingForNextRoundView($game, $playerId);
+            } else {
+                switch($state) {
+                case Game::WAITING_FOR_PLAYERS:
+                    $view = new WaitingForPlayersView($game, $playerId);
+                    break;
+                case Game::ASKING_QUESTION:
+                    $view = new AskingQuestionView($game, $playerId);
+                    break;
+                case Game::ANSWERING_QUESTION:
+                    $view = new AnsweringQuestionView($game, $playerId);
+                    break;
+                case Game::VOTING:
+                    $view = new VotingView($game, $playerId);
+                    break;
+                case Game::RESULTS:
+                    $view = new ResultsView($game, $playerId);
+                    break;
+                }
             }
         }
 

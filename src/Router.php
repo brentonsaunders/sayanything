@@ -151,6 +151,6 @@ class Router {
             return;
         }
 
-        throw new Exception("No routes found!");
+        throw new Exception("No routes found for");
     }
 }

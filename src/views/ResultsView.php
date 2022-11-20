@@ -21,7 +21,7 @@ class ResultsView extends GameView {
 
         echo '<div id="game" class="results">';
         echo '<div class="top"></div>';
-        echo '<div class="middle">';
+        echo '<div id="results" data-dont-refresh="true" class="middle">';
 
         parent::heading($this->game);
 

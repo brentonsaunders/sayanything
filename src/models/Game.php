@@ -123,6 +123,16 @@ class Game {
         return $playerId == $this->creatorId;
     }
 
+    public function allowPlayersWaitingForNextRound() {
+        if(!$this->players) {
+            return;
+        }
+
+        foreach($this->players as $player) {
+            $player->setMustWaitForNextRound(false);
+        }
+    }
+
     public function getRoundNumber() {
         if(!$this->rounds) {
             return null;
@@ -163,7 +173,7 @@ class Game {
         }
 
         $this->players[] = new Player(null, $this->id, $playerName, $playerToken,
-            $numPlayers, null);
+            $numPlayers, null, true);
     }
 
     public function addRound($judgeId, $cardId) {

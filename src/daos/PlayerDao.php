@@ -18,7 +18,8 @@ class PlayerDao implements PlayerDaoInterface {
             $row['name'],
             $row['token'],
             $row['turn'],
-            $row['skip_turn']
+            $row['skip_turn'],
+            $row['must_wait_for_next_round']
         );
     }
 
@@ -72,7 +73,8 @@ class PlayerDao implements PlayerDaoInterface {
                 'name' => $player->getName(),
                 'token' => $player->getToken(),
                 'turn' => $player->getTurn(),
-                'skip_turn' => ($player->getSkipTurn() ? 1 : 0)
+                'skip_turn' => ($player->getSkipTurn() ? 1 : 0),
+                'must_wait_for_next_round' => ($player->getMustWaitForNextRound() ? 1 : 0),
             ]
         );
 
@@ -85,7 +87,8 @@ class PlayerDao implements PlayerDaoInterface {
                  "name = :name, " . 
                  "token = :token, " . 
                  "turn = :turn, " .
-                 "skip_turn = :skip_turn " .
+                 "skip_turn = :skip_turn, " .
+                 "must_wait_for_next_round = :must_wait_for_next_round " . 
                  "WHERE id = :id";
 
         $this->db->query($query, [
@@ -94,6 +97,7 @@ class PlayerDao implements PlayerDaoInterface {
             ':token' => $player->getToken(),
             ":turn" => $player->getTurn(),
             ':skip_turn' => ($player->getSkipTurn() ? 1 : 0),
+            ':must_wait_for_next_round' => ($player->getMustWaitForNextRound() ? 1 : 0),
             ':id' => $player->getId()
         ]);
 

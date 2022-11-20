@@ -29,7 +29,11 @@ class GameService {
             throw $e;
         }
 
-        $game =  $this->gameRepository->getById($gameId);
+        $game = $this->gameRepository->getById($gameId);
+
+        if(!$game) {
+            throw new GameServiceException("Game doesn't exist!");
+        }
 
         return $game;
     }
@@ -46,7 +50,7 @@ class GameService {
         $game = new Game($id, $gameName, null, Game::WAITING_FOR_PLAYERS,
             null, null);
 
-        $player = new Player(null, $id, $playerName, $playerToken, null, null);
+        $player = new Player(null, $id, $playerName, $playerToken, null, null, false);
 
         $game->addPlayer($playerName, $playerToken);
 
@@ -137,6 +141,8 @@ class GameService {
         if($playerId !== $game->getCreatorId()) {
             throw new GameServiceException("Only the creator of the game can start a new round!");
         }
+
+        $game->allowPlayersWaitingForNextRound();
 
         $firstRound = $game->getRounds() === null;
 

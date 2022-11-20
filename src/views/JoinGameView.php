@@ -12,6 +12,7 @@ class JoinGameView extends GameView {
 
     public function render() {
         $gameIsFull = $this->game->getNumberOfPlayers() >= 8;
+        
         echo '<div id="game">';
         echo '<div class="top">';
 

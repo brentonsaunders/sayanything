@@ -32,13 +32,13 @@ class VotingView extends GameView {
         parent::countdown($this->game, Game::SECONDS_TO_VOTE);
 
         echo '</div>';
-        echo '<div class="middle">';
+        echo '<div id="choose-answer" data-dont-refresh="true" class="middle">';
 
         $answers = $this->game->getCurrentRound()->getAnswers();
         $chosenAnswerId = $this->game->getCurrentRound()->getChosenAnswerId();
 
         if($isJudge) {
-            echo '<form onchange="$(this).submit();" data-dont-refresh="true" id="choose-answer" action="' . $this->game->getId() . '/chooseAnswer" method="post">';
+            echo '<form onchange="$(this).submit();" action="' . $this->game->getId() . '/chooseAnswer" method="post">';
 
             $this->selectOMatic($this->game, $answers, $chosenAnswerId);
             $this->answersForJudge($answers);
@@ -69,6 +69,7 @@ class VotingView extends GameView {
 
     private function answersForPlayers($answers) {
         $votes = $this->game->getCurrentRound()->getPlayerVotes($this->playerId);
+        $token = $this->game->getPlayer($this->playerId)->getToken();
 
         echo '<form onchange="if($(this).find(\'input[type=radio]:checked\').length === 2) { $(this).submit(); }" data-dont-refresh="true" id="vote" action="' . $this->game->getId() . '/vote" method="post">';
         echo '<div class="voting" id="answers">';
@@ -82,14 +83,14 @@ class VotingView extends GameView {
                 echo "checked ";
             }
 
-            echo 'name="vote1" type="radio" value="' . $answer->getId() . '"><div class="token guitar"></div></label>';
+            echo 'name="vote1" type="radio" value="' . $answer->getId() . '"><div class="token ' . $token . '"></div></label>';
             echo "<label><input ";
 
             if($votes && $votes[1]->getAnswerId() === $answer->getId()) {
                 echo "checked ";
             }
             
-            echo 'name="vote2" type="radio" value="' . $answer->getId() . '"><div class="token guitar"></div></label>';
+            echo 'name="vote2" type="radio" value="' . $answer->getId() . '"><div class="token ' . $token . '"></div></label>';
             echo "</div>";
             echo '<div class="answer-text">' . $answer->getAnswer() . '</div>';
             echo "</div>";

@@ -24,6 +24,11 @@ $(function() {
         const $dontRefresh = $('*[data-dont-refresh="true"]:visible');
         const $focus = $(":focus");
         const focusId = ($focus.length > 0) ? $focus.attr("id") : null;
+        const scrollTops = new Map();
+
+        $dontRefresh.each(function() {
+            scrollTops.set(this, $(this).scrollTop());
+        });
 
         await new Promise(resolve => $('main').load(`${GAME_ID}/view`, () => resolve()));
 
@@ -33,9 +38,13 @@ $(function() {
                 const id = $(this).attr("id");
 
                 $(`#${id}`).replaceWith($(this));
+
+                $(this).scrollTop(scrollTops.get(this));
             });
 
             $(`#${focusId}`).focus();
+
+            
         }
 
         updateGame();
@@ -45,7 +54,7 @@ $(function() {
         loadGame();
 
         setInterval(() => {
-            // loadGame();
+            loadGame();
         }, 5000);
     }
 

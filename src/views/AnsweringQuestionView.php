@@ -44,9 +44,10 @@ class AnsweringQuestionView extends GameView {
 
             $readonly = ($answer) ? "readonly" : "";
             $disabled = ($answer) ? "" : "disabled";
+            $answerText = ($answer) ? $answer->getAnswer() : "";
 
-            echo '<form data-dont-refresh="true" action="' . $this->game->getId() . '/answer" method="post">';
-            echo '<textarea oninput="$(this).next(\'button\').prop(\'disabled\', $(this).val().length === 0);" ' . $readonly . ' id="answer" name="answer" onclick="$(this).removeAttr(\'readonly\');">' . $answer->getAnswer() . '</textarea>';
+            echo '<form id="answering-question" data-dont-refresh="true" action="' . $this->game->getId() . '/answer" method="post">';
+            echo '<textarea oninput="$(this).next(\'button\').prop(\'disabled\', $(this).val().length === 0);" ' . $readonly . ' id="answer" name="answer" onclick="$(this).removeAttr(\'readonly\');">' . $answerText . '</textarea>';
             echo '<button ' . $disabled . ' type="submit">Answer</button>';
             echo "</form>";
         }
