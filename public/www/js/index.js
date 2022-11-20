@@ -76,7 +76,7 @@ $(function() {
                     return;
                 }
 
-                if("forceRefresh" in data  && !data.forceRefresh) {
+                if(data.forceRefresh === false) {
                     return;
                 }
 

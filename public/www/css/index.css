@@ -424,6 +424,10 @@ button:disabled {
     visibility: hidden;
 }
 
+#answers {
+    margin-top: 40px;
+}
+
 #answers .answer {
     display: flex;
     flex-direction: column;
@@ -586,51 +590,71 @@ button:disabled {
     position: relative;
     width: 250px;
     height: 250px;
-    margin: 20px auto 60px;
+    margin: 20px auto;
     padding: 20px;
     background-color: rgb(50, 50, 50);
     border-radius: 250px;
     
 }
 
-@keyframes spin-to-guitar {
+@keyframes spinToGuitar {
     0% { transform: rotate(0deg);}
     100% { transform: rotate(810deg); }
 }
 
-@keyframes spin-to-computer {
+@keyframes spinToComputer {
     0% { transform: rotate(0deg);}
     100% { transform: rotate(855deg); }
 }
 
-@keyframes spin-to-martini-glass {
+@keyframes spinToMartiniGlass {
     0% { transform: rotate(0deg);}
     100% { transform: rotate(900deg); }
 }
 
-@keyframes spin-to-dollar-sign {
+@keyframes spinToDollarSign {
     0% { transform: rotate(0deg);}
     100% { transform: rotate(945deg); }
 }
 
-@keyframes spin-to-car {
+@keyframes spinToCar {
     0% { transform: rotate(0deg);}
     100% { transform: rotate(990deg); }
 }
 
-@keyframes spin-to-high-heels {
+@keyframes spinToHighHeels {
     0% { transform: rotate(0deg);}
     100% { transform: rotate(1035deg); }
 }
 
-@keyframes spin-to-clapperboard {
+@keyframes spinToClapperboard {
     0% { transform: rotate(0deg);}
     100% { transform: rotate(1080deg); }
 }
 
-@keyframes spin-to-football {
+@keyframes spinToFootball {
     0% { transform: rotate(0deg);}
     100% { transform: rotate(1125deg); }
+}
+
+@keyframes show {
+    from {
+        visibility: collapse;
+    }
+    to {
+        visibility: visible;
+    }
+}
+
+#game.results #select-o-matic ~ * {
+    animation-name: show;
+    animation-delay: 2s;
+    animation-fill-mode: forwards;
+    visibility: collapse;
+}
+
+#game.results #players {
+    margin-top: 40px;
 }
 
 #select-o-matic .arrow {
@@ -649,42 +673,42 @@ button:disabled {
 }
 
 #select-o-matic.guitar .arrow {
-    animation-name: spin-to-guitar;
+    animation-name: spinToGuitar;
     display: block;
 }
 
 #select-o-matic.computer .arrow {
-    animation-name: spin-to-computer;
+    animation-name: spinToComputer;
     display: block;
 }
 
 #select-o-matic.martini-glass .arrow {
-    animation-name: spin-to-martini-glass;
+    animation-name: spinToMartiniGlass;
     display: block;
 }
 
 #select-o-matic.dollar-sign .arrow {
-    animation-name: spin-to-dollar-sign;
+    animation-name: spinToDollarSign;
     display: block;
 }
 
 #select-o-matic.car .arrow {
-    animation-name: spin-to-car;
+    animation-name: spinToCar;
     display: block;
 }
 
 #select-o-matic.high-heels .arrow {
-    animation-name: spin-to-high-heels;
+    animation-name: spinToHighHeels;
     display: block;
 }
 
 #select-o-matic.clapperboard .arrow {
-    animation-name: spin-to-clapperboard;
+    animation-name: spinToClapperboard;
     display: block;
 }
 
 #select-o-matic.football .arrow {
-    animation-name: spin-to-football;
+    animation-name: spinToFootball;
     display: block;
 }
 

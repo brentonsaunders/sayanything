@@ -15,8 +15,11 @@ class ResultsView extends GameView {
     public function render() {
         $answers = $this->game->getCurrentRound()->getAnswers();
         $chosenAnswerId = $this->game->getCurrentRound()->getChosenAnswerId();
+        $winnerId = $this->game->getCurrentRound()->getChosenAnswerPlayerId();
+        $winner = $this->game->getPlayer($winnerId);
+        $roundNumber = count($this->game->getRounds());
 
-        echo '<div id="game">';
+        echo '<div id="game" class="results">';
         echo '<div class="top"></div>';
         echo '<div class="middle">';
 
@@ -24,21 +27,15 @@ class ResultsView extends GameView {
 
         parent::selectOMatic($this->game, $answers, $chosenAnswerId, true);
 
-        parent::players($this->game, $this->playerId);
-
         echo '<div id="game-state">';
-
-        $winnerId = $this->game->getCurrentRound()->getChosenAnswerPlayerId();
-
-        $winner = $this->game->getPlayer($winnerId);
-
-        $roundNumber = count($this->game->getRounds());
 
         echo $winner->getName() . ' Wins Round ' . $roundNumber . '!<br>';
         
         echo 'Waiting for the next round to begin ...</div>';
 
         parent::countdown($this->game, Game::SECONDS_UNTIL_NEW_ROUND);
+
+        parent::players($this->game, $this->playerId);
         
         $this->answers($answers, $chosenAnswerId);
         
@@ -56,7 +53,7 @@ class ResultsView extends GameView {
     }
 
     private function answers($answers, $chosenAnswerId) {
-        $votes = $this->game->getCurrentRound()->getPlayerVotes($this->playerId);
+        $votes = $this->game->getCurrentRound()->getVotes();
 
         $votesForAnswer = function($answerId) use($votes) {
             return array_filter($votes, function($vote) use($answerId) {

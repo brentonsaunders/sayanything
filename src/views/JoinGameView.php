@@ -11,6 +11,7 @@ class JoinGameView extends GameView {
     }
 
     public function render() {
+        $gameIsFull = $this->game->getNumberOfPlayers() >= 8;
         echo '<div id="game">';
         echo '<div class="top">';
 
@@ -20,21 +21,23 @@ class JoinGameView extends GameView {
         echo '</div>';
         echo '<div class="middle"></div>';
         echo '<div class="bottom">';
-        echo '<button type="button" onclick="showModal(\'join-game\');">Join Game</button>';
+
+        if(!$gameIsFull) {
+            echo '<button type="button" onclick="showModal(\'join-game\');">Join Game</button>';
+        }
+
         echo '</div>';
         echo '</div>';
 
-        if($this->game->getNumberOfPlayers() < 8) {
+        if(!$gameIsFull) {
             $this->joinGame();
         }
     }
 
     private function joinGame() {
-        $gameId = $this->game->getId();
-
         echo '<div data-dont-refresh="true" id="join-game" class="modal-overlay">';
         echo '<div class="modal">';
-        echo '<form action="$gameId/join" method="post">';
+        echo '<form action="' . $this->game->getId() . '/join" method="post">';
         echo '<h2>Join Game</h2>';
         echo '<input id="player-name" name="playerName" placeholder="Your Name" type="text">';
         echo '<h2>Your Token</h2>';

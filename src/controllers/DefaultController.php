@@ -107,10 +107,6 @@ class DefaultController extends Controller {
 
         $state = $game->getState();
 
-        $state = Game::RESULTS;
-
-        $playerId = 58;
-
         if(!$playerId) {
             $view = new JoinGameView($game);
         } else {
