@@ -12,8 +12,8 @@ class GamePartialView implements View {
         $this->game = $game;
         $this->playerId = $playerId;
 
-        $game->setState(Game::RESULTS);
-        $this->playerId = 60;
+        $game->setState(Game::ANSWERING_QUESTION);
+        $this->playerId = 59;
     }
 
     private function gameNameRound() {
@@ -325,6 +325,14 @@ class GamePartialView implements View {
             echo '<div class="answer ' . $token. '">';
 
             echo '<div class="votes">';
+
+            foreach($votes as $vote) {
+                if($answer->getId() == $vote->getId()) {
+                    $token = $this->game->getPlayer($vote->getPlayerId())->getToken();
+
+                    echo '<div class="vote ' . $token . '"></div>';
+                }
+            }
 
             echo '</div>';
 

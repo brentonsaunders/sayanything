@@ -194,6 +194,18 @@ main {
     background-image: url("../img/judge-wig.png");
 }
 
+#game .player.winner .token::before {
+    position: absolute;
+    display: block;
+    content: "";
+    width: 40px;
+    height: 80px;
+    background-size: 40px 30px;
+    background-position: top;
+    background-repeat: no-repeat;
+    background-image: url("../img/crown.png");
+}
+
 .token::after {
     display: block;
     content: "";
@@ -422,10 +434,15 @@ button:disabled {
 
 #answers.voting .answer {
     background-color: rgb(200, 200, 200);
+    padding-bottom: 50px;
 }
 
 #answers.choosing-answer .answer {
     padding: 50px 10px;
+}
+
+#answers.results .answer {
+    padding: 0 10px 50px;
 }
 
 #answers .votes {
@@ -805,4 +822,27 @@ button:disabled {
 
 #select-o-matic.martini-glass + #answers .answer.martini-glass {
     border: 10px solid rgb(0, 255, 0);
+}
+
+#game-heading {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-weight: bold;
+    margin-bottom: 20px;
+}
+
+#game-round {
+    display: flex;
+    align-items: center;
+    margin-left: 8px;
+}
+
+#game-round::before {
+    display: block;
+    content: "";
+    width: 20px;
+    height: 20px;
+    background-image: url('../img/round-icon.png');
+    background-size: 20px;
 }

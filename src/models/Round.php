@@ -219,17 +219,27 @@ class Round {
     }
 
     public function wroteChosenAnswer($playerId) {
-        if(!$this->answers) {
+        $chosenAnswerPlayerId = $this->getChosenAnswerPlayerId();
+        
+        if(!$chosenAnswerPlayerId) {
             return false;
+        }
+
+        return $playerId == $chosenAnswerPlayerId;
+    }
+
+    public function getChosenAnswerPlayerId() {
+        if(!$this->answers) {
+            return null;
         }
 
         foreach($this->answers as $answer) {
             if($answer->getId() === $this->chosenAnswerId) {
-                return $answer->getPlayerId() === $playerId;
+                return $answer->getPlayerId();
             }
         }
 
-        return false;
+        return null;
     }
 
     public function getAskedQuestion() {
