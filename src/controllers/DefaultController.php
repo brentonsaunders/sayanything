@@ -6,7 +6,6 @@ use Models\Game;
 use Services\GameService;
 use Services\GameServiceException;
 use Views\MainView;
-use Views\GamePartialView;
 use Views\LobbyView;
 use Views\AnsweringQuestionView;
 use Views\AskingQuestionView;
@@ -59,37 +58,7 @@ class DefaultController extends Controller {
         $view->render();
     }
 
-    public function test() {
-        $gameId = '8279662444';
-
-        try {
-            $game = $this->gameService->getGame($gameId);
-        } catch(GameServiceException $e) {
-            $this->badRequest();
-        }
-
-        $playerId = null;
-
-        if(array_key_exists($gameId, $_SESSION["games"])) {
-            $playerId = $_SESSION["games"][$gameId];
-
-            if(!$game->hasPlayer($playerId)) {
-                $playerId = null;
-            }
-        }
-
-        $view = new GamePartialView($game, $playerId);
-
-        $view->render();
-    }
-
     public function view($gameId) {
-        if($gameId === 'test') {
-            $this->test();
-
-            return;
-        }
-        
         try {
             $game = $this->gameService->getGame($gameId);
         } catch(GameServiceException $e) {
