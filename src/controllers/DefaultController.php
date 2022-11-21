@@ -113,7 +113,7 @@ class DefaultController extends Controller {
         } else {
             $player = $game->getPlayer($playerId);
 
-            if($player->getMustWaitForNextRound()) {
+            if($player->getMustWaitForNextRound() && $state !== Game::WAITING_FOR_PLAYERS) {
                 $view = new WaitingForNextRoundView($game, $playerId);
             } else {
                 switch($state) {

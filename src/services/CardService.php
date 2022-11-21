@@ -4,7 +4,7 @@ namespace Services;
 use Models\Card;
 use Repositories\CardRepositoryInterface;
 
-class CardService {
+class CardService implements CardServiceInterface {
     private CardRepositoryInterface $cardRepository;
 
     public function __construct(CardRepositoryInterface $cardRepository) {

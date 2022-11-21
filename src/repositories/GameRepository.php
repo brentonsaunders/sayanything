@@ -8,7 +8,7 @@ use Models\Round;
 use Repositories\PlayerRepositoryInterface;
 use Repositories\RoundRepositoryInterface;
 
-class GameRepository {
+class GameRepository implements GameRepositoryInterface {
     private GameDaoInterface $gameDao;
     private PlayerRepositoryInterface $playerRepository;
     private RoundRepositoryInterface $roundRepository;

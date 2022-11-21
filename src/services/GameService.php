@@ -8,16 +8,16 @@ use Models\Game;
 use Models\Player;
 use Models\Question;
 use Models\Vote;
-use Repositories\GameRepository;
+use Repositories\GameRepositoryInterface;
 use Services\CardService;
 use Services\ScoreService;
 
 class GameService {
-    private GameRepository $gameRepository;
-    private CardService $cardService;
+    private GameRepositoryInterface $gameRepository;
+    private CardServiceInterface $cardService;
 
-    public function __construct(GameRepository $gameRepository,
-        CardService $cardService) {
+    public function __construct(GameRepositoryInterface $gameRepository,
+        CardServiceInterface $cardService) {
         $this->gameRepository = $gameRepository;
         $this->cardService = $cardService;
     }
@@ -52,7 +52,7 @@ class GameService {
 
         $player = new Player(null, $id, $playerName, $playerToken, null, null, false);
 
-        $game->addPlayer($playerName, $playerToken);
+        $game->addPlayer($playerName, $playerToken, false);
 
         $game = $this->gameRepository->insert($game);
 
