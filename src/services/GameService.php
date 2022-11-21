@@ -52,7 +52,7 @@ class GameService {
 
         $player = new Player(null, $id, $playerName, $playerToken, null, null, false);
 
-        $game->addPlayer($playerName, $playerToken, false);
+        $game->addPlayer($playerName, $playerToken, false, false);
 
         $game = $this->gameRepository->insert($game);
 
@@ -84,12 +84,14 @@ class GameService {
         }
         
         $skipTurn = false;
+        $mustWaitForNextRound = false;
         
         if($game->getState() !== Game::WAITING_FOR_PLAYERS) {
             $skipTurn = true;
+            $mustWaitForNextRound = true;
         }
 
-        $game->addPlayer($playerName, $playerToken, $skipTurn);
+        $game->addPlayer($playerName, $playerToken, $skipTurn, $mustWaitForNextRound);
 
         $game = $this->gameRepository->update($game);
 
