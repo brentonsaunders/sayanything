@@ -42,8 +42,8 @@ class AskingQuestionView extends GameView {
 
             $questions = $card->getQuestions();
 
-            echo '<form onchange="$(this).find(\'button\').removeAttr(\'disabled\');" action="' . $this->game->getId() . '/ask" method="post">';
-            echo '<div data-dont-refresh="true" id="questions">';
+            echo '<form data-dont-refresh="true" id="asking-question" onchange="$(this).find(\'button\').removeAttr(\'disabled\');" action="' . $this->game->getId() . '/ask" method="post">';
+            echo '<div id="questions">';
 
             foreach($questions as $question) {
                 echo '<label><input name="questionId" type="radio" value="' . $question->getId() . '"><div class="question">' . $question->getQuestion(). '</div></label>';

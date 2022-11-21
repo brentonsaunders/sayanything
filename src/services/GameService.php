@@ -24,7 +24,7 @@ class GameService {
 
     public function getGame($gameId) {
         try {
-            // $this->updateGame($gameId);
+            $this->updateGame($gameId);
         } catch(GameServiceException $e) {
             throw $e;
         }
@@ -82,12 +82,14 @@ class GameService {
         if(in_array($playerToken, $game->getUsedTokens())) {
             throw new TokenAlreadyBeingUsedException("Token is already being used!");
         }
-
-        // TODO: Handle case of player joining after game has started
-        if($game->getState() === Game::WAITING_FOR_PLAYERS) {
+        
+        $skipTurn = false;
+        
+        if($game->getState() !== Game::WAITING_FOR_PLAYERS) {
+            $skipTurn = true;
         }
 
-        $game->addPlayer($playerName, $playerToken);
+        $game->addPlayer($playerName, $playerToken, $skipTurn);
 
         $game = $this->gameRepository->update($game);
 

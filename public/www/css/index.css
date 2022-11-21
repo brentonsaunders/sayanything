@@ -647,10 +647,10 @@ button:disabled {
 }
 
 #game.results #select-o-matic ~ * {
-    animation-name: show;
-    animation-delay: 2s;
     animation-fill-mode: forwards;
-    visibility: collapse;
+    /* animation-name: show; */
+    animation-delay: 2s;
+    /* visibility: collapse; */
 }
 
 #game.results #players {

@@ -163,7 +163,7 @@ class Game {
         return $remainingTokens;
     }
 
-    public function addPlayer($playerName, $playerToken) {
+    public function addPlayer($playerName, $playerToken, $skipTurn) {
         if($this->players) {
             $numPlayers = count($this->players);
         } else {
@@ -173,7 +173,7 @@ class Game {
         }
 
         $this->players[] = new Player(null, $this->id, $playerName, $playerToken,
-            $numPlayers, null, true);
+            $numPlayers, $skipTurn, true);
     }
 
     public function addRound($judgeId, $cardId) {
