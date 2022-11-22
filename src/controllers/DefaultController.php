@@ -16,6 +16,10 @@ use Views\VotingView;
 use Views\WaitingForNextRoundView;
 use Views\WaitingForPlayersView;
 
+
+use Views\TestGameView;
+use Views\TestView;
+
 class DefaultController extends Controller {
     private GameService $gameService;
 
@@ -55,6 +59,14 @@ class DefaultController extends Controller {
 
     public function game($gameId) {
         $view = new MainView($gameId);
+
+        $view->render();
+    }
+
+    public function test() {
+        $testGameView = new TestGameView();
+
+        $view = new TestView($testGameView);
 
         $view->render();
     }

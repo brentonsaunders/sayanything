@@ -10,15 +10,15 @@ class Router {
         ],
         [
             "method" => "POST",
-            "pattern" => "/test",
-            "controller" => "Controllers\\DefaultController",
-            "action" => "test"
-        ],
-        [
-            "method" => "POST",
             "pattern" => "/",
             "controller" => "Controllers\\DefaultController",
             "action" => "create"
+        ],
+        [
+            "method" => "GET",
+            "pattern" => "/test",
+            "controller" => "Controllers\\DefaultController",
+            "action" => "test"
         ],
         [
             "method" => "GET",

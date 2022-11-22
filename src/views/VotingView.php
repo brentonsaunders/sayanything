@@ -68,7 +68,7 @@ class VotingView extends GameView {
     }
 
     private function answersForPlayers($answers) {
-        $votes = $this->game->getCurrentRound()->getPlayerVotes($this->playerId);
+        $votes = $this->game->getCurrentRound()->getVotesFromPlayer($this->playerId);
         $token = $this->game->getPlayer($this->playerId)->getToken();
 
         echo '<form onchange="if($(this).find(\'input[type=radio]:checked\').length === 2) { $(this).submit(); }" data-dont-refresh="true" id="vote" action="' . $this->game->getId() . '/vote" method="post">';

@@ -130,7 +130,7 @@ class Round {
         return null;
     }
 
-    public function getPlayerVotes($playerId) {
+    public function getVotesFromPlayer($playerId) {
         if(!$this->votes) {
             return null;
         }
@@ -147,7 +147,7 @@ class Round {
     }
 
     public function vote($playerId, $answerId1, $answerId2) {
-        $votes = $this->getPlayerVotes($playerId);
+        $votes = $this->getVotesFromPlayer($playerId);
 
         if($votes) {
             $votes[0]->setAnswerId($answerId1);
@@ -254,5 +254,41 @@ class Round {
         }
 
         return null;
+    }
+
+    public function getVotesForAnswer($answerId) {
+        if(!$this->votes) {
+            return null;
+        }
+
+        $votes = [];
+
+        foreach($this->votes as $vote) {
+            if($vote->getAnswerId() === $answerId) {
+                $votes[] = $vote;
+            }
+        }
+
+        return $votes;
+    }
+
+    public function getAnswersSortedByVotes() {
+        if(!$this->answers) {
+            return null;
+        }
+
+        $answers = $this->answers;
+
+        usort($answers, function($a, $b) {
+            $votesForA = $this->getVotesForAnswer($a->getId());
+            $votesForB = $this->getVotesForAnswer($b->getId());
+
+            $numVotesForA = $votesForA ? count($votesForA) : 0;
+            $numVotesForB = $votesForB ? count($votesForB) : 0;
+
+            return $numVotesForB - $numVotesForA;
+        });
+
+        return $answers;
     }
 }

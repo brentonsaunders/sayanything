@@ -65,7 +65,7 @@ class ScoreService {
     }
 
     private function calculateScore(Round $round, Player $player) {
-        $votes = $round->getPlayerVotes($player->getId());
+        $votes = $round->getVotesFromPlayer($player->getId());
 
         if(!$votes) {
             return null;

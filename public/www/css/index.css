@@ -872,3 +872,102 @@ button:disabled {
     background-image: url('../img/round-icon.png');
     background-size: 20px;
 }
+
+#select-o-matic.clapperboard ~ #answer-boards .answer-board.clapperboard,
+#select-o-matic.car ~ #answer-boards .answer-board.car,
+#select-o-matic.martini-glass ~ #answer-boards .answer-board.martini-glass,
+#select-o-matic.computer ~ #answer-boards .answer-board.computer,
+#select-o-matic.dollar-sign ~ #answer-boards .answer-board.dollar-sign,
+#select-o-matic.guitar ~ #answer-boards .answer-board.guitar,
+#select-o-matic.football ~ #answer-boards .answer-board.football,
+#select-o-matic.high-heels ~ #answer-boards .answer-board.high-heels  {
+    order: -1;
+    border: 10px solid rgb(133, 255, 0);
+}
+
+#answer-boards {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.answer-board {
+    position: relative;
+    display: flex;
+    padding: 20px 20px 10px;
+    border: 3px solid black;
+    border-radius: 10px;
+    height: 275px;
+    background-image: url('../img/bubble.png');
+    background-repeat: no-repeat;
+    background-origin: content-box;
+    background-size: 100% 100%;
+}
+
+.answer-board.voting {
+    background-color: rgb(215, 215, 215);
+}
+
+.answer-board-text {
+    width: 100%;
+    margin: 30px 30px 50px;
+    overflow: hidden;
+    font-weight: bold;
+}
+
+.answer-board-text textarea {
+    display: block;
+    width: 100%;
+    height: 100%;
+    resize: none;
+    border: none;
+    outline: none;
+    font-size: 100%;
+    font-weight: bold;
+    overflow: hidden;
+}
+
+.answer-board-text textarea:read-only {
+    background-image: url('../img/pen-icon.png');
+    background-size: 30px;
+    background-repeat: no-repeat;
+    background-position: right top;
+    cursor: pointer;
+}
+
+.answer-board .votes {
+    position: absolute;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 2px;
+    left: 0;
+    padding: 10px 20px;
+}
+
+.answer-board .votes.top {
+    top: 0;
+}
+
+.answer-board .votes.bottom {
+    bottom: 0;
+}
+
+.answer-board .votes label {
+    display: block;
+    width: 40px;
+    height: 40px;
+    border-radius: 40px;
+    background-color: rgb(100, 100, 100);
+}
+
+.answer-board .votes label input[type=radio] {
+    display: none;
+}
+
+.answer-board .votes label .token {
+    display: none;
+}
+
+.answer-board .votes label input[type=radio]:checked + .token {
+    display: flex;
+}
