@@ -9,6 +9,7 @@ use Views\MainView;
 use Views\LobbyView;
 use Views\AnsweringQuestionView;
 use Views\AskingQuestionView;
+use Views\GameOverView;
 use Views\JoinGameView;
 use Views\ResultsView;
 use Views\VotingView;
@@ -99,7 +100,11 @@ class DefaultController extends Controller {
                     $view = new VotingView($game, $playerId);
                     break;
                 case Game::RESULTS:
-                    $view = new ResultsView($game, $playerId);
+                    if(intval($game->getRoundNumber()) >= 11) {
+                        $view = new GameOverView($game, $playerId);
+                    } else {
+                        $view = new ResultsView($game, $playerId);
+                    }
                     break;
                 }
             }

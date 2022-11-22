@@ -24,7 +24,7 @@ class GameService {
 
     public function getGame($gameId) {
         try {
-            $this->updateGame($gameId);
+            // $this->updateGame($gameId);
         } catch(GameServiceException $e) {
             throw $e;
         }
@@ -140,6 +140,10 @@ class GameService {
 
         if($state !== Game::GAME_STARTED && $state !== Game::RESULTS) {
             throw new GameServiceException("Can't start a new round!");
+        }
+
+        if($game->getRoundNumber() > 11) {
+            throw new GameServiceException("The game ends after 11 rounds!");
         }
 
         if($playerId !== $game->getCreatorId()) {
