@@ -272,23 +272,62 @@ class Round {
         return $votes;
     }
 
-    public function getAnswersSortedByVotes() {
+    public function getNumVotesForAnswer($answerId) {
+        $votesForAnswer = $this->getVotesForAnswer($answerId);
+
+        return $votesForAnswer ? count($votesForAnswer) : 0;
+    }
+
+    private function getAnswersAndNumVotesSortedByVotes() {
         if(!$this->answers) {
             return null;
         }
 
-        $answers = $this->answers;
+        $answersAndNumVotes = [];
 
-        usort($answers, function($a, $b) {
-            $votesForA = $this->getVotesForAnswer($a->getId());
-            $votesForB = $this->getVotesForAnswer($b->getId());
+        foreach($this->answers as $answer) {
+            $answersAndNumVotes[] = [
+                "answer" => $answer,
+                "numVotes" => $this->getNumVotesForAnswer($answer->getId())
+            ];
+        }
 
-            $numVotesForA = $votesForA ? count($votesForA) : 0;
-            $numVotesForB = $votesForB ? count($votesForB) : 0;
-
-            return $numVotesForB - $numVotesForA;
+        usort($answersAndNumVotes, function($a, $b) {
+            return $b["numVotes"] - $a["numVotes"];
         });
 
-        return $answers;
+        return $answersAndNumVotes;
+    }
+
+    public function getAnswersSortedByVotes() {
+        $answersAndNumVotes = $this->getAnswersAndNumVotesSortedByVotes();
+
+        if(!$answersAndNumVotes) {
+            return null;
+        }
+
+        return array_map(function($answer) {
+            return $answer["answer"];
+        }, $answersAndNumVotes);
+    }
+
+    public function getTopAnswers() {
+        $answersAndNumVotes = $this->getAnswersAndNumVotesSortedByVotes();
+
+        if(!$answersAndNumVotes) {
+            return null;
+        }
+
+        $mostVotes = $answersAndNumVotes[0]["numVotes"];
+
+        $topAnswers = [];
+
+        foreach($answersAndNumVotes as $answerAndNumVotes) {
+            if($answerAndNumVotes["numVotes"] == $mostVotes) {
+                $topAnswers = $answerAndNumVotes["answer"];
+            }
+        }
+
+        return $topAnswers;
     }
 }
