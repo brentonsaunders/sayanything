@@ -16,12 +16,6 @@ class Router {
         ],
         [
             "method" => "GET",
-            "pattern" => "/test",
-            "controller" => "Controllers\\DefaultController",
-            "action" => "test"
-        ],
-        [
-            "method" => "GET",
             "pattern" => "/{gameId}",
             "controller" => "Controllers\\DefaultController",
             "action" => "game"
@@ -74,10 +68,34 @@ class Router {
             "controller" => "Controllers\\DefaultController",
             "action" => "chooseAnswer"
         ],
+        [
+            "method" => "GET",
+            "pattern" => "/test",
+            "controller" => "Controllers\\DefaultController",
+            "action" => "test"
+        ],
     ];
 
     public function __construct(App $app) {
         $this->app = $app;
+    }
+
+    private function getNumLiteralParts($pattern) {
+        $parts = explode("/", $pattern);
+
+        $numParts = 0;
+
+        foreach($parts as $part) {
+            if(strlen($part) === 0) {
+                continue;
+            }
+
+            if(preg_match('/^{[a-zA-Z_$][a-zA-Z_$0-9]*}$/', $part) !== 1) {
+                ++$numParts;
+            }
+        }
+
+        return $numParts;
     }
 
     public function route($request) {
@@ -87,7 +105,17 @@ class Router {
 
         $urlParts = explode("/", $url);
 
-        foreach($this->routes as $route) {
+        $routes = $this->routes;
+
+        // Sort the routes by the number of literal parts in the pattern
+        usort($routes, function($a, $b) {
+            $numPartsA = $this->getNumLiteralParts($a["pattern"]);
+            $numPartsB = $this->getNumLiteralParts($b["pattern"]);
+
+            return $numPartsB - $numPartsA;
+        });
+
+        foreach($routes as $route) {
             $method = $route["method"];
             $pattern = $route["pattern"];
 
