@@ -383,4 +383,8 @@ class Game {
     public function secondsSinceLastUpdate() {
         return strtotime("now") - strtotime($this->timeUpdated);
     }
+
+    public function isOver() {
+        return $this->getRoundNumber() >= 11;
+    }
 }

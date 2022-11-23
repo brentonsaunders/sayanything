@@ -4,7 +4,6 @@ namespace Views;
 use Models\Game;
 
 class VotingView extends GameView {
-    private Game $game;
     private $playerId = null;
 
     public function __construct(Game $game, $playerId) {
@@ -12,91 +11,107 @@ class VotingView extends GameView {
         $this->playerId = $playerId;
     }
 
-    public function render() {
+    protected function head() {
         $isJudge = $this->game->isJudge($this->playerId);
-        $judge = $this->game->getJudge();
-
-        echo '<div id="game">';
-        echo '<div class="top">';
-
-        parent::heading($this->game);
-
+        $judgeName = $this->game->getJudge()->getName();
         $question = $this->game->getCurrentRound()->getAskedQuestion();
 
-        if($isJudge) {
-            echo '<div id="game-state">What\'s your favorite answer to ...<br>' . $question . '</div>';
-        } else {
-            echo '<div id="game-state">Which answer do you think ' . $judge->getName() . ' picked for  ...<br>' . $question . '</div>';
-        }
+        parent::heading();
 
-        parent::countdown($this->game, Game::SECONDS_TO_VOTE);
-
-        echo '</div>';
-        echo '<div id="choose-answer" data-dont-refresh="true" class="middle">';
-
-        $answers = $this->game->getCurrentRound()->getAnswers();
-        $chosenAnswerId = $this->game->getCurrentRound()->getChosenAnswerId();
+        parent::countdownTimer(Game::SECONDS_TO_VOTE);
 
         if($isJudge) {
-            echo '<form onchange="$(this).submit();" action="' . $this->game->getId() . '/chooseAnswer" method="post">';
-
-            $this->selectOMatic($this->game, $answers, $chosenAnswerId);
-            $this->answersForJudge($answers);
-
-            echo '</form>';
+            parent::gameState("Choose your favorite answer to ...<br>$question");
         } else {
-            $this->answersForPlayers($answers);
+            parent::gameState("Vote on what you think is $judgeName's favorite answer to ...<br>$question");
         }
-
-        echo '</div>';
-        echo '<div class="bottom"></div>';
-        echo '</div>';
     }
 
-    private function answersForJudge($answers) {
-        echo '<div class="choosing-answer" id="answers">';
+    protected function body() {
+        $isJudge = $this->game->isJudge($this->playerId);
+
+        if($isJudge) {
+            $answers = $this->game->getCurrentRound()->getAnswers();
+            $chosenAnswerId = $this->game->getCurrentRound()->getChosenAnswerId();
+
+            $this->selectOMatic($answers, $chosenAnswerId);
+
+            $this->answerCardsForJudge();
+        } else {
+            $this->answerCardsForPlayers();
+        }
+    }
+
+    private function answerCardsForJudge() {
+        $round = $this->game->getCurrentRound();
+        $answers = $round->getAnswers();
+        
+        echo '<div id="answer-cards">';
 
         foreach($answers as $answer) {
-            $token = $this->game->getPlayer($answer->getPlayerId())->getToken();
-
-            echo '<div class="answer ' . $token. '">';
-            echo '<div class="answer-text">' . $answer->getAnswer() . '</div>';
-            echo "</div>";
+            $this->answerCard($answer);
         }
 
-        echo "</div>";
+        echo '</div>';
     }
 
-    private function answersForPlayers($answers) {
-        $votes = $this->game->getCurrentRound()->getVotesFromPlayer($this->playerId);
+    private function answerCardsForPlayers() {
+        $round = $this->game->getCurrentRound();
+        $answers = $round->getAnswers();
+        $votes = $round->getVotesFromPlayer($this->playerId);
         $token = $this->game->getPlayer($this->playerId)->getToken();
-
-        echo '<form onchange="if($(this).find(\'input[type=radio]:checked\').length === 2) { $(this).submit(); }" data-dont-refresh="true" id="vote" action="' . $this->game->getId() . '/vote" method="post">';
-        echo '<div class="voting" id="answers">';
+        
+        echo '<form data-dont-refresh="true" id="voting" onchange="$(this).find(\'input[type=radio]:checked\').length === 2 && $(this).submit();" action="' . $this->game->getId() . '/votes" method="post">';
+        echo '<div id="answer-cards">';
 
         foreach($answers as $answer) {
-            echo '<div class="answer">';
-            echo '<div class="votes">';
-            echo "<label><input ";
-
-            if($votes && $votes[0]->getAnswerId() === $answer->getId()) {
-                echo "checked ";
-            }
-
-            echo 'name="vote1" type="radio" value="' . $answer->getId() . '"><div class="token ' . $token . '"></div></label>';
-            echo "<label><input ";
-
-            if($votes && $votes[1]->getAnswerId() === $answer->getId()) {
-                echo "checked ";
-            }
-            
-            echo 'name="vote2" type="radio" value="' . $answer->getId() . '"><div class="token ' . $token . '"></div></label>';
-            echo "</div>";
-            echo '<div class="answer-text">' . $answer->getAnswer() . '</div>';
-            echo "</div>";
+            $this->answerCardWithVotes($token, $answer, $votes);
         }
 
-        echo "</div>";
-        echo "</form>";
+        echo '</div>';
+        echo '</form>';
+    }
+
+    protected function answerCardWithVotes($token, $answer, $votesFromPlayer) {
+        if(!$answer) {
+            return;
+        }
+
+        echo '<div class="answer-card voting">';
+        echo '<div class="votes top">';
+
+        for($i = 0; $i < 2; ++$i) {
+            $checked = "";
+
+            if($votesFromPlayer && $votesFromPlayer[$i]->getAnswerId() === $answer->getId()) {
+                $checked = "checked";
+            }
+
+            echo '<label><input ' . $checked . ' name="vote'. ($i + 1) . '" type="radio"><div class="token ' . $token . '"></div></label>';
+        }
+
+        echo '</div>';
+        echo '<div class="answer-card-text">';
+
+        echo $answer->getAnswer();
+
+        echo '</div>';
+        echo '</div>';
+    }
+
+    protected function answerCard($answer) {
+        if(!$answer) {
+            return;
+        }
+
+        $token = $this->game->getPlayer($answer->getPlayerId())->getToken();
+
+        echo '<div class="answer-card ' . $token . '">';
+        echo '<div class="answer-card-text">';
+
+        echo $answer->getAnswer();
+
+        echo '</div>';
+        echo '</div>';
     }
 }

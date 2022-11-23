@@ -5,35 +5,21 @@ use Models\Game;
 use Models\Player;
 
 abstract class GameView implements View {
-    protected function heading(Game $game) {
-        $rounds = $game->getRounds();
+    protected Game $game;
 
-        echo '<div id="game-heading">';
-        echo '<div id="game-name">' . $game->getName() . '</div>';
-
-        if($rounds) {
-            $roundNumber = count($rounds);
-
-            echo '<div id="game-round">' . $roundNumber . '/11</div>';
-        }
-
-        echo '</div>';
+    public function __construct(Game $game) {
+        $this->game = $game;
     }
 
-    protected function players(Game $game, $playerId) {
+    protected function playerTokens($playerId, $winnerIds = []) {
         echo '<div id="players">';
 
-        $players = $game->getPlayers();
-        $chosenAnswerPlayerId = null;
-
-        if($round = $game->getCurrentRound()) {
-            $chosenAnswerPlayerId = $round->getChosenAnswerPlayerId();
-        }
+        $players = $this->game->getPlayers();
 
         $notWaiting = false;
         
         if($playerId) {
-            $notWaiting = $game->getPlayer($playerId)->getMustWaitForNextRound() === false;
+            $notWaiting = !$this->game->getPlayer($playerId)->getMustWaitForNextRound();
         }
 
         foreach($players as $player) {
@@ -45,12 +31,16 @@ abstract class GameView implements View {
                 $me = 'me';
             }
 
-            if($game->isJudge($player->getId())) {
+            if($this->game->isJudge($player->getId())) {
                 $judge = 'judge';
             }
 
+            if(in_array($player->getId(), $winnerIds)) {
+                $winner = "winner";
+            }
+
             // Only show the winner of a round if the player is a part of the game
-            if($playerId !== null && $notWaiting && $player->getId() == $chosenAnswerPlayerId) {
+            if($playerId !== null && $notWaiting && in_array($player->getId(), $winnerIds)) {
                 $winner = 'winner';
             }
 
@@ -65,21 +55,25 @@ abstract class GameView implements View {
         echo '</div>';
     }
 
-    protected function countdown($game, $secondsGiven) {
-        $secondsElapsed = $game->secondsSinceLastUpdate();
+    protected function gameState($state) {
+        echo '<div id="game-state">' . $state . '</div>';
+    }
+
+    protected function countdownTimer($secondsGiven) {
+        $secondsElapsed = $this->game->secondsSinceLastUpdate();
 
         $secondsLeft = max($secondsGiven - $secondsElapsed, 0);
 
-        echo '<div id="countdown-timer">' .$secondsLeft . '</div>';
+        echo '<div id="countdown-timer">' . $secondsLeft . '</div>';
     }
 
-    protected function selectOMatic($game, $answers, $chosenAnswerId, $disabled = false) {
+    protected function selectOMatic($answers, $chosenAnswerId, $disabled = false) {
         $tokensOfPlayersWhoAnswered = [];
         $spaces = [];
         $chosenAnswerPlayerToken = '';
 
         foreach($answers as $answer) {
-            $player = $game->getPlayer($answer->getPlayerId());
+            $player = $this->game->getPlayer($answer->getPlayerId());
 
             $token = $player->getToken();
 
@@ -95,7 +89,7 @@ abstract class GameView implements View {
 
             $tokensOfPlayersWhoAnswered[] = $token;
 
-            $spaces[] = '<input ' . (($disabled) ? 'disabled' : '') . ' ' . $checked . ' onclick="$(\'#select-o-matic\').attr(\'class\', \'' . $token . '\');" name="answerId" id="' . $token . '" type="radio" value="' . $answer->getId() . '"><label for="' . $token . '" class="space ' . $token . '"></label>';
+            $spaces[] = '<input ' . (($disabled) ? 'disabled' : '') . ' ' . $checked . ' onchange="$(\'#choosing-answer\').submit();" onclick="$(\'#select-o-matic\').attr(\'class\', \'' . $token . '\');" name="answerId" id="' . $token . '" type="radio" value="' . $answer->getId() . '"><label for="' . $token . '" class="space ' . $token . '"></label>';
         }
 
         $tokens = array_diff(Player::getTokens(), $tokensOfPlayersWhoAnswered);
@@ -104,6 +98,7 @@ abstract class GameView implements View {
             $spaces[] = '<input disabled name="answerId" id="' . $token . '" type="radio"><label for="' . $token . '" class="inactive space ' . $token . '"></label>';
         }
 
+        echo '<form data-dont-refresh="true" id="choosing-answer" action="' . $this->game->getId() . '/chooseAnswer" method="post"></form>';
         echo '<div id="select-o-matic" class="' . $chosenAnswerPlayerToken . '">';
 
         foreach($spaces as $space) {
@@ -111,6 +106,42 @@ abstract class GameView implements View {
         }
 
         echo '<div class="arrow"></div>';
-        echo "</div>";
+        echo '</div>';
+    }
+
+    protected function heading() {
+        $rounds = $this->game->getRounds();
+
+        echo '<div id="game-heading">';
+        echo '<div id="game-name">' . $this->game->getName() . '</div>';
+
+        if($rounds) {
+            $roundNumber = count($rounds);
+
+            echo '<div id="game-round">' . $roundNumber . '/11</div>';
+        }
+
+        echo '</div>';
+    }
+
+    protected function head() {
+        $this->heading();
+    }
+
+    protected function body() {}
+
+    public function render() {
+        echo '<div id="game">';
+        echo '<div class="head">';
+
+        $this->head();
+
+        echo '</div>';
+        echo '<div class="body">';
+
+        $this->body();
+
+        echo '</div>';
+        echo '</div>';
     }
 }

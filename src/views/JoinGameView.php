@@ -4,38 +4,26 @@ namespace Views;
 use Models\Game;
 
 class JoinGameView extends GameView {
-    private Game $game;
-
     public function __construct(Game $game) {
-        $this->game = $game;
+        parent::__construct($game);
     }
 
-    public function render() {
-        $gameIsFull = $this->game->getNumberOfPlayers() >= 8;
+    public function body() {
+        $gameIsFull = $this->game->getNumberOfPlayers() >= Game::MAX_PLAYERS;
         
-        echo '<div id="game">';
-        echo '<div class="top">';
-
-        parent::heading($this->game);
-        parent::players($this->game, null);
-
-        echo '</div>';
-        echo '<div class="middle"></div>';
-        echo '<div class="bottom">';
+        parent::playerTokens(null);
 
         if(!$gameIsFull) {
-            echo '<button type="button" onclick="showModal(\'join-game\');">Join Game</button>';
-        }
-
-        echo '</div>';
-        echo '</div>';
-
-        if(!$gameIsFull) {
-            $this->joinGame();
+            $this->joinGameButton();
+            $this->joinGameModal();
         }
     }
 
-    private function joinGame() {
+    private function joinGameButton() {
+        echo '<button id="join-game-button" type="button" onclick="showModal(\'join-game\');">Join Game</button>';
+    }
+
+    private function joinGameModal() {
         echo '<div data-dont-refresh="true" id="join-game" class="modal-overlay">';
         echo '<div class="modal">';
         echo '<form action="' . $this->game->getId() . '/join" method="post">';

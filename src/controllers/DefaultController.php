@@ -19,6 +19,12 @@ use Views\WaitingForPlayersView;
 
 use Views\TestGameView;
 use Views\TestView;
+use Models\Player;
+use Models\Round;
+use Models\Answer;
+use Models\Question;
+use Models\Card;
+use Models\Vote;
 
 class DefaultController extends Controller {
     private GameService $gameService;
@@ -64,7 +70,95 @@ class DefaultController extends Controller {
     }
 
     public function test() {
-        $testGameView = new TestGameView();
+        $game = new Game(
+            1,
+            "Redbud Ballers",
+            1,
+            Game::VOTING,
+            date( 'Y-m-d H:i:s', time()),
+            date( 'Y-m-d H:i:s', time())
+        );
+
+        $game->setPlayers([
+            new Player(1, 1, "Brenton", Player::COMPUTER, 0, 0, 0),
+            new Player(2, 1, "Prem", Player::MARTINI_GLASS, 1, 0, 0),
+            new Player(3, 1, "TJ", Player::CAR, 2, 0, 0),
+
+            new Player(4, 1, "Bablu", Player::DOLLAR_SIGN, 3, 0, 0),
+            new Player(5, 1, "Saad", Player::CLAPPERBOARD, 4, 0, 0),
+
+            new Player(6, 1, "Devesh", Player::HIGH_HEELS, 5, 0, 0),
+            new Player(7, 1, "Brian", Player::FOOTBALL, 6, 0, 0),
+            new Player(8, 1, "Tyler", Player::GUITAR, 7, 0, true),
+        ]);
+
+        $round = new Round(1, 1, 1, 1, 1, null);
+
+        $round->setCard(new Card(1, [
+            new Question(1, 1, "Which technology product would be the hardest to live without?"),
+            new Question(2, 1, "What would be the most dangerous stunt for a movie stuntman?"),
+            new Question(3, 1, "If I could train a monkey to do anything, what would it be?"),
+            new Question(4, 1, "What would I most want to see constructed out of Legos?"),
+            new Question(5, 1, "What's the best TV show to watch in re-runs?"),
+        ]));
+
+        $round->setAnswers([
+            new Answer(1, 2, 1, "Instagram"),
+            new Answer(2, 3, 1, "PS5"),
+            new Answer(3, 4, 1, "Internal combustion engine"),
+            new Answer(4, 5, 1, "X-ray imaging")
+        ]);
+
+        $round->setVotes([
+            new Vote(1, 1, 2, 2), new Vote(1, 1, 2, 3),
+            new Vote(1, 1, 3, 2), new Vote(1, 1, 3, 2),
+            new Vote(1, 1, 4, 3), new Vote(1, 1, 4, 3),
+            new Vote(1, 1, 5, 1), new Vote(1, 1, 5, 3),
+        ]);
+
+        $rounds = [];
+
+        for($i = 0; $i < 11; ++$i) {
+            $rounds[] = $round;
+        }
+
+        $game->setRounds($rounds);
+
+        $state = $game->getState();
+
+        $playerId = 1;
+
+        if(!$playerId) {
+            $testGameView = new JoinGameView($game);
+        } else {
+            $player = $game->getPlayer($playerId);
+
+            if($player->getMustWaitForNextRound()) {
+                $testGameView = new WaitingForNextRoundView($game, $playerId);
+            } else {
+                switch($state) {
+                case Game::WAITING_FOR_PLAYERS:
+                    $testGameView = new WaitingForPlayersView($game, $playerId);
+                    break;
+                case Game::ASKING_QUESTION:
+                    $testGameView = new AskingQuestionView($game, $playerId);
+                    break;
+                case Game::ANSWERING_QUESTION:
+                    $testGameView = new AnsweringQuestionView($game, $playerId);
+                    break;
+                case Game::VOTING:
+                    $testGameView = new VotingView($game, $playerId);
+                    break;
+                case Game::RESULTS:
+                    if($game->isOver()) {
+                        $testGameView = new GameOverView($game, $playerId);
+                    } else {
+                        $testGameView = new ResultsView($game, $playerId);
+                    }
+                    break;
+                }
+            }
+        }
 
         $view = new TestView($testGameView);
 

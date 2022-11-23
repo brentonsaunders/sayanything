@@ -2,9 +2,9 @@
 namespace Views;
 
 class TestView extends MainView {
-    private TestGameView $testGameView;
+    private View $testGameView;
 
-    public function __construct(TestGameView $testGameView) {
+    public function __construct(View $testGameView) {
         $this->testGameView = $testGameView;
     }
 
