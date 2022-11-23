@@ -4,6 +4,111 @@ namespace Views;
 use Models\Game;
 
 class ResultsView extends GameView {
+    private $playerId = null;
+
+    public function __construct(Game $game, $playerId) {
+        parent::__construct($game);
+
+        $this->playerId = $playerId;
+    }
+
+    protected function head() {
+        parent::heading($this->playerId);
+
+        parent::playerTokens($this->playerId);
+
+        parent::countdownTimer(Game::SECONDS_UNTIL_NEW_ROUND);
+    }
+
+    protected function body() {
+        $round = $this->game->getCurrentRound();
+        $answers = $round->getAnswersSortedByVotes();
+        $chosenAnswerId = $round->getChosenAnswerId();
+
+        $this->selectOMatic($answers, $chosenAnswerId, true);
+
+        $this->answerCards($answers);
+    }
+
+    protected function vote($vote) {
+        if(!$vote) {
+            return;
+        }
+
+        $token = $this->game->getPlayer($vote->getPlayerId())->getToken();
+
+        echo '<div class="token ' . $token . '"></div>';
+    }
+
+    protected function votes($votes) {
+        if(!$votes) {
+            return;
+        }
+
+        $votesTop = array_slice($votes, 0, 8);
+        $votesBottom = array_slice($votes, 8);
+
+        echo '<div class="votes top">';
+
+        foreach($votesTop as $vote) {
+            $this->vote($vote);
+        }
+
+        echo '</div>';
+
+        echo '<div class="votes bottom">';
+
+        foreach($votesBottom as $vote) {
+            $this->vote($game, $vote);
+        }
+
+        echo '</div>';
+    }
+
+
+    private function answerCards($answers) {
+        if(!$answers) {
+            return;
+        }
+
+        $round = $this->game->getCurrentRound();
+        
+        echo '<div id="answer-cards">';
+
+        foreach($answers as $answer) {
+            $votes = $round->getVotesForAnswer($answer->getId());
+
+            $this->answerCard($answer, $votes);
+        }
+
+        echo '</div>';
+    }
+
+    protected function answerCard($answer, $votes) {
+        if(!$answer) {
+            return;
+        }
+
+        $token = $this->game->getPlayer($answer->getPlayerId())->getToken();
+
+        echo '<div class="answer-card ' . $token . '">';
+
+        $this->votes($votes);
+
+        echo '<div class="answer-card-text">';
+        echo $answer->getAnswer();
+
+        echo '</div>';
+        echo '</div>';
+    }
+}
+
+/*
+namespace Views;
+
+use Models\Game;
+
+class ResultsView extends GameView {
     private Game $game;
     private $playerId = null;
 
@@ -239,3 +344,4 @@ class ResultsView extends GameView {
         echo "</div>";
     }
 }
+*/

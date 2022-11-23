@@ -74,7 +74,7 @@ class DefaultController extends Controller {
             1,
             "Redbud Ballers",
             1,
-            Game::VOTING,
+            Game::RESULTS,
             date( 'Y-m-d H:i:s', time()),
             date( 'Y-m-d H:i:s', time())
         );
@@ -92,7 +92,7 @@ class DefaultController extends Controller {
             new Player(8, 1, "Tyler", Player::GUITAR, 7, 0, true),
         ]);
 
-        $round = new Round(1, 1, 1, 1, 1, null);
+        $round = new Round(1, 1, 1, 1, 1, 4);
 
         $round->setCard(new Card(1, [
             new Question(1, 1, "Which technology product would be the hardest to live without?"),
@@ -116,11 +116,15 @@ class DefaultController extends Controller {
             new Vote(1, 1, 5, 1), new Vote(1, 1, 5, 3),
         ]);
 
+        /*
+
         $rounds = [];
 
-        for($i = 0; $i < 11; ++$i) {
+        for($i = 0; $i < 1; ++$i) {
             $rounds[] = $round;
-        }
+        }*/
+
+        $rounds = [$round];
 
         $game->setRounds($rounds);
 

@@ -4,6 +4,29 @@ namespace Views;
 use Models\Game;
 
 class GameOverView extends GameView {
+    private $playerId = null;
+
+    public function __construct(Game $game, $playerId) {
+        parent::__construct($game);
+
+        $this->playerId = $playerId;
+    }
+
+    protected function head() {
+        parent::heading($this->playerId);
+    }
+
+    protected function body() {
+        
+    }
+}
+
+/*
+namespace Views;
+
+use Models\Game;
+
+class GameOverView extends GameView {
     private Game $game;
     private $playerId = null;
 
@@ -90,3 +113,4 @@ class GameOverView extends GameView {
         echo "</div>";
     }
 }
+*/
