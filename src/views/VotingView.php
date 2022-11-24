@@ -7,7 +7,10 @@ class VotingView extends GameView {
     private $playerId = null;
 
     public function __construct(Game $game, $playerId) {
-        $this->game = $game;
+        parent::__construct($game);
+
+        parent::dontRefreshBody(true);
+        
         $this->playerId = $playerId;
     }
 

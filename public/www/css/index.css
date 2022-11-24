@@ -251,6 +251,7 @@ main {
 #create-game-button,
 #start-game-button,
 #join-game-button,
+#answer-button,
 #next-round-button,
 #scores-button {
     position: absolute;
@@ -382,121 +383,6 @@ button:disabled {
 #create-game #tokens input[type=radio]:checked + .token {
     width: 60px;
     height: 60px;
-}
-
-/*
-#questions {
-    margin-bottom: 40px;
-}
-
-#questions label {
-    display: block;
-    height: 48px;
-    border: 2px dotted black;
-}
-
-#questions input[type=radio] {
-    display: none;
-}
-
-#questions .question {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    height: 100%;
-}
-
-#questions input[type=radio]:checked + .question {
-    background-color: lightgrey;
-    font-weight: bold;
-}*/
-
-#answer {
-    position: relative;
-    width: 100%;
-    height: 150px;
-    margin-bottom: 40px;
-    border: 2px solid black;
-    resize: none;
-    outline: none;
-}
-
-#answer:read-only {
-    border: none;
-    background-image: url("../img/pen-icon.png");
-    background-size: 20px;
-    background-position: right 10px top 10px;
-    background-repeat: no-repeat;
-    cursor: pointer;
-}
-
-#answer:read-only + button[type=submit] {
-    visibility: hidden;
-}
-
-#answers {
-    margin-top: 40px;
-}
-
-#answers .answer {
-    display: flex;
-    flex-direction: column;
-    width: 100%;
-    padding: 10px;
-    margin-bottom: 40px;
-    border-radius: 10px;
-}
-
-#answers.voting .answer {
-    background-color: rgb(200, 200, 200);
-    padding-bottom: 50px;
-}
-
-#answers.choosing-answer .answer {
-    padding: 50px 10px;
-}
-
-#answers.results .answer {
-    padding: 15px 10px;
-}
-
-#answers .votes {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
-    padding-bottom: 10px;
-}
-
-#answers .votes label {
-    display: block;
-    width: 40px;
-    height: 40px;
-    background-color: rgb(140, 140, 140);
-    border-radius: 40px;
-}
-
-#answers .votes label .token {
-    display: none;
-}
-
-#answers .votes input[type=radio] {
-    display: none;
-}
-
-#answers .votes input[type=radio]:checked + .token {
-    display: flex;
-}
-
-#answers .votes .token {
-    margin-bottom: 0;
-}
-
-#answers .answer-text {
-    height: 175px;
-    padding: 15px;
-    background-color: white;
-    border-radius: 10px;
-    border: 4px solid black;
 }
 
 #my-games {
@@ -785,7 +671,7 @@ button:disabled {
 }
 
 #select-o-matic .space.high-heels,
-#select-o-mati.high-heels .arrow {
+#select-o-matic.high-heels .arrow {
     transform: rotate(315deg);
 }
 

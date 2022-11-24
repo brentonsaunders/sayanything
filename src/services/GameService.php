@@ -24,7 +24,7 @@ class GameService {
 
     public function getGame($gameId) {
         try {
-            // $this->updateGame($gameId);
+            $this->updateGame($gameId);
         } catch(GameServiceException $e) {
             throw $e;
         }

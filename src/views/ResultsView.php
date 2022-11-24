@@ -11,6 +11,8 @@ class ResultsView extends GameView {
     public function __construct(Game $game, $playerId, $round = null) {
         parent::__construct($game);
 
+        parent::dontRefreshBody(true);
+
         $this->playerId = $playerId;
 
         if($round) {

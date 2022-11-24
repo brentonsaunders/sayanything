@@ -335,7 +335,7 @@ class Game {
         $answers = $round->getAnswers();
 
         if(!$answers) {
-            return false;
+            return true;
         }
 
         $numAnswers = count($answers);

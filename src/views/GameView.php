@@ -6,9 +6,14 @@ use Models\Player;
 
 abstract class GameView implements View {
     protected Game $game;
+    private $dontRefreshBody = false;
 
     public function __construct(Game $game) {
         $this->game = $game;
+    }
+
+    protected function dontRefreshBody($dontRefreshBody) {
+        $this->dontRefreshBody = $dontRefreshBody;
     }
 
     protected function playerTokens($playerId, $winnerIds = [], $roundId = null) {
@@ -142,7 +147,13 @@ abstract class GameView implements View {
         $this->head();
 
         echo '</div>';
-        echo '<div data-dont-refresh="true" id="game-body" class="body">';
+        echo '<div ';
+
+        if($this->dontRefreshBody) {
+            echo 'data-dont-refresh="true"';
+        }
+        
+        echo ' id="game-body" class="body">';
 
         $this->body();
 

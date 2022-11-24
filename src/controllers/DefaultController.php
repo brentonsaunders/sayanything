@@ -76,6 +76,8 @@ class DefaultController extends Controller {
 
         $playerId = 1;
 
+        $game->setState(Game::VOTING);
+
         $state = $game->getState();
 
         if(!$playerId) {

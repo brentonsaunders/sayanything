@@ -52,7 +52,7 @@ class AnsweringQuestionView extends GameView {
             $disabled = "disabled";
         }
 
-        echo '<textarea ' . $readonly . ' name="answer" onclick="$(this).attr(\'readonly\', false); $(\'#answer-button\').attr(\'disabled\', false);">';
+        echo '<textarea ' . $readonly . ' id="answer" name="answer" onclick="$(this).attr(\'readonly\', false); $(\'#answer-button\').attr(\'disabled\', false);">';
         
 
         if($answer) {
