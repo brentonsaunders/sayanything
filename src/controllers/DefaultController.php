@@ -3,8 +3,10 @@ namespace Controllers;
 
 use App;
 use Models\Game;
+use Models\ScoreBoard;
 use Services\GameService;
 use Services\GameServiceException;
+use Services\ScoreService;
 use Views\MainView;
 use Views\LobbyView;
 use Views\AnsweringQuestionView;
@@ -70,67 +72,11 @@ class DefaultController extends Controller {
     }
 
     public function test() {
-        $game = new Game(
-            1,
-            "Redbud Ballers",
-            1,
-            Game::RESULTS,
-            date( 'Y-m-d H:i:s', time()),
-            date( 'Y-m-d H:i:s', time())
-        );
-
-        $game->setPlayers([
-            new Player(1, 1, "Brenton", Player::COMPUTER, 0, 0, 0),
-            new Player(2, 1, "Prem", Player::MARTINI_GLASS, 1, 0, 0),
-            new Player(3, 1, "TJ", Player::CAR, 2, 0, 0),
-
-            new Player(4, 1, "Bablu", Player::DOLLAR_SIGN, 3, 0, 0),
-            new Player(5, 1, "Saad", Player::CLAPPERBOARD, 4, 0, 0),
-
-            new Player(6, 1, "Devesh", Player::HIGH_HEELS, 5, 0, 0),
-            new Player(7, 1, "Brian", Player::FOOTBALL, 6, 0, 0),
-            new Player(8, 1, "Tyler", Player::GUITAR, 7, 0, true),
-        ]);
-
-        $round = new Round(1, 1, 1, 1, 1, 4);
-
-        $round->setCard(new Card(1, [
-            new Question(1, 1, "Which technology product would be the hardest to live without?"),
-            new Question(2, 1, "What would be the most dangerous stunt for a movie stuntman?"),
-            new Question(3, 1, "If I could train a monkey to do anything, what would it be?"),
-            new Question(4, 1, "What would I most want to see constructed out of Legos?"),
-            new Question(5, 1, "What's the best TV show to watch in re-runs?"),
-        ]));
-
-        $round->setAnswers([
-            new Answer(1, 2, 1, "Instagram"),
-            new Answer(2, 3, 1, "PS5"),
-            new Answer(3, 4, 1, "Internal combustion engine"),
-            new Answer(4, 5, 1, "X-ray imaging")
-        ]);
-
-        $round->setVotes([
-            new Vote(1, 1, 2, 2), new Vote(1, 1, 2, 3),
-            new Vote(1, 1, 3, 2), new Vote(1, 1, 3, 2),
-            new Vote(1, 1, 4, 3), new Vote(1, 1, 4, 3),
-            new Vote(1, 1, 5, 1), new Vote(1, 1, 5, 3),
-        ]);
-
-        /*
-
-        $rounds = [];
-
-        for($i = 0; $i < 1; ++$i) {
-            $rounds[] = $round;
-        }*/
-
-        $rounds = [$round];
-
-        $game->setRounds($rounds);
-
-        $state = $game->getState();
+        $game = $this->mockGame();
 
         $playerId = 1;
+
+        $state = $game->getState();
 
         if(!$playerId) {
             $testGameView = new JoinGameView($game);
@@ -154,11 +100,8 @@ class DefaultController extends Controller {
                     $testGameView = new VotingView($game, $playerId);
                     break;
                 case Game::RESULTS:
-                    if($game->isOver()) {
-                        $testGameView = new GameOverView($game, $playerId);
-                    } else {
-                        $testGameView = new ResultsView($game, $playerId);
-                    }
+                case GAME::GAME_OVER:
+                    $testGameView = new ResultsView($game, $playerId);
                     break;
                 }
             }
@@ -210,11 +153,7 @@ class DefaultController extends Controller {
                     $view = new VotingView($game, $playerId);
                     break;
                 case Game::RESULTS:
-                    if(intval($game->getRoundNumber()) >= 11) {
-                        $view = new GameOverView($game, $playerId);
-                    } else {
-                        $view = new ResultsView($game, $playerId);
-                    }
+                    $view = new ResultsView($game, $playerId);
                     break;
                 }
             }
@@ -365,5 +304,87 @@ class DefaultController extends Controller {
         $playerId = $_SESSION["games"][$gameId];
 
         $game = $this->gameService->chooseAnswer($gameId, $playerId, $answerId);
+    }
+
+    private function mockGame() {
+        $game = new Game(
+            1,
+            "Redbud Ballers",
+            1,
+            Game::RESULTS,
+            date( 'Y-m-d H:i:s', time() - 31),
+            date( 'Y-m-d H:i:s', time())
+        );
+
+        $game->setPlayers([
+            new Player(1, 1, "Brenton", Player::COMPUTER, 0, 0, 0),
+            new Player(2, 1, "Prem", Player::MARTINI_GLASS, 1, 0, 0),
+            new Player(3, 1, "TJ", Player::CAR, 2, 0, 0),
+
+            new Player(4, 1, "Bablu", Player::DOLLAR_SIGN, 3, 0, 0),
+            new Player(5, 1, "Saad", Player::CLAPPERBOARD, 4, 0, 0),
+
+            new Player(6, 1, "Devesh", Player::HIGH_HEELS, 5, 0, 0),
+            new Player(7, 1, "Brian", Player::FOOTBALL, 6, 0, 0),
+            new Player(8, 1, "Tyler", Player::GUITAR, 7, 0, true),
+        ]);
+
+        $round = new Round(1, 1, 1, 1, 1, null);
+
+        $round->setCard(new Card(1, [
+            new Question(1, 1, "Which technology product would be the hardest to live without?"),
+            new Question(2, 1, "What would be the most dangerous stunt for a movie stuntman?"),
+            new Question(3, 1, "If I could train a monkey to do anything, what would it be?"),
+            new Question(4, 1, "What would I most want to see constructed out of Legos?"),
+            new Question(5, 1, "What's the best TV show to watch in re-runs?"),
+        ]));
+
+        $anotherRound = new Round(2, 1, 2, 2, 6, null);
+
+        $anotherRound->setCard(new Card(2, [
+            new Question(6, 2, "What's the most useless household item?"),
+            new Question(7, 2, "What hit song should have never been recorded?"),
+            new Question(8, 2, "If my life was a movie, what would it be?"),
+            new Question(9, 2, "What living person would be the cooles to have dinner with?"),
+            new Question(10, 2, "What's the worst place for a date?"),
+        ]));
+
+        $round->setAnswers([
+            new Answer(1, 2, 1, "Instagram"),
+            new Answer(2, 3, 1, "PS5"),
+            new Answer(3, 4, 1, "Internal combustion engine"),
+            new Answer(4, 5, 1, "X-ray imaging")
+        ]);
+
+        $anotherRound->setAnswers([
+            new Answer(5, 1, 2, "Loofahs"),
+            new Answer(6, 3, 2, "Tea candles"),
+            new Answer(7, 4, 2, "Piggy banks"),
+            new Answer(8, 5, 2, "Banana slicers"),
+        ]);
+
+        $round->setVotes([
+            new Vote(1, 1, 2, 2), new Vote(1, 1, 2, 3),
+            new Vote(1, 1, 3, 2), new Vote(1, 1, 3, 2),
+            new Vote(1, 1, 4, 3), new Vote(1, 1, 4, 3),
+            new Vote(1, 1, 5, 1), new Vote(1, 1, 5, 3),
+        ]);
+
+        $anotherRound->setVotes([
+            new Vote(1, 1, 1, 6), new Vote(1, 1, 1, 6),
+            new Vote(1, 1, 3, 5), new Vote(1, 1, 3, 7),
+            new Vote(1, 1, 4, 7), new Vote(1, 1, 4, 3),
+            new Vote(1, 1, 5, 7), new Vote(1, 1, 5, 5),
+        ]);
+
+        $rounds = [$round, $anotherRound];
+
+        for($i = 0; $i < 9; ++$i) {
+            $rounds[] = $round;
+        }
+
+        $game->setRounds($rounds);
+
+        return $game;
     }
 }

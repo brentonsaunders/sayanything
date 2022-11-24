@@ -248,8 +248,11 @@ main {
     background-image: url("../img/clapperboard.png");
 }
 
+#create-game-button,
 #start-game-button,
-#join-game-button {
+#join-game-button,
+#next-round-button,
+#scores-button {
     position: absolute;
     bottom: 0;
 }
@@ -893,7 +896,7 @@ button:disabled {
     display: flex;
     flex-direction: column;
     gap: 20px;
-    margin-top: 40px;
+    margin: 40px auto 80px;
 }
 
 .answer-card {

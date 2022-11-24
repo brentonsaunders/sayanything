@@ -37,7 +37,7 @@ class AskingQuestionView extends GameView {
 
         foreach($questions as $question) {
             echo '<label>';
-            echo '<input name="question" type="radio">';
+            echo '<input name="questionId" type="radio" value="' . $question->getId() . '">';
             echo '<span>' . $question->getQuestion() . '</span>';
             echo '</label>';
         }

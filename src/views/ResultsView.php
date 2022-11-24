@@ -5,29 +5,110 @@ use Models\Game;
 
 class ResultsView extends GameView {
     private $playerId = null;
+    private $round = null;
+    private $isCurrentRound = false;
 
-    public function __construct(Game $game, $playerId) {
+    public function __construct(Game $game, $playerId, $round = null) {
         parent::__construct($game);
 
         $this->playerId = $playerId;
+
+        if($round) {
+            $this->round = $round;
+        } else {
+            $this->round = $game->getCurrentRound();
+        }
+
+        if($this->round->getId() == $game->getCurrentRound()->getId()) {
+            $this->isCurrentRound = true;
+        }
     }
 
     protected function head() {
-        parent::heading($this->playerId);
+        parent::heading($this->round->getId());
 
-        parent::playerTokens($this->playerId);
-
-        parent::countdownTimer(Game::SECONDS_UNTIL_NEW_ROUND);
+        if($this->isCurrentRound && !$this->game->isOver()) {
+            parent::countdownTimer(Game::SECONDS_UNTIL_NEW_ROUND);
+        }
     }
 
     protected function body() {
-        $round = $this->game->getCurrentRound();
-        $answers = $round->getAnswersSortedByVotes();
-        $chosenAnswerId = $round->getChosenAnswerId();
+        $answers = $this->round->getAnswersSortedByVotes();
+        $chosenAnswerId = $this->round->getChosenAnswerId();
+        $judgeName = $this->game->getJudge()->getName();
+        $roundNumber = $this->game->getRoundNumber($this->round->getId());
+        $winners = $this->round->getWinners();
+        $question = $this->round->getAskedQuestion();
 
-        $this->selectOMatic($answers, $chosenAnswerId, true);
+        $waitingForNextRound = "";
+
+        if($this->isCurrentRound && !$this->game->isOver()) {
+            $waitingForNextRound = "Waiting for the next round to begin ...";
+        }
+
+        if(!$answers) {
+            parent::gameState(
+                $question . "<br>" . 
+                "No one answered in time!<br>" . 
+                $waitingForNextRound
+            );
+        } else if(count($answers) === 1) {
+            $player = $this->game->getPlayer($winners[0]);
+            $playerName = $player->getName();
+
+            parent::gameState(
+                $question . "<br>" . 
+                "$playerName was the only one to answer the question!<br>" . 
+                "$playerName wins round $roundNumber!<br>" . 
+                $waitingForNextRound
+            );
+        } else if($chosenAnswerId) {
+            $this->selectOMatic($answers, $chosenAnswerId, true);
+
+            $player = $this->game->getPlayer($this->round->getChosenAnswerPlayerId());
+            $playerName = $player->getName();
+
+            parent::gameState(
+                $question . "<br>" . 
+                "$playerName wins round $roundNumber with the chosen answer!<br>" . 
+                $waitingForNextRound
+            );
+        } else {
+            $winnerNames = array_map(function($winner) {
+                return $this->game->getPlayer($winner)->getName();
+            }, $winners);
+
+            parent::gameState(
+                $question . "<br>" . 
+                "$judgeName didn't choose a favorite answer in time!<br>" .
+                implode(" and ", $winnerNames) .
+                " wins round $roundNumber with the most votes!<br>" . 
+                $waitingForNextRound
+            );
+        }
+
+        parent::playerTokens($this->playerId, $winners, $this->round->getId());
 
         $this->answerCards($answers);
+
+        if($this->isCurrentRound) {
+            if($this->game->isOver()) {
+                $this->scoresButton();
+            } else if($this->game->isCreator($this->playerId) &&
+                      $this->game->secondsSinceLastUpdate() >= 30) {
+                $this->nextRoundButton();
+            }
+        }
+    }
+
+    protected function nextRoundButton() {
+        echo '<form action="' . $this->game->getId() . '/nextRound" method="post">';
+        echo '<button id="next-round-button" type="submit">Next Round</button>';
+        echo '</form>';
+    }
+
+    protected function scoresButton() {
+        echo '<button onclick="window.location = \'' . $this->game->getId() . '\';" id="scores-button" type="submit">Scores</button>';
     }
 
     protected function vote($vote) {
@@ -76,7 +157,7 @@ class ResultsView extends GameView {
         echo '<div id="answer-cards">';
 
         foreach($answers as $answer) {
-            $votes = $round->getVotesForAnswer($answer->getId());
+            $votes = $this->round->getVotesForAnswer($answer->getId());
 
             $this->answerCard($answer, $votes);
         }
@@ -102,246 +183,3 @@ class ResultsView extends GameView {
         echo '</div>';
     }
 }
-
-/*
-namespace Views;
-
-use Models\Game;
-
-class ResultsView extends GameView {
-    private Game $game;
-    private $playerId = null;
-
-    public function __construct(Game $game, $playerId) {
-        $this->game = $game;
-        $this->playerId = $playerId;
-    }
-
-    public function render() {
-        $answers = $this->game->getCurrentRound()->getAnswers();
-        $chosenAnswerId = $this->game->getCurrentRound()->getChosenAnswerId();
-        $winnerId = $this->game->getCurrentRound()->getChosenAnswerPlayerId();
-        $winner = $this->game->getPlayer($winnerId);
-        $roundNumber = count($this->game->getRounds());
-
-        echo '<div id="game" class="results">';
-        echo '<div class="top"></div>';
-        echo '<div id="results" data-dont-refresh="true" class="middle">';
-
-        // No answers - judge awarded two points
-        // 1 answer - player award two points, player one point
-        // No chosen answer - judge loses two points, player with most tokens win
-        // Less than two votes - lose a point for each vote not given
-
-        parent::heading($this->game);
-
-        $votes = $this->game->getCurrentRound()->getVotes();
-
-        if(!$answers) {
-            $this->noAnswers();
-        } else if(count($answers) === 1) {
-            $this->onlyOneAnswer($answers);
-        } else if(!$chosenAnswerId && !$votes) {
-            $this->noChosenAnswerAndNoVotes($answers);
-        } else if(!$chosenAnswerId) {
-            $this->noChosenAnswer($answers);
-        } else {
-            parent::selectOMatic($this->game, $answers, $chosenAnswerId, true);
-
-            echo '<div id="game-state">';
-
-            echo $winner->getName() . ' Wins Round ' . $roundNumber . '!<br>';
-            
-            echo 'Waiting for the next round to begin ...</div>';
-
-            parent::countdown($this->game, Game::SECONDS_UNTIL_NEW_ROUND);
-
-            parent::players($this->game, $this->playerId);
-            
-            $this->answers($answers, $chosenAnswerId);
-        }
-        
-        echo '</div>';
-        echo '<div class="bottom">';
-
-        if($this->game->isCreator($this->playerId) && $this->game->secondsSinceLastUpdate() >= 30) {
-            echo '<form action="' . $this->game->getId() . '/nextRound" method="post">';
-            echo '<button type="submit">Next Round</button>';
-            echo '</form>';
-        }
-        
-        echo '</div>';
-        echo '</div>';
-    }
-
-    private function getPlayerWithMostVotes() {
-        $answers = $this->game->getCurrentRound()->getAnswers();
-        $votes = $this->game->getCurrentRound()->getVotes();
-
-        if(!$answers || !$votes) {
-            return null;
-        }
-
-        $mostVotes = 0;
-        $answersWithMostVotes = [];
-
-        foreach($answers as $answer) {
-            $numVotes = 0;
-
-            foreach($votes as $vote) {
-                if($vote->getAnswerId() === $answer->getId()) {
-                    ++$numVotes;
-                }
-            }
-
-            if($numVotes === $mostVotes) {
-                $answersWithMostVotes[] = $answer;
-            } else if($numVotes > $mostVotes) {
-                $mostVotes = $numVotes;
-
-                $answersWithMostVotes = [$answer];
-            }
-        }
-
-        if(count($answersWithMostVotes) === 0) {
-            return null;
-        }
-
-        $playersWithMostVotes = [];
-
-        foreach($answersWithMostVotes as $answer) {
-            $playersWithMostVotes[] = $this->game->getPlayer($answer->getPlayerId())->getName();
-        }
-
-        return $playersWithMostVotes;
-    }
-
-    private function noAnswers() {
-        parent::players($this->game, $this->playerId);
-
-        $judge = $this->game->getJudge();
-
-        echo '<div id="game-state">No player answered the question in time.<br>';
-        
-        echo $judge->getName() . ' is awarded two points.<br>';
-        
-        echo 'Waiting for the next round to begin ...</div>';
-
-        parent::countdown($this->game, Game::SECONDS_UNTIL_NEW_ROUND);
-    }
-
-    private function onlyOneAnswer($answers) {
-        parent::players($this->game, $this->playerId);
-
-        $judge = $this->game->getJudge();
-
-        $answer = $answers[0];
-
-        $player = $this->game->getPlayer($answer->getPlayerId());
-
-        echo '<div id="game-state">Only ' . $player->getName() . ' answered the question in time.<br>';
-        
-        echo $player->getName() . ' is awarded two points.<br>';
-
-        echo $judge->getName() . ' is awarded one point.<br>';
-        
-        echo 'Waiting for the next round to begin ...</div>';
-
-        parent::countdown($this->game, Game::SECONDS_UNTIL_NEW_ROUND);
-
-        $this->answers($answers, null);
-    }
-
-    private function noChosenAnswerAndNoVotes($answers) {
-        parent::players($this->game, $this->playerId);
-
-        $judge = $this->game->getJudge();
-
-        echo '<div id="game-state">' . $judge->getName() . ' didn\'t choose a favorite answer in time, and no one placed a vote.<br>';
-        echo 'No points awarded this round.<br>';
-        echo 'Waiting for the next round to begin ...</div>';
-
-        parent::countdown($this->game, Game::SECONDS_UNTIL_NEW_ROUND);
-        
-        $this->answers($answers, null);
-    }
-
-    private function noChosenAnswer($answers) {
-        parent::players($this->game, $this->playerId);
-
-        $judge = $this->game->getJudge();
-
-        echo '<div id="game-state">' . $judge->getName() . ' didn\'t choose a favorite answer in time.<br>';
-       
-        $winners = $this->getPlayerWithMostVotes();
-
-        echo implode(" and ", $winners) . " are tied for most votes.<br>";
-       
-        echo 'Waiting for the next round to begin ...</div>';
-
-        echo '<pre>';
-
-        
-
-        echo '</pre>';
-
-        parent::countdown($this->game, Game::SECONDS_UNTIL_NEW_ROUND);
-        
-        $this->answers($answers, null);
-    }
-
-    private function answers($answers, $chosenAnswerId) {
-        $votes = $this->game->getCurrentRound()->getVotes();
-
-        $votesForAnswer = function($answerId) use($votes) {
-            if(!$votes) {
-                return [];
-            }
-
-            return array_filter($votes, function($vote) use($answerId) {
-                return $vote->getAnswerId() == $answerId;
-            });
-        };
-
-        // Bring the chosen answer to the top, and then sort the rest by number
-        // of votes
-        usort($answers, function($a, $b) use($chosenAnswerId, $votesForAnswer) {
-            if($a->getId() == $chosenAnswerId) {
-                return -1;
-            } else if($b->getId() == $chosenAnswerId) {
-                return 1;
-            }
-
-            $numVotesForA = count($votesForAnswer($a->getId()));
-            $numVotesForB = count($votesForAnswer($b->getId()));
-
-            return $numVotesForB - $numVotesForA;
-        });
-
-        echo '<div class="results" id="answers">';
-
-        foreach($answers as $answer) {
-            $player = $this->game->getPlayer($answer->getPlayerId());
-
-            echo '<div class="answer ' . $player->getToken() . '">';
-            echo '<div class="votes">';
-
-            if($votes) {
-                foreach($votes as $vote) {
-                    if($vote->getAnswerId() == $answer->getId()) {
-                        $player = $this->game->getPlayer($vote->getPlayerId());
-
-                        echo '<div class="token ' . $player->getToken() . '"></div>';
-                    }
-                }
-            }
-
-            echo '</div>';
-            echo '<div class="answer-text">' . $answer->getAnswer() . '</div>';
-            echo "</div>";
-        }
-
-        echo "</div>";
-    }
-}
-*/

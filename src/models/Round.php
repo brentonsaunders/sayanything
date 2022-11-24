@@ -324,10 +324,29 @@ class Round {
 
         foreach($answersAndNumVotes as $answerAndNumVotes) {
             if($answerAndNumVotes["numVotes"] == $mostVotes) {
-                $topAnswers = $answerAndNumVotes["answer"];
+                $topAnswers[] = $answerAndNumVotes["answer"];
             }
         }
 
         return $topAnswers;
+    }
+
+    // Returns the ids of the tentative winners of the round
+    public function getWinners() {
+        if(!$this->answers) {
+            return null;
+        }
+
+        if($this->chosenAnswerId) {
+            return [$this->getChosenAnswerPlayerId()];
+        }
+
+        $answers = $this->getTopAnswers();
+
+        $winners = array_map(function($answer) {
+            return $answer->getPlayerId();
+        }, $answers);
+
+        return  $winners;
     }
 }

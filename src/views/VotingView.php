@@ -61,7 +61,7 @@ class VotingView extends GameView {
         $votes = $round->getVotesFromPlayer($this->playerId);
         $token = $this->game->getPlayer($this->playerId)->getToken();
         
-        echo '<form data-dont-refresh="true" id="voting" onchange="$(this).find(\'input[type=radio]:checked\').length === 2 && $(this).submit();" action="' . $this->game->getId() . '/votes" method="post">';
+        echo '<form data-dont-refresh="true" id="voting" onchange="$(this).find(\'input[type=radio]:checked\').length === 2 && $(this).submit();" action="' . $this->game->getId() . '/vote" method="post">';
         echo '<div id="answer-cards">';
 
         foreach($answers as $answer) {
@@ -87,7 +87,7 @@ class VotingView extends GameView {
                 $checked = "checked";
             }
 
-            echo '<label><input ' . $checked . ' name="vote'. ($i + 1) . '" type="radio"><div class="token ' . $token . '"></div></label>';
+            echo '<label><input ' . $checked . ' name="vote'. ($i + 1) . '" type="radio" value="' . $answer->getId() . '"><div class="token ' . $token . '"></div></label>';
         }
 
         echo '</div>';

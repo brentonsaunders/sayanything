@@ -17,10 +17,8 @@ class LobbyView extends MainView {
         $this->myGames();
 
         echo '</div>';
-        echo '<div class="middle">';
-        echo '</div>';
         echo '<div class="bottom">';
-        echo '<button class="button" onclick="showModal(\'create-game\');">Create Game</button>';
+        echo '<button id="create-game-button" class="button" onclick="showModal(\'create-game\');">Create Game</button>';
         echo '</div>';
         echo '</div>';
 

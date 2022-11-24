@@ -8,6 +8,7 @@ class Game {
     const ANSWERING_QUESTION = "answering-question";
     const VOTING = "voting";
     const RESULTS = "results";
+    const GAME_OVER = "game-over";
 
     const MIN_PLAYERS = 4;
     const MAX_PLAYERS = 8;
@@ -133,12 +134,28 @@ class Game {
         }
     }
 
-    public function getRoundNumber() {
+    public function getRoundNumber($roundId = null) {
         if(!$this->rounds) {
             return null;
         }
 
-        return count($this->rounds);
+        if(!$roundId) {
+           return count($this->rounds);
+        }
+
+        $rounds = $this->rounds;
+
+        usort($rounds, function($a, $b) {
+            return $a->getId() - $b->getId();
+        });
+
+        for($i = 0; $i < count($rounds); ++$i) {
+            if($rounds[$i]->getId() == $roundId) {
+                return $i + 1;
+            }
+        }
+
+        return null;
     }
 
     public function getUsedTokens() {
@@ -257,33 +274,47 @@ class Game {
             return null;
         }
 
-        usort($this->rounds, function($a, $b) {
-            if($a->getId() < $b->getId()) {
-                return -1;
-            } else if($a->getId() > $b->getId()) {
-                return 1;
-            }
+        $rounds = $this->rounds;
 
-            return 0;
+        usort($rounds, function($a, $b) {
+            return $a->getId() - $b->getId();
         });
 
-        return end($this->rounds);
+        return end($rounds);
     }
 
-    public function isJudge($playerId) {
-        $judge = $this->getJudge();
-
-        return $judge !== null && $judge->getId() == $playerId;
-    }
-
-    public function getJudge() {
+    public function getRound($roundId) {
         if(!$this->rounds) {
             return null;
         }
 
-        $thisRound = $this->getCurrentRound();
+        foreach($this->rounds as $round) {
+            if($round->getId() == $roundId) {
+                return $round;
+            }
+        }
 
-        $judgeId = $thisRound->getJudgeId();
+        return null;
+    }
+
+    public function isJudge($playerId, $roundId = null) {
+        $judge = $this->getJudge($roundId);
+
+        return $judge !== null && $judge->getId() == $playerId;
+    }
+
+    public function getJudge($roundId = null) {
+        if(!$this->rounds) {
+            return null;
+        }
+
+        if($roundId) {
+            $round = $this->getRound($roundId);
+        } else {
+            $round = $this->getCurrentRound();
+        }
+
+        $judgeId = $round->getJudgeId();
 
         foreach($this->players as $player) {
             if($player->getId() === $judgeId) {

@@ -11,7 +11,7 @@ abstract class GameView implements View {
         $this->game = $game;
     }
 
-    protected function playerTokens($playerId, $winnerIds = []) {
+    protected function playerTokens($playerId, $winnerIds = [], $roundId = null) {
         echo '<div id="players">';
 
         $players = $this->game->getPlayers();
@@ -31,16 +31,21 @@ abstract class GameView implements View {
                 $me = 'me';
             }
 
-            if($this->game->isJudge($player->getId())) {
+            if($this->game->isJudge($player->getId(), $roundId)) {
                 $judge = 'judge';
             }
 
-            if(in_array($player->getId(), $winnerIds)) {
+            if($winnerIds && in_array($player->getId(), $winnerIds)) {
                 $winner = "winner";
             }
 
             // Only show the winner of a round if the player is a part of the game
-            if($playerId !== null && $notWaiting && in_array($player->getId(), $winnerIds)) {
+            if(
+               $playerId !== null &&
+               $notWaiting &&
+               $winnerIds &&
+               in_array($player->getId(), $winnerIds)
+               ) {
                 $winner = 'winner';
             }
 
@@ -89,7 +94,7 @@ abstract class GameView implements View {
 
             $tokensOfPlayersWhoAnswered[] = $token;
 
-            $spaces[] = '<input ' . (($disabled) ? 'disabled' : '') . ' ' . $checked . ' onchange="$(\'#choosing-answer\').submit();" onclick="$(\'#select-o-matic\').attr(\'class\', \'' . $token . '\');" name="answerId" id="' . $token . '" type="radio" value="' . $answer->getId() . '"><label for="' . $token . '" class="space ' . $token . '"></label>';
+            $spaces[] = '<input ' . (($disabled) ? 'disabled' : '') . ' ' . $checked . ' form="choosing-answer" onchange="$(\'#choosing-answer\').submit();" onclick="$(\'#select-o-matic\').attr(\'class\', \'' . $token . '\');" name="answerId" id="' . $token . '" type="radio" value="' . $answer->getId() . '"><label for="' . $token . '" class="space ' . $token . '"></label>';
         }
 
         $tokens = array_diff(Player::getTokens(), $tokensOfPlayersWhoAnswered);
@@ -109,14 +114,14 @@ abstract class GameView implements View {
         echo '</div>';
     }
 
-    protected function heading() {
+    protected function heading($roundId = null) {
         $rounds = $this->game->getRounds();
 
         echo '<div id="game-heading">';
         echo '<div id="game-name">' . $this->game->getName() . '</div>';
 
         if($rounds) {
-            $roundNumber = count($rounds);
+            $roundNumber = $this->game->getRoundNumber($roundId);
 
             echo '<div id="game-round">' . $roundNumber . '/11</div>';
         }
@@ -137,7 +142,7 @@ abstract class GameView implements View {
         $this->head();
 
         echo '</div>';
-        echo '<div class="body">';
+        echo '<div data-dont-refresh="true" id="game-body" class="body">';
 
         $this->body();
 

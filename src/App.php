@@ -17,13 +17,27 @@ use Services\GameService;
 
 define('ROOT_DIR', realpath(__DIR__ . '/..'));
 
+define('DEBUG', true);
+
 class App {
     private $gameService = null;
 
     public function __construct() {
         date_default_timezone_set("US/Eastern");
 
-        $this->initGameService(new DatabaseHelper('localhost', 'sayanything', 'root', null));
+        if(DEBUG) {
+            $host = "localhost";
+            $dbname = "sayanything";
+            $username = "root";
+            $password = "";
+        } else {
+            $host = "ijellyrollcom.ipagemysql.com";
+            $dbname = "sayanything";
+            $username = "sayanything";
+            $password = "7UoF3k&95BZ*";
+        }
+
+        $this->initGameService(new DatabaseHelper($host, $dbname, $username, $password));
 
         session_start();
         

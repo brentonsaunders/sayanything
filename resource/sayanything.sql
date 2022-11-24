@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1:3306
--- Generation Time: Nov 21, 2022 at 01:21 AM
+-- Generation Time: Nov 24, 2022 at 12:45 AM
 -- Server version: 10.6.5-MariaDB
 -- PHP Version: 7.4.26
 
@@ -37,7 +37,7 @@ CREATE TABLE IF NOT EXISTS `answers` (
   KEY `player_id` (`player_id`),
   KEY `round_id` (`round_id`),
   KEY `answer` (`answer`(333))
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb3;
+) ENGINE=MyISAM AUTO_INCREMENT=8 DEFAULT CHARSET=utf8mb3;
 
 -- --------------------------------------------------------
 
@@ -118,7 +118,7 @@ CREATE TABLE IF NOT EXISTS `games` (
   `id` char(11) NOT NULL,
   `name` varchar(255) NOT NULL,
   `creator_id` int(11) DEFAULT NULL,
-  `state` enum('waiting-for-players','asking-question','answering-question','voting','game-started','results') DEFAULT NULL,
+  `state` enum('waiting-for-players','asking-question','answering-question','voting','game-started','results','game-over') DEFAULT NULL,
   `time_updated` datetime NOT NULL DEFAULT current_timestamp(),
   `time_created` datetime NOT NULL DEFAULT current_timestamp(),
   PRIMARY KEY (`id`),
@@ -143,7 +143,7 @@ CREATE TABLE IF NOT EXISTS `players` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `game_id_2` (`game_id`,`token`),
   KEY `game_id` (`game_id`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb3;
+) ENGINE=MyISAM AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb3;
 
 -- --------------------------------------------------------
 
@@ -158,7 +158,7 @@ CREATE TABLE IF NOT EXISTS `questions` (
   `question` text NOT NULL,
   PRIMARY KEY (`id`),
   KEY `card_id` (`card_id`)
-) ENGINE=MyISAM AUTO_INCREMENT=261 DEFAULT CHARSET=utf8mb3;
+) ENGINE=MyISAM AUTO_INCREMENT=264 DEFAULT CHARSET=utf8mb3;
 
 --
 -- Dumping data for table `questions`
@@ -414,7 +414,10 @@ INSERT INTO `questions` (`id`, `card_id`, `question`) VALUES
 (257, 50, 'What would be the worst movie to get remade with a completely nude cast?'),
 (258, 50, 'What\'s the greatest thing about being a celebrity?'),
 (259, 50, 'I just wrote a book. What\'s it called?'),
-(260, 50, 'What would be the most inappropriate thing to have on your desk?');
+(260, 50, 'What would be the most inappropriate thing to have on your desk?'),
+(261, 16, 'What\'s the most delicious ice cream flavor?'),
+(262, 16, 'What\'s the best music album of all time?'),
+(263, 16, 'What\'s the best Saturday morning cartoon ever?');
 
 -- --------------------------------------------------------
 
@@ -437,7 +440,7 @@ CREATE TABLE IF NOT EXISTS `rounds` (
   KEY `card_id` (`card_id`),
   KEY `chosen_answer_id` (`chosen_answer_id`),
   KEY `question_id` (`question_id`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb3;
+) ENGINE=MyISAM AUTO_INCREMENT=30 DEFAULT CHARSET=utf8mb3;
 
 -- --------------------------------------------------------
 
@@ -480,7 +483,7 @@ CREATE TABLE IF NOT EXISTS `votes` (
   KEY `player_id` (`player_id`),
   KEY `answer_id` (`answer_id`),
   KEY `round_id` (`round_id`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb3;
+) ENGINE=MyISAM AUTO_INCREMENT=19 DEFAULT CHARSET=utf8mb3;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

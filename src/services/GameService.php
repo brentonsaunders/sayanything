@@ -325,6 +325,10 @@ class GameService {
                 $game->setState(Game::RESULTS);
             }
         } else if($state === Game::RESULTS) {
+            if($game->isOver()) {
+                return;
+            }
+            
             if($game->secondsSinceLastUpdate() >= Game::SECONDS_UNTIL_NEW_ROUND) {
                 $this->newRound($gameId, $game->getCreatorId());
 
