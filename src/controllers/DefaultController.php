@@ -14,6 +14,7 @@ use Views\AskingQuestionView;
 use Views\GameOverView;
 use Views\JoinGameView;
 use Views\ResultsView;
+use Views\ScoreBoardView;
 use Views\VotingView;
 use Views\WaitingForNextRoundView;
 use Views\WaitingForPlayersView;
@@ -76,7 +77,7 @@ class DefaultController extends Controller {
 
         $playerId = 1;
 
-        $game->setState(Game::VOTING);
+        $game->setState(Game::RESULTS);
 
         $state = $game->getState();
 
@@ -103,7 +104,10 @@ class DefaultController extends Controller {
                     break;
                 case Game::RESULTS:
                 case GAME::GAME_OVER:
-                    $testGameView = new ResultsView($game, $playerId);
+                    // $testGameView = new ResultsView($game, $playerId);
+                    $scoreService = new ScoreService($game);
+
+                    $testGameView = new ScoreBoardView($game, $scoreService->getScoreBoard());
                     break;
                 }
             }
@@ -326,9 +330,10 @@ class DefaultController extends Controller {
             new Player(4, 1, "Bablu", Player::DOLLAR_SIGN, 3, 0, 0),
             new Player(5, 1, "Saad", Player::CLAPPERBOARD, 4, 0, 0),
 
+            /*
             new Player(6, 1, "Devesh", Player::HIGH_HEELS, 5, 0, 0),
             new Player(7, 1, "Brian", Player::FOOTBALL, 6, 0, 0),
-            new Player(8, 1, "Tyler", Player::GUITAR, 7, 0, true),
+            new Player(8, 1, "Tyler", Player::GUITAR, 7, 0, true),*/
         ]);
 
         $round = new Round(1, 1, 1, 1, 1, null);

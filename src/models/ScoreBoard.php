@@ -14,6 +14,10 @@ class ScoreBoard {
         }
     }
 
+    public function getPlayerIds() {
+        return array_keys($this->scores);
+    }
+
     public function getScores(Player $player) {
         return $this->scores[$player->getId()];
     }
