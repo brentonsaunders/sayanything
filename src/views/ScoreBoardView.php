@@ -16,32 +16,47 @@ class ScoreBoardView implements View {
 
     public function render() {
         echo '<div id="game">';
-        echo '<div class="head"></div><div class="body">';
-
+        echo '<div class="head">';
+        echo "</div>";
+        echo '<div class="body">';
         echo '<div id="score-board">';
-        echo '<div class="score-board-table">';
 
-        $playerIds = $this->scoreBoard->getPlayerIds();
+        echo '<div class="table">';
 
-        foreach($playerIds as $playerId) {
-            $player = $this->game->getPlayer($playerId);
-            $playerName = $player->getName();
-            $token = $player->getToken();
+        echo '<div class="caption">Score for Each Round</div>';
 
-            echo "<div class=\"score-board-row $token\">";
-            echo "<div class=\"score-board-col\">$playerName</div>";
+        echo '<div class="head">';
+        echo '<div class="row">';
 
-            for($round = 1; $round <= 12; ++$round) {
-                echo '<div class="score-board-col score">0</div>';
-            }
-
-            echo '<div class="score-board-col total">0</div>';
-            echo '</div>';
+        for($round = 1; $round <= 12; ++$round) {
+            echo "<div class=\"col\">$round</div>";
         }
 
-        echo '</div>';
-        
-        echo '</div>';
+        echo '<div class="col"><span>Total</span></div>';
+        echo "</div>";
+        echo "</div>";
+
+        echo '<div class="body">';
+
+        $tokens = Player::getTokens();
+
+        foreach($tokens as $token) {
+            echo "<div class=\"row $token\">";
+            echo "<div class=\"col\"></div>";
+
+            for($round = 1; $round <= 12; ++$round) {
+                echo "<div class=\"col\"><span>0</span></div>";
+            }
+
+            echo '<div class="col"><span>0</span></div>';
+            echo "</div>";
+        }
+
+        echo "</div>";
+
+        echo "</div>";
+
+        echo "</div>";
         echo "</div>";
         echo "</div>";
     }
