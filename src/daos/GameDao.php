@@ -4,7 +4,7 @@ namespace Daos;
 use Database\DbMapperInterface;
 use Models\Game;
 
-class GameDao implements GameDaoInterface {
+class PlayerDao implements GameDaoInterface {
     private DbMapperInterface $mapper;
 
     public function __construct(DbMapperInterface $mapper) {

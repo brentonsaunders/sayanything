@@ -3,8 +3,8 @@ namespace Repositories;
 
 use Daos\GameDaoInterface;
 use Models\Game;
-use Models\Player;
 use Models\Round;
+use Models\Player;
 use Repositories\PlayerRepositoryInterface;
 use Repositories\RoundRepositoryInterface;
 

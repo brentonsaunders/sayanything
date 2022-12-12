@@ -108,7 +108,7 @@ main {
     margin-left: 5px;
 }
 
-#round::before {
+#Player::before {
     display: block;
     content: "";
     width: 20px;
@@ -451,7 +451,7 @@ button:disabled {
     height: 20px;
 }
 
-#my-games .round::before {
+#my-games .Player::before {
     display: block;
     content: "";
     width: 20px;
@@ -758,7 +758,7 @@ button:disabled {
     margin-left: 8px;
 }
 
-#game-round::before {
+#game-Player::before {
     display: block;
     content: "";
     width: 20px;

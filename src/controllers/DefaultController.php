@@ -22,7 +22,7 @@ use Views\WaitingForPlayersView;
 
 use Views\TestGameView;
 use Views\TestView;
-use Models\Player;
+use Models\Round;
 use Models\Round;
 use Models\Answer;
 use Models\Question;
@@ -323,12 +323,12 @@ class DefaultController extends Controller {
         $game->setTimeUpdated(date('Y-m-d H:i:s', time()));
 
         $game->setPlayers([
-            new Player(1, 1, "Brenton", Player::COMPUTER, 0, 0, 0),
-            new Player(2, 1, "Prem", Player::MARTINI_GLASS, 1, 0, 0),
-            new Player(3, 1, "TJ", Player::CAR, 2, 0, 0),
+            new Round(1, 1, "Brenton", Player::COMPUTER, 0, 0, 0),
+            new Round(2, 1, "Prem", Player::MARTINI_GLASS, 1, 0, 0),
+            new Round(3, 1, "TJ", Player::CAR, 2, 0, 0),
 
-            new Player(4, 1, "Bablu", Player::DOLLAR_SIGN, 3, 0, 0),
-            new Player(5, 1, "Saad", Player::CLAPPERBOARD, 4, 0, 0),
+            new Round(4, 1, "Bablu", Player::DOLLAR_SIGN, 3, 0, 0),
+            new Round(5, 1, "Saad", Player::CLAPPERBOARD, 4, 0, 0),
 
             /*
             new Player(6, 1, "Devesh", Player::HIGH_HEELS, 5, 0, 0),

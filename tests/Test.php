@@ -25,6 +25,6 @@ class Test {
             echo "<br>";
         }
 
-        echo "Finished running $className.<br>";
+        echo "Finished running $className.<br><br><br>";
     }
 }

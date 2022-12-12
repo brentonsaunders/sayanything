@@ -1,7 +1,7 @@
 <?php
 use Daos\AnswerDao;
 use Daos\CardDao;
-use Daos\GameDao;
+use Daos\PlayerDao;
 use Daos\PlayerDao;
 use Daos\QuestionDao;
 use Daos\VoteDao;
@@ -72,7 +72,7 @@ class App {
         
         $answerDao = new AnswerDao($db);
         $cardDao = new CardDao($db);
-        $gameDao = new GameDao($mapper);
+        $gameDao = new PlayerDao($mapper);
         $playerDao = new PlayerDao($db);
         $questionDao = new QuestionDao($db);
         $roundDao = new RoundDao($db);

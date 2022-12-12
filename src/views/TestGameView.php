@@ -4,7 +4,7 @@ namespace Views;
 use Models\Answer;
 use Models\Card;
 use Models\Game;
-use Models\Player;
+use Models\Round;
 use Models\Question;
 use Models\Round;
 use Models\Vote;
@@ -23,11 +23,11 @@ class TestGameView{
         );
 
         $this->game->setPlayers([
-            new Player(1, 1, "Brenton", Player::FOOTBALL, 0, 0, 0),
-            new Player(2, 1, "Prem", Player::MARTINI_GLASS, 1, 0, 0),
-            new Player(3, 1, "TJ", Player::CAR, 2, 0, 0),
-            new Player(4, 1, "Bablu", Player::DOLLAR_SIGN, 3, 0, 0),
-            new Player(5, 1, "Saad", Player::CLAPPERBOARD, 4, 0, 0),
+            new Round(1, 1, "Brenton", Player::FOOTBALL, 0, 0, 0),
+            new Round(2, 1, "Prem", Player::MARTINI_GLASS, 1, 0, 0),
+            new Round(3, 1, "TJ", Player::CAR, 2, 0, 0),
+            new Round(4, 1, "Bablu", Player::DOLLAR_SIGN, 3, 0, 0),
+            new Round(5, 1, "Saad", Player::CLAPPERBOARD, 4, 0, 0),
         ]);
 
         $round = new Round(1, 1, 1, 1, 1, null);

@@ -1,7 +1,7 @@
 <?php
 namespace Views;
 
-use Models\Player;
+use Models\Round;
 
 class LobbyView extends MainView {
     private $games = [];

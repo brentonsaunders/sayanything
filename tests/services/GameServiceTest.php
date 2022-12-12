@@ -2,8 +2,8 @@
 namespace Services;
 
 use Models\Game;
-use Models\Player;
 use Models\Round;
+use Models\Player;
 use Repositories\GameRepositoryInterface;
 use Repositories\MockGameRepository;
 use Test;

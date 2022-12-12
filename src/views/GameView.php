@@ -2,7 +2,7 @@
 namespace Views;
 
 use Models\Game;
-use Models\Player;
+use Models\Round;
 
 abstract class GameView implements View {
     protected Game $game;

@@ -2,7 +2,7 @@
 namespace Views;
 
 use Models\Game;
-use Models\Player;
+use Models\Round;
 use Models\ScoreBoard;
 
 class ScoreBoardView implements View {
