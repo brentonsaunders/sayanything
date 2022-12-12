@@ -4,6 +4,7 @@ namespace Daos;
 use Models\Answer;
 
 interface AnswerDaoInterface {
+    public function getAll(): array;
     public function getById($id): ?Answer;
     public function getByRoundId($roundId): array;
     public function insert(Answer $answer) : Answer;

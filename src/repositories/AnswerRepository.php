@@ -11,6 +11,10 @@ class AnswerRepository implements AnswerRepositoryInterface {
         $this->answerDao = $answerDao;
     }
 
+    public function getAll() {
+        return $this->answerDao->getAll();
+    }
+
     public function getById($id) {
         return $this->answerDao->getById($id);
     }

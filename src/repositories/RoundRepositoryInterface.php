@@ -4,6 +4,7 @@ namespace Repositories;
 use Models\Round;
 
 interface RoundRepositoryInterface {
+    public function getAll(): array;
     public function getById($id);
     public function getByGameId($gameId);
     public function insertRound(Round $round) : Round;

@@ -11,6 +11,10 @@ class VoteRepository implements VoteRepositoryInterface {
         $this->voteDao = $voteDao;
     }
 
+    public function getAll(): array {
+        return $this->voteDao->getAll();
+    }
+
     public function getById($id) {
         return $this->voteDao->getById($id);
     }

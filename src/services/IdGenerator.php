@@ -28,23 +28,45 @@ class IdGenerator implements IdGeneratorInterface {
         $this->voteRepository = $voteRepository;
     }
 
-	public function generateGameId() {
-        return 1;
-	}
-	
-	public function generatePlayerId() {
-        return 1;
-	}
-	
-	public function generateRoundId() {
-        return 1;
-	}
-	
-	public function generateAnswerId() {
-        return 1;
-	}
-	
-	public function generateVoteId() {
-        return 1;
-	}
+        private function randomTenDigits() {
+                $digits = "";
+
+                for($i = 0; $i < 10; ++$i) {
+                        $digits .= rand(0, 9);
+                }
+
+                return $digits;
+        }
+
+        public function generateGameId() {
+                do {
+                        $digits = $this->randomTenDigits();
+                } while ($this->gameRepository->getById($digits));
+
+                return $digits;
+        }
+
+        public function generatePlayerId() {
+                $players = $this->playerRepository->getAll();
+
+                return count($players) + 1;
+        }
+
+        public function generateRoundId() {
+                $rounds = $this->playerRepository->getAll();
+
+                return count($rounds) + 1;
+        }
+
+        public function generateAnswerId() {
+                $answers = $this->answerRepository->getAll();
+
+                return count($answers) + 1;
+        }
+
+        public function generateVoteId() {
+                $votes = $this->voteRepository->getAll();
+
+                return count($votes) + 1;
+        }
 }

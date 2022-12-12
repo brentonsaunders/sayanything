@@ -4,6 +4,7 @@ namespace Daos;
 use Models\Vote;
 
 interface VoteDaoInterface {
+    public function getAll(): array;
     public function getById($id): ?Vote;
     public function getByRoundId($roundId): array;
     public function insert(Vote $vote) : Vote;

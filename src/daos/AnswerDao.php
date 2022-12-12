@@ -11,6 +11,10 @@ class AnswerDao implements AnswerDaoInterface {
         $this->mapper = $mapper;
     }
 
+    public function getAll(): array {
+        return $this->mapper->select("Models\\Answer");
+    }
+
     public function getById($id): ?Answer {
         $results = $this->mapper->select("Models\\Answer", ["id" => $id]);
 

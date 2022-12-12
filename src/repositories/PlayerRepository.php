@@ -2,13 +2,17 @@
 namespace Repositories;
 
 use Daos\PlayerDaoInterface;
-use Models\Round;
+use Models\Player;
 
 class PlayerRepository implements PlayerRepositoryInterface {
     private PlayerDaoInterface $playerDao;
 
     public function __construct(PlayerDaoInterface $playerDao) {
         $this->playerDao = $playerDao;
+    }
+
+    public function getAll(): array {
+        return $this->playerDao->getAll();
     }
 
     public function getById($id) {
@@ -19,7 +23,7 @@ class PlayerRepository implements PlayerRepositoryInterface {
         return $this->playerDao->getByGameId($gameId);
     }
 
-    public function insertPlayer(Player $player) : Round {
+    public function insertPlayer(Player $player) : Player {
         return $this->playerDao->insert($player);
     }
 
@@ -33,7 +37,7 @@ class PlayerRepository implements PlayerRepositoryInterface {
         return $arr;
     }
 
-    public function updatePlayer(Player $player) : Round {
+    public function updatePlayer(Player $player) : Player {
         if(!$this->getById($player->getId())) {
             return $this->insertPlayer($player);
         }

@@ -4,6 +4,7 @@ namespace Repositories;
 use Models\Answer;
 
 interface AnswerRepositoryInterface {
+    public function getAll(): array;
     public function getById($id);
     public function getByRoundId($roundId);
     public function insertAnswer(Answer $answer) : Answer;

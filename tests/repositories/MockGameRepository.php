@@ -17,6 +17,10 @@ class MockGameRepository implements GameRepositoryInterface {
     public function getById($id) {
         $game = $this->games[$id] ?? null;
 
+        if(!$game) {
+            return null;
+        }
+
         $rounds = $game->getRounds();
 
         if ($rounds) {

@@ -4,6 +4,7 @@ namespace Daos;
 use Models\Player;
 
 interface PlayerDaoInterface {
+    public function getAll(): array;
     public function getById($id): ?Player;
     public function getByGameId($gameId): array;
     public function insert(Player $player): Player;

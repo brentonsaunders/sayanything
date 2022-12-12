@@ -11,6 +11,10 @@ class RoundDao implements RoundDaoInterface {
         $this->mapper = $mapper;
     }
 
+    public function getAll(): array {
+        return $this->mapper->select("Models\\Round");
+    }
+
     public function getById($id): ?Round {
         $results = $this->mapper->select("Models\\Round", ["id" => $id]);
 

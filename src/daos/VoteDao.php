@@ -11,6 +11,10 @@ class VoteDao implements VoteDaoInterface {
         $this->mapper = $mapper;
     }
 
+    public function getAll(): array {
+        return $this->mapper->select("Models\\Vote");
+    }
+
     public function getById($id): ?Vote {
         $results = $this->mapper->select("Models\\Vote", ["id" => $id]);
 

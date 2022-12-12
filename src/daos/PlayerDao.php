@@ -11,6 +11,10 @@ class PlayerDao implements PlayerDaoInterface {
         $this->mapper = $mapper;
     }
 
+    public function getAll(): array {
+        return $this->mapper->select("Models\\Player");
+    }
+
     public function getById($id): ?Player {
         $results = $this->mapper->select("Models\\Player", ["id" => $id]);
 
