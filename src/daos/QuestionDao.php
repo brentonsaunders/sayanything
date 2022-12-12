@@ -29,7 +29,7 @@ class QuestionDao implements QuestionDaoInterface {
         return $questions;
     }
 
-    public function getById($id) {
+    public function getById($id): ?Question {
         $query = "SELECT * " . 
                  "FROM questions " . 
                  "WHERE id = :id";
@@ -45,7 +45,7 @@ class QuestionDao implements QuestionDaoInterface {
         return $this->questionFromRow($rows[0]);
     }
 
-    public function getByCardId($cardId) {
+    public function getByCardId($cardId): array {
         $query = "SELECT * " . 
                  "FROM questions " . 
                  "WHERE card_id = :card_id";

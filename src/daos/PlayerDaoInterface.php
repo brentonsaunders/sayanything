@@ -1,12 +1,12 @@
 <?php
 namespace Daos;
 
-use Models\Round;
+use Models\Player;
 
 interface PlayerDaoInterface {
-    public function getById($id): ?Round;
+    public function getById($id): ?Player;
     public function getByGameId($gameId): array;
-    public function insert(Player $player): Round;
-    public function update(Player $player): Round;
-    public function delete(Player $player): Round;
+    public function insert(Player $player): Player;
+    public function update(Player $player): Player;
+    public function delete(Player $player): Player;
 }

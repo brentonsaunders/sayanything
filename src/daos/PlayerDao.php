@@ -2,7 +2,7 @@
 namespace Daos;
 
 use Database\DbMapperInterface;
-use Models\Round;
+use Models\Player;
 
 class PlayerDao implements PlayerDaoInterface {
     private DbMapperInterface $mapper;
@@ -11,7 +11,7 @@ class PlayerDao implements PlayerDaoInterface {
         $this->mapper = $mapper;
     }
 
-    public function getById($id): ?Round {
+    public function getById($id): ?Player {
         $results = $this->mapper->select("Models\\Player", ["id" => $id]);
 
         return (count($results) === 1) ? $results[0] : null;
@@ -21,15 +21,15 @@ class PlayerDao implements PlayerDaoInterface {
         return $this->mapper->select("Models\\Player", ["game_id" => $gameId]);
     }
 
-    public function insert(Player $player): Round {
+    public function insert(Player $player): Player {
         return $this->mapper->insert($player);
     }
 
-    public function update(Player $player): Round {
+    public function update(Player $player): Player {
         return $this->mapper->update($player);
     }
 
-    public function delete(Player $player): Round {
+    public function delete(Player $player): Player {
         return $this->mapper->delete($player);
     }
 }

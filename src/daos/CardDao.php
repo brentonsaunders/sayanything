@@ -11,7 +11,7 @@ class CardDao implements CardDaoInterface {
         $this->db = $db;
     }
 
-    public function getAll() {
+    public function getAll(): array {
         $rows = $this->db->query("SELECT * FROM cards");
 
         $cards = [];
