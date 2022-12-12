@@ -77,7 +77,7 @@ class DefaultController extends Controller {
 
         $playerId = 1;
 
-        $game->setState(Game::RESULTS);
+        $game->setState(Game::WAITING_FOR_PLAYERS);
 
         $state = $game->getState();
 
@@ -313,14 +313,14 @@ class DefaultController extends Controller {
     }
 
     private function mockGame() {
-        $game = new Game(
-            1,
-            "Redbud Ballers",
-            1,
-            Game::RESULTS,
-            date( 'Y-m-d H:i:s', time() - 31),
-            date( 'Y-m-d H:i:s', time())
-        );
+        $game = new Game();
+
+        $game->setId(1);
+        $game->setName("Redbud Ballers");
+        $game->setCreatorId(1);
+        $game->setState(Game::RESULTS);
+        $game->setTimeCreated(date('Y-m-d H:i:s', time() - 31));
+        $game->setTimeUpdated(date('Y-m-d H:i:s', time()));
 
         $game->setPlayers([
             new Player(1, 1, "Brenton", Player::COMPUTER, 0, 0, 0),

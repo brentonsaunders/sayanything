@@ -19,16 +19,7 @@ class Player {
     private $skipTurn = null;
     private $mustWaitForNextRound = null;
 
-    public function __construct($id, $gameId, $name, $token, $turn,
-        $skipTurn, $mustWaitForNextRound) {
-        $this->id = $id;
-        $this->gameId = $gameId;
-        $this->name = $name;
-        $this->token = $token;
-        $this->turn = $turn;
-        $this->skipTurn = $skipTurn;
-        $this->mustWaitForNextRound = $mustWaitForNextRound;
-    }
+    public function __construct() {}
 
     public static function getTokens() {
         return [

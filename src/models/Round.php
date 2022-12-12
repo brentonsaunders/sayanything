@@ -9,6 +9,7 @@ use Models\Vote;
 class Round {
     private $id = null;
     private $gameId = null;
+    private $roundNumber = null;
     private $judgeId = null;
     private $cardId = null;
     private $questionId = null;
@@ -18,15 +19,7 @@ class Round {
     private $answers = null;
     private $votes = null;
 
-    public function __construct($id, $gameId, $judgeId, $cardId,
-        $questionId, $chosenAnswerId) {
-        $this->id = $id;
-        $this->gameId = $gameId;
-        $this->judgeId = $judgeId;
-        $this->cardId = $cardId;
-        $this->questionId = $questionId;
-        $this->chosenAnswerId = $chosenAnswerId;
-    }
+    public function __construct() {}
 
     public function getId() {
         return $this->id;
@@ -88,6 +81,14 @@ class Round {
         $this->chosenAnswerId = $chosenAnswerId;
     }
 
+    public function getRoundNumber() {
+        return $this->roundNumber;
+    }
+
+    public function setRoundNumber($roundNumber) {
+        $this->roundNumber = $roundNumber;
+    }
+
     public function setCard($card) {
         $this->card = $card;
     }
@@ -100,20 +101,18 @@ class Round {
         $this->votes = $votes;
     }
 
-    public function addAnswer($playerId, $answer) {
+    public function addAnswer($answer) {
         if(!$this->answers) {
             $this->answers = [];
         }
 
-        foreach($this->answers as $key => $otherAnswer) {
-            if($otherAnswer->getPlayerId() == $playerId) {
-                $this->answers[$key]->setAnswer($answer);
+        $playerId = $answer->getPlayerId();
 
-                return true;
-            }
+        if(isset($this->answers[$playerId])) {
+            $this->answers[$playerId]->setAnswer($answer->getAnswer());
+        } else {
+            $this->answers[$answer->getPlayerId()] = $answer;
         }
-
-        $this->answers[] = new Answer(null, $playerId, $this->id, $answer);
     }
 
     public function getPlayerAnswer($playerId) {
@@ -121,13 +120,7 @@ class Round {
             return null;
         }
 
-        foreach($this->answers as $answer) {
-            if($answer->getPlayerId() == $playerId) {
-                return $answer;
-            }
-        }
-
-        return null;
+        return $this->answers[$playerId] ?? null;
     }
 
     public function getVotesFromPlayer($playerId) {
@@ -146,18 +139,19 @@ class Round {
         return $playerVotes;
     }
 
-    public function vote($playerId, $answerId1, $answerId2) {
-        $votes = $this->getVotesFromPlayer($playerId);
-
-        if($votes) {
-            $votes[0]->setAnswerId($answerId1);
-            $votes[1]->setAnswerId($answerId2);
-
-            return;
+    public function vote($vote) {
+        if(!$this->votes) {
+            $this->votes = [];
         }
 
-        $this->votes[] = new Vote(null, $this->id, $playerId, $answerId1);
-        $this->votes[] = new Vote(null, $this->id, $playerId, $answerId2);
+        $playerId = $vote->getPlayerId();
+
+        if(isset($this->votes[$playerId])) {
+            $this->votes[$playerId]->setAnswer1Id($vote->getAnswer1Id());
+            $this->votes[$playerId]->setAnswer2Id($vote->getAnswer2Id());
+        } else {
+            $this->votes[$playerId] = $vote;
+        }
     }
 
     public function hasQuestion($questionId) {

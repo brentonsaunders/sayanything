@@ -4,192 +4,322 @@ namespace Services;
 use Models\Game;
 use Models\Player;
 use Models\Round;
+use Repositories\GameRepositoryInterface;
 use Repositories\MockGameRepository;
+use Test;
 
-class GameServiceTest {
+class GameServiceTest extends Test {
+    private GameRepositoryInterface $gameRepository;
+    private CardServiceInterface $cardService;
+    private MockIdGeneratorService $idGeneratorService;
+
     public function __construct() {
-        assert_options(ASSERT_BAIL, 1);
-
-        $this->updateGame_whenTimeUntilNewRoundHasPassed_beginsNewRound();
-        $this->updateGame_judgeHasntChosenAnswer_picksTheMostPopularAnswer();
-        $this->updateGame_playersTurnMustBeSkipped_skipsTurn();
-        $this->joinGame_afterGameHasStarted_skipsTurn();
-
-        echo "Tests have passed.<br>";
+        $this->gameRepository = new MockGameRepository();
+        $this->cardService = new MockCardService();
+        $this->idGeneratorService = new MockIdGeneratorService();
+        
+        parent::__construct();
     }
 
-    private function joinGame_afterGameHasStarted_skipsTurn() {
+    public function createGame_createsNewGame() {
         // GIVEN
-        $gameRepository = new class extends MockGameRepository {
-            private Game $game;
-
-            public function __construct() {
-                parent::__construct();
-
-                $this->game = new Game(
-                    1,
-                    "Test Game",
-                    1,
-                    Game::ASKING_QUESTION,
-                    date( 'Y-m-d H:i:s', time()),
-                    null
-                );
-
-                $this->game->setPlayers([
-                    new Player(1, 1, "Test Creator", "guitar", 0, false, false)
-                ]);
-            }
-
-            public function getById($id) {
-                return $this->game;
-            }
-
-            public function insert(Game $game) : Game {
-                $this->game = $game;
-
-                return $this->game;
-            }
-
-            public function update(Game $game) {
-                $this->game = $game;
-
-                return $this->game;
-            }
-        };
-
-        $gameService = new GameService(
-            $gameRepository,
-            new MockCardService()
-        );
+        $gameService = new GameService($this->gameRepository, $this->cardService,
+            $this->idGeneratorService);
 
         // WHEN
-        $gameService->joinGame(1, "Test Player", "football");
+        $game = $gameService->createGame("Test Game", "Player 1", Player::CLAPPERBOARD);
 
         // THEN
-        $game = $gameService->getGame(1);
+        $findGame = $this->gameRepository->getById($game->getId());
 
-        assert(
-            $game->getPlayerByToken("football")->getSkipTurn(),
-            "Expected turn to be skipped when a player joins a game after it has started."
-        );
+        return $findGame !== null &&
+            $findGame->getName() === "Test Game" &&
+            $findGame->getCreatorId() !== null &&
+            is_array($findGame->getPlayers()) &&
+            $findGame->getPlayer($findGame->getCreatorId())->getName() === "Player 1" &&
+            $findGame->getPlayer($findGame->getCreatorid())->getToken() === Player::CLAPPERBOARD;
     }
 
-    private function updateGame_playersTurnMustBeSkipped_skipsTurn() {
+    public function joinGame_addsPlayerToGame() {
         // GIVEN
-        $gameRepository = new class extends MockGameRepository {
-            private Game $game;
-
-            public function __construct() {
-                parent::__construct();
-
-                $this->game = new Game(
-                    1,
-                    "Test Game",
-                    1,
-                    Game::RESULTS,
-                    date( 'Y-m-d H:i:s', time() - 120),
-                    null
-                );
-
-                $this->game->setPlayers([
-                    new Player(1, 1, "Test Creator", "guitar", 0, false, false),
-                    new Player(2, 1, "Test Player", "football", 1, true, false),
-                    new Player(3, 1, "Test Player", "clapperboard", 2, false, false),
-                ]);
-
-                $this->game->setRounds([
-                    new Round(1, 1, 1, null, null, null)
-                ]);
-            }
-
-            public function getById($id) {
-                return $this->game;
-            }
-
-            public function insert(Game $game) : Game {
-                $this->game = $game;
-
-                return $this->game;
-            }
-
-            public function update(Game $game) {
-                $this->game = $game;
-
-                $this->game->setTimeUpdated(date( 'Y-m-d H:i:s', time()));
-
-                return $this->game;
-            }
-        };
-
-        $gameService = new GameService(
-            $gameRepository,
-            new MockCardService()
-        );
+        $gameService = new GameService($this->gameRepository, $this->cardService,
+            $this->idGeneratorService);
 
         // WHEN
-        $gameService->updateGame(1);
+        $game = $gameService->createGame("Test Game", "Player 1", Player::CLAPPERBOARD);
+
+        $playerIdAndGame = $gameService->joinGame($game->getId(), "Player 2", Player::CAR);
+
+        $playerId = $playerIdAndGame["playerId"];
 
         // THEN
-        $game = $gameService->getGame(1);
+        $findGame = $this->gameRepository->getById($game->getId());
 
-        $rounds = $game->getRounds();
-
-        $lastRound = $rounds[count($rounds) - 1];
-
-        $player = $game->getPlayer(2);
-
-        assert(
-            $lastRound->getJudgeId() === 3 &&
-            !$player->getSkipTurn(),
-            "Expected turn to be skipped when a player joins a game after it has started."
-        );
+        return $findGame !== null &&
+            count($findGame->getPlayers()) === 2 &&
+            $findGame->getPlayer($playerId)->getName() === "Player 2" &&
+            $findGame->getPlayer($playerId)->getToken() === Player::CAR &&
+            $findGame->getPlayer($playerId)->getTurn() == 1;
     }
 
-    private function updateGame_whenTimeUntilNewRoundHasPassed_beginsNewRound() {
+    public function startGame_startsANewRound() {
         // GIVEN
-        $gameRepository = new class extends MockGameRepository {
-            private Game $game;
+        $gameService = new GameService($this->gameRepository, $this->cardService,
+            $this->idGeneratorService);
 
-            public function __construct() {
-                parent::__construct();
+        $game = $gameService->createGame("Test Game", "Player 1", Player::CLAPPERBOARD);
 
-                $this->game = new Game(
-                    1,
-                    "Test Game",
-                    1,
-                    Game::RESULTS,
-                    date( 'Y-m-d H:i:s', time() - 120),
-                    date( 'Y-m-d H:i:s', time() - 300)
-                );
-            }
-
-            public function getById($id) {
-                return $this->game;
-            }
-
-            public function update(Game $game) {
-                $this->game = $game;
-            }
-        };
-
-        $gameService = new GameService(
-            $gameRepository,
-            new MockCardService()
-        );
+        $gameService->joinGame($game->getId(), "Player 2", Player::CAR);
+        $gameService->joinGame($game->getId(), "Player 3", Player::GUITAR);
+        $gameService->joinGame($game->getId(), "Player 4", Player::MARTINI_GLASS);
+        $gameService->joinGame($game->getId(), "Player 5", Player::FOOTBALL);
+        $gameService->joinGame($game->getId(), "Player 6", Player::COMPUTER);
 
         // WHEN
-        $gameService->updateGame(1);
+        $gameService->startGame($game->getId(), $game->getCreatorId());
 
         // THEN
-        $game = $gameRepository->getById(1);
+        $findGame = $this->gameRepository->getById($game->getId());
 
-        assert(
-            $game->getState() === Game::ASKING_QUESTION,
-            "Expected a new round to begin when time until next round has passed."
-        );
+        return $findGame !== null &&
+            $findGame->getState() === Game::ASKING_QUESTION &&
+            $findGame->getJudge()->getId() === $game->getCreatorId() &&
+            $findGame->getCurrentRound()->getId() !== null;
     }
 
-    private function updateGame_judgeHasntChosenAnswer_picksTheMostPopularAnswer() {
+    public function updateGame_judgeTookTooLongToAskQuestion_asksRandomQuestion() {
+        // GIVEN
+        $gameService = new GameService($this->gameRepository, $this->cardService,
+            $this->idGeneratorService);
 
+        $game = $gameService->createGame("Test Game", "Player 1", Player::CLAPPERBOARD);
+
+        $gameService->joinGame($game->getId(), "Player 2", Player::CAR);
+        $gameService->joinGame($game->getId(), "Player 3", Player::GUITAR);
+        $gameService->joinGame($game->getId(), "Player 4", Player::MARTINI_GLASS);
+        $gameService->joinGame($game->getId(), "Player 5", Player::FOOTBALL);
+        $gameService->joinGame($game->getId(), "Player 6", Player::COMPUTER);
+
+        $gameService->startGame($game->getId(), $game->getCreatorId());
+
+        $game->setTimeUpdated(date("Y-m-d H:i:s", strtotime("-120 seconds")));
+
+        $this->gameRepository->update($game);
+
+        // WHEN
+        $gameService->updateGame($game->getId());
+        
+
+        // THEN
+        $findGame = $this->gameRepository->getById($game->getId());
+
+        return $findGame !== null &&
+            $findGame->getState() === Game::ANSWERING_QUESTION &&
+            $findGame->getCurrentRound()->getQuestionId() !== null;
+    }
+
+    public function newRound_afterFirstRound_makesTheCorrectPlayerJudge() {
+        // GIVEN
+        $gameService = new GameService($this->gameRepository, $this->cardService,
+            $this->idGeneratorService);
+
+        $game = $gameService->createGame("Test Game", "Player 1", Player::CLAPPERBOARD);
+
+        $gameService->joinGame($game->getId(), "Player 2", Player::CAR);
+        $gameService->joinGame($game->getId(), "Player 3", Player::GUITAR);
+        $gameService->joinGame($game->getId(), "Player 4", Player::MARTINI_GLASS);
+        $gameService->joinGame($game->getId(), "Player 5", Player::FOOTBALL);
+        $gameService->joinGame($game->getId(), "Player 6", Player::COMPUTER);
+
+        $gameService->startGame($game->getId(), $game->getCreatorId());
+
+        $game = $this->gameRepository->getById($game->getId());
+
+        $game->setState(Game::RESULTS);
+
+        // WHEN
+        $gameService->newRound($game->getId(), $game->getCreatorId());
+
+        // THEN
+        $findGame = $this->gameRepository->getById($game->getId());
+
+        return $findGame !== null &&
+            $findGame->getState() === Game::ASKING_QUESTION &&
+            $findGame->getJudge()->getName() === "Player 2";
+    }
+
+    public function askQuestion_asksQuestion() {
+        // GIVEN
+        $gameService = new GameService($this->gameRepository, $this->cardService,
+            $this->idGeneratorService);
+
+        $game = $gameService->createGame("Test Game", "Player 1", Player::CLAPPERBOARD);
+
+        $gameService->joinGame($game->getId(), "Player 2", Player::CAR);
+        $gameService->joinGame($game->getId(), "Player 3", Player::GUITAR);
+        $gameService->joinGame($game->getId(), "Player 4", Player::MARTINI_GLASS);
+        $gameService->joinGame($game->getId(), "Player 5", Player::FOOTBALL);
+        $gameService->joinGame($game->getId(), "Player 6", Player::COMPUTER);
+
+        $gameService->startGame($game->getId(), $game->getCreatorId());
+
+        // WHEN
+        $game = $this->gameRepository->getById($game->getId());
+
+        $questions = $game->getCurrentRound()->getCard()->getQuestions();
+
+        $question = $questions[rand(0, count($questions) - 1)];
+
+        $gameService->askQuestion($game->getId(), $game->getJudge()->getId(), $question->getId());
+
+        // THEN
+        $findGame = $this->gameRepository->getById($game->getId());
+
+        return $findGame !== null &&
+            $findGame->getState() === Game::ANSWERING_QUESTION &&
+            $findGame->getJudge()->getId() === $game->getCreatorId() &&
+            $findGame->getCurrentRound()->getId() !== null &&
+            $findGame->getCurrentRound()->getQuestionId() !== null;
+    }
+
+    public function answerQuestion_answersQuestion() {
+        // GIVEN
+        $gameService = new GameService($this->gameRepository, $this->cardService,
+            $this->idGeneratorService);
+
+        $game = $gameService->createGame("Test Game", "Player 1", Player::CLAPPERBOARD);
+
+        $playerIds = [];
+
+        ["playerId" => $playerIds[]] = $gameService->joinGame($game->getId(), "Player 2", Player::CAR);
+        ["playerId" => $playerIds[]] = $gameService->joinGame($game->getId(), "Player 3", Player::GUITAR);
+        ["playerId" => $playerIds[]] = $gameService->joinGame($game->getId(), "Player 4", Player::MARTINI_GLASS);
+        ["playerId" => $playerIds[]] = $gameService->joinGame($game->getId(), "Player 5", Player::FOOTBALL);
+        ["playerId" => $playerIds[]] = $gameService->joinGame($game->getId(), "Player 6", Player::COMPUTER);
+
+        $gameService->startGame($game->getId(), $game->getCreatorId());
+
+        $game->setTimeUpdated(date("Y-m-d H:i:s", strtotime("-120 seconds")));
+
+        $game = $gameService->updateGame($game->getId());
+
+        // WHEN
+        foreach($playerIds as $playerId) {
+            $gameService->answerQuestion($game->getId(), $playerId, "Laborum deserunt velit magna consequat ipsum deserunt consectetur aliqua magna.");
+        }
+
+        // THEN
+        $findGame = $this->gameRepository->getById($game->getId());
+
+        if($findGame === null) {
+            return false;
+        }
+
+        $answers = $findGame->getCurrentRound()->getAnswers();
+
+        if(count($answers) !== 5) {
+            return false;
+        }
+
+        foreach($answers as $answer) {
+            if(!$answer->getId()) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    public function vote_votes() {
+        // GIVEN
+        $gameService = new GameService($this->gameRepository, $this->cardService,
+            $this->idGeneratorService);
+
+        $game = $gameService->createGame("Test Game", "Player 1", Player::CLAPPERBOARD);
+
+        $playerIds = [];
+
+        ["playerId" => $playerIds[]] = $gameService->joinGame($game->getId(), "Player 2", Player::CAR);
+        ["playerId" => $playerIds[]] = $gameService->joinGame($game->getId(), "Player 3", Player::GUITAR);
+        ["playerId" => $playerIds[]] = $gameService->joinGame($game->getId(), "Player 4", Player::MARTINI_GLASS);
+        ["playerId" => $playerIds[]] = $gameService->joinGame($game->getId(), "Player 5", Player::FOOTBALL);
+        ["playerId" => $playerIds[]] = $gameService->joinGame($game->getId(), "Player 6", Player::COMPUTER);
+
+        $gameService->startGame($game->getId(), $game->getCreatorId());
+
+        $game->setTimeUpdated(date("Y-m-d H:i:s", strtotime("-120 seconds")));
+
+        $game = $gameService->updateGame($game->getId());
+
+        foreach($playerIds as $playerId) {
+            $gameService->answerQuestion($game->getId(), $playerId, "Laborum deserunt velit magna consequat ipsum deserunt consectetur aliqua magna.");
+        }
+
+        $game->setTimeUpdated(date("Y-m-d H:i:s", strtotime("-120 seconds")));
+
+        $game = $gameService->updateGame($game->getId());
+
+        // WHEN
+        foreach ($playerIds as $playerId) {
+            $answers = $game->getCurrentRound()->getAnswers();
+
+            shuffle($answers);
+
+            $answer1Id = $answers[0]->getId();
+            $answer2Id = $answers[1]->getId();
+
+            $gameService->vote($game->getId(), $playerId, $answer1Id, $answer2Id);
+        }
+
+        // THEN
+        $findGame = $this->gameRepository->getById($game->getId());
+
+        $votes = $findGame->getCurrentRound()->getVotes();
+
+        return is_array($votes) && count($votes) === 5;
+    }
+
+    public function chooseAnswer_choosesAnswer() {
+        // GIVEN
+        $gameService = new GameService($this->gameRepository, $this->cardService,
+            $this->idGeneratorService);
+
+        $game = $gameService->createGame("Test Game", "Player 1", Player::CLAPPERBOARD);
+
+        $playerIds = [];
+
+        ["playerId" => $playerIds[]] = $gameService->joinGame($game->getId(), "Player 2", Player::CAR);
+        ["playerId" => $playerIds[]] = $gameService->joinGame($game->getId(), "Player 3", Player::GUITAR);
+        ["playerId" => $playerIds[]] = $gameService->joinGame($game->getId(), "Player 4", Player::MARTINI_GLASS);
+        ["playerId" => $playerIds[]] = $gameService->joinGame($game->getId(), "Player 5", Player::FOOTBALL);
+        ["playerId" => $playerIds[]] = $gameService->joinGame($game->getId(), "Player 6", Player::COMPUTER);
+
+        $gameService->startGame($game->getId(), $game->getCreatorId());
+
+        $game->setTimeUpdated(date("Y-m-d H:i:s", strtotime("-120 seconds")));
+
+        $game = $gameService->updateGame($game->getId());
+
+        foreach($playerIds as $playerId) {
+            $gameService->answerQuestion($game->getId(), $playerId, "Laborum deserunt velit magna consequat ipsum deserunt consectetur aliqua magna.");
+        }
+
+        $game->setTimeUpdated(date("Y-m-d H:i:s", strtotime("-120 seconds")));
+
+        $game = $gameService->updateGame($game->getId());
+
+        // WHEN
+        $answers = $game->getCurrentRound()->getAnswers();
+
+        shuffle($answers);
+
+        $answer = $answers[0];
+
+        $gameService->chooseAnswer($game->getId(), $game->getJudge()->getId(), $answer->getId());
+
+        // THEN
+        $findGame = $this->gameRepository->getById($game->getId());
+
+        return $findGame->getCurrentRound()->getChosenAnswerId() !== null;
     }
 }

@@ -7,12 +7,7 @@ class Answer {
     private $roundId = null;
     private $answer = null;
 
-    public function __construct($id, $playerId, $roundId, $answer) {
-        $this->id = $id;
-        $this->playerId = $playerId;
-        $this->roundId = $roundId;
-        $this->answer = $answer;
-    }
+    public function __construct() {}
 
     public function getId() {
         return $this->id;

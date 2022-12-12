@@ -7,6 +7,7 @@ use Models\Card;
 use Models\Game;
 use Models\Player;
 use Models\Question;
+use Models\Round;
 use Models\Vote;
 use Repositories\GameRepositoryInterface;
 use Services\CardService;
@@ -15,11 +16,16 @@ use Services\ScoreService;
 class GameService {
     private GameRepositoryInterface $gameRepository;
     private CardServiceInterface $cardService;
+    private IdGeneratorServiceInterface $idGeneratorService;
 
-    public function __construct(GameRepositoryInterface $gameRepository,
-        CardServiceInterface $cardService) {
+    public function __construct(
+        GameRepositoryInterface $gameRepository,
+        CardServiceInterface $cardService,
+        IdGeneratorServiceInterface $idGeneratorService
+    ) {
         $this->gameRepository = $gameRepository;
         $this->cardService = $cardService;
+        $this->idGeneratorService = $idGeneratorService;
     }
 
     public function getGame($gameId) {
@@ -45,20 +51,30 @@ class GameService {
             throw new GameServiceException("Game name, player name, and player token must be given!");
         }
 
-        $id = $this->generateId();
+        $game = new Game();
 
-        $game = new Game($id, $gameName, null, Game::WAITING_FOR_PLAYERS,
-            null, null);
+        $gameId = $this->idGeneratorService->generateGameId();
+        $playerId = $this->idGeneratorService->generatePlayerId();
 
-        $player = new Player(null, $id, $playerName, $playerToken, null, null, false);
+        $game->setId($gameId);
+        $game->setName($gameName);
+        $game->setCreatorId($playerId);
+        $game->setState(Game::WAITING_FOR_PLAYERS);
+        $game->setTimeCreated(date("Y-m-d H:i:s"));
 
-        $game->addPlayer($playerName, $playerToken, false, false);
+        $player = new Player();
+
+        $player->setId($playerId);
+        $player->setGameId($gameId);
+        $player->setName($playerName);
+        $player->setToken($playerToken);
+        $player->setTurn(0);
+        $player->setSkipTurn(false);
+        $player->setMustWaitForNextRound(false);
+
+        $game->addPlayer($player);
 
         $game = $this->gameRepository->insert($game);
-
-        $game->setCreatorId($game->getPlayers()[0]->getId());
-
-        $game = $this->gameRepository->update($game);
 
         return $game;
     }
@@ -91,11 +107,21 @@ class GameService {
             $mustWaitForNextRound = true;
         }
 
-        $game->addPlayer($playerName, $playerToken, $skipTurn, $mustWaitForNextRound);
+        $numPlayers = count($game->getPlayers());
+
+        $player = new Player();
+
+        $player->setId($this->idGeneratorService->generatePlayerId());
+        $player->setGameId($game->getId());
+        $player->setName($playerName);
+        $player->setToken($playerToken);
+        $player->setTurn($numPlayers);
+        $player->setSkipTurn($skipTurn);
+        $player->setMustWaitForNextRound($mustWaitForNextRound);
+
+        $game->addPlayer($player);
 
         $game = $this->gameRepository->update($game);
-
-        $player = $game->getPlayerByToken($playerToken);
 
         return [
             "playerId" => $player->getId(),
@@ -152,21 +178,33 @@ class GameService {
 
         $game->allowPlayersWaitingForNextRound();
 
-        $firstRound = $game->getRounds() === null;
+        $rounds = $game->getRounds();
 
         $playedCards = $game->getPlayedCards();
 
         $card = $this->cardService->getRandomCard($playedCards);
 
-        if($firstRound) {
-            $game->addRound($game->getCreatorId(), $card->getId());
+        $round = new Round();
+
+        $round->setId($this->idGeneratorService->generateRoundId());
+        $round->setGameId($game->getId());
+        $round->setCardId($card->getId());
+
+        if(!$rounds) {
+            $round->setRoundNumber(1);
+            $round->setJudgeId($game->getCreatorId());
         } else {
             $nextPlayer = $game->getNextPlayer();
 
-            $game->addRound($nextPlayer->getId(), $card->getId());
+            $round->setRoundNumber(count($rounds) + 1);
+            $round->setJudgeId($nextPlayer->getId());
         }
 
+        $game->addRound($round);
+        $game->setCurrentRoundId($round->getId());
+
         $game->setState(Game::ASKING_QUESTION);
+        $game->setTimeUpdated(date("Y-m-d H:i:s"));
 
         $game = $this->gameRepository->update($game);
 
@@ -201,13 +239,14 @@ class GameService {
         $currentRound->setQuestionId($questionId);
 
         $game->setState(Game::ANSWERING_QUESTION);
+        $game->setTimeUpdated(date("Y-m-d H:i:s"));
 
         $game = $this->gameRepository->update($game);
 
         return $game;
     }
 
-    public function answerQuestion($gameId, $playerId, $answer) {
+    public function answerQuestion($gameId, $playerId, $answerText) {
         $game = $this->gameRepository->getById($gameId);
 
         if(!$game) {
@@ -228,14 +267,21 @@ class GameService {
 
         $currentRound = $game->getCurrentRound();
 
-        $currentRound->addAnswer($playerId, $answer);
+        $answer = new Answer();
+
+        $answer->setId($this->idGeneratorService->generateAnswerId());
+        $answer->setPlayerId($playerId);
+        $answer->setRoundId($currentRound->getId());
+        $answer->setAnswer($answerText);
+
+        $currentRound->addAnswer($answer);
 
         $game = $this->gameRepository->update($game);
 
         return $game;
     }
 
-    public function vote($gameId, $playerId, $answerId1, $answerId2) {
+    public function vote($gameId, $playerId, $answer1Id, $answer2Id) {
         $game = $this->gameRepository->getById($gameId);
 
         if(!$game) {
@@ -256,11 +302,19 @@ class GameService {
 
         $currentRound = $game->getCurrentRound();
 
-        if(!$currentRound->hasAnswer($answerId1) || !$currentRound->hasAnswer($answerId2)) {
+        if(!$currentRound->hasAnswer($answer1Id) || !$currentRound->hasAnswer($answer2Id)) {
             throw new GameServiceException("Invalid answer!");
         }
 
-        $currentRound->vote($playerId, $answerId1, $answerId2);
+        $vote = new Vote();
+
+        $vote->setId($this->idGeneratorService->generateRoundId());
+        $vote->setPlayerId($playerId);
+        $vote->setRoundId($currentRound->getId());
+        $vote->setAnswer1Id($answer1Id);
+        $vote->setAnswer2Id($answer2Id);
+
+        $currentRound->vote($vote);
 
         $game = $this->gameRepository->update($game);
 
@@ -311,18 +365,22 @@ class GameService {
                 $game->getCurrentRound()->askRandomQuestion();
 
                 $game->setState(Game::ANSWERING_QUESTION);
+                $game->setTimeUpdated(date("Y-m-d H:i:s"));
             }
         } else if($state === Game::ANSWERING_QUESTION) {
             if($game->secondsSinceLastUpdate() >= Game::SECONDS_TO_ANSWER_QUESTION) {
                 if($game->lessThanTwoPlayersHaveAnswered()) {
                     $game->setState(Game::RESULTS);
+                    $game->setTimeUpdated(date("Y-m-d H:i:s"));
                 } else {
                     $game->setState(Game::VOTING);
+                    $game->setTimeUpdated(date("Y-m-d H:i:s"));
                 }
             }
         } else if($state === Game::VOTING) {
             if($game->secondsSinceLastUpdate() >= Game::SECONDS_TO_VOTE) {
                 $game->setState(Game::RESULTS);
+                $game->setTimeUpdated(date("Y-m-d H:i:s"));
             }
         } else if($state === Game::RESULTS) {
             if($game->isOver()) {
@@ -337,28 +395,8 @@ class GameService {
         }
 
         $game = $this->gameRepository->update($game);
-    }
 
-    private function generateId() {
-        do {
-            $id = $this->randomTenDigits();
-        } while(!$this->isIdUnique($id));
-
-        return $id;
-    }
-
-    private function isIdUnique($id) {
-        return $this->gameRepository->getById($id) === null;
-    }
-
-    private function randomTenDigits() {
-        $digits = "";
-
-        for($i = 0; $i < 10; ++$i) {
-            $digits .= rand(0, 9);
-        }
-
-        return $digits;
+        return $game;
     }
 }
 

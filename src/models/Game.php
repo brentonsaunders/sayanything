@@ -22,94 +22,89 @@ class Game {
     private $name = null;
     private $creatorId = null;
     private $state = null;
+    private $currentRoundId = null;
     private $timeUpdated = null;
     private $timeCreated = null;
-
-    private $stateChanged = false;
 
     private $players = null;
     private $rounds = null;
 
-    public function __construct($id, $name, $creatorId, $state, $timeUpdated,
-        $timeCreated) {
-        $this->id = $id;
-        $this->name = $name;
-        $this->creatorId = $creatorId;
-        $this->state = $state;
-        $this->timeUpdated = $timeUpdated;
-        $this->timeCreated = $timeCreated;
-    }
+    public function __construct() {}
 
     public function getId() {
         return $this->id;
-    }
-
-    public function getName() {
-        return $this->name;
-    }
-
-    public function getCreatorId() {
-        return $this->creatorId;
-    }
-
-    public function getState() {
-        return $this->state;
-    }
-
-    public function getTimeUpdated() {
-        return $this->timeUpdated;
-    }
-
-    public function getTimeCreated() {
-        return $this->timeCreated;
-    }
-
-    public function getPlayers() {
-        return $this->players;
-    }
-
-    public function getRounds() {
-        return $this->rounds;
     }
 
     public function setId($id) {
         $this->id = $id;
     }
 
+    public function getName() {
+        return $this->name;
+    }
+
     public function setName($name) {
         $this->name = $name;
+    }
+
+    public function getCreatorId() {
+        return $this->creatorId;
     }
 
     public function setCreatorId($creatorId) {
         $this->creatorId = $creatorId;
     }
 
-    public function setState($state) {
-        if($state !== $this->state) {
-            $this->stateChanged = true;
-        }
+    public function getState() {
+        return $this->state;
+    }
 
+    public function setState($state) {
         $this->state = $state;
+    }
+
+    public function getCurrentRoundId() {
+        return $this->currentRoundId;
+    }
+
+    public function setCurrentRoundId($currentRoundId) {
+        $this->currentRoundId = $currentRoundId;
+    }
+
+    public function getTimeUpdated() {
+        return $this->timeUpdated;
     }
 
     public function setTimeUpdated($timeUpdated) {
         $this->timeUpdated = $timeUpdated;
     }
 
+    public function getTimeCreated() {
+        return $this->timeCreated;
+    }
+
     public function setTimeCreated($timeCreated) {
         $this->timeCreated = $timeCreated;
     }
 
+    public function getPlayers() {
+        return $this->players;
+    }
+
     public function setPlayers($players) {
-        $this->players = $players;
+        $this->players = [];
+
+        foreach($players as $player) {
+            $this->players[$player->getId()] = $player;
+        }
+    }
+
+    public function getRounds() {
+        return $this->rounds;
     }
 
     public function setRounds($rounds) {
         $this->rounds = $rounds;
-    }
-
-    public function stateHasChanged() {
-        return $this->stateChanged;
     }
 
     public function getCreator() {
@@ -180,35 +175,24 @@ class Game {
         return $remainingTokens;
     }
 
-    public function addPlayer($playerName, $playerToken, $skipTurn, $mustWaitForNextRound) {
-        if($this->players) {
-            $numPlayers = count($this->players);
-        } else {
-            $numPlayers = 0;
-
+    public function addPlayer(Player $player) {
+        if(!$this->players) {
             $this->players = [];
         }
 
-        $this->players[] = new Player(null, $this->id, $playerName, $playerToken,
-            $numPlayers, $skipTurn, $mustWaitForNextRound);
+        $this->players[$player->getId()] = $player;
     }
 
-    public function addRound($judgeId, $cardId) {
-        $this->rounds[] = new Round(null, $this->id, $judgeId, $cardId, null, null);
+    public function addRound(Round $round) {
+        if(!$this->rounds) {
+            $this->rounds = [];
+        }
+
+        $this->rounds[$round->getId()] = $round;
     }
 
     public function getPlayer($playerId) {
-        if(!$this->players) {
-            return null;
-        }
-
-        foreach($this->players as $player) {
-            if($player->getId() == $playerId) {
-                return $player;
-            }
-        }
-
-        return null;
+        return $this->players[$playerId] ?? null;
     }
 
     public function getPlayerByToken($token) {
@@ -274,13 +258,7 @@ class Game {
             return null;
         }
 
-        $rounds = $this->rounds;
-
-        usort($rounds, function($a, $b) {
-            return $a->getId() - $b->getId();
-        });
-
-        return end($rounds);
+        return $this->rounds[$this->currentRoundId];
     }
 
     public function getRound($roundId) {

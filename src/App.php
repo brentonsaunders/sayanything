@@ -6,6 +6,8 @@ use Daos\PlayerDao;
 use Daos\QuestionDao;
 use Daos\VoteDao;
 use Daos\RoundDao;
+use Database\DbMapper;
+use Database\PdoSession;
 use Repositories\AnswerRepository;
 use Repositories\CardRepository;
 use Repositories\GameRepository;
@@ -14,6 +16,7 @@ use Repositories\RoundRepository;
 use Repositories\VoteRepository;
 use Services\CardService;
 use Services\GameService;
+use Services\IdGeneratorService;
 
 define('ROOT_DIR', realpath(__DIR__ . '/..'));
 
@@ -51,9 +54,25 @@ class App {
     }
 
     private function initGameService(DatabaseHelper $db) {
+        $mapper = new DbMapper(new PdoSession("localhost", "sayanything", "root", ""));
+
+        $mapper->map(
+            "Models\\Game",
+            "games",
+            "id",
+            [
+                "id" => "id",
+                "name" => "name",
+                "creator_id" => "creatorId",
+                "state" => "state",
+                "time_updated" => "timeUpdated",
+                "time_created" => "timeCreated",
+            ]
+        );
+        
         $answerDao = new AnswerDao($db);
         $cardDao = new CardDao($db);
-        $gameDao = new GameDao($db);
+        $gameDao = new GameDao($mapper);
         $playerDao = new PlayerDao($db);
         $questionDao = new QuestionDao($db);
         $roundDao = new RoundDao($db);
@@ -68,8 +87,15 @@ class App {
         $gameRepository = new GameRepository($gameDao, $playerRepository, $roundRepository);
 
         $cardService = new CardService($cardRepository);
+        $idGeneratorService = new IdGeneratorService(
+            $gameRepository,
+            $playerRepository,
+            $roundRepository,
+            $answerRepository,
+            $voteRepository
+        );
 
-        $this->gameService = new GameService($gameRepository, $cardService);
+        $this->gameService = new GameService($gameRepository, $cardService, $idGeneratorService);
     }
 
     public function getGameService() {

@@ -3,15 +3,21 @@ namespace Services;
 
 use Models\Card;
 use Models\Question;
+use Repositories\CardRepositoryInterface;
+use Repositories\MockCardRepository;
 
 class MockCardService implements CardServiceInterface {
-    public function __construct() { }
+    private CardRepositoryInterface $cardRepository;
 
-    public function getRandomCard($a) : Card {
-        return new Card(1, [
-            new Question(1, 1, "What celebrity would make the worst babysitter?"),
-            new Question(2, 1, "What would make long car rides more fun?"),
-            new Question(3, 1, "Where's the best place to have a birthday party?"),
-        ]);
+    public function __construct() { 
+        $this->cardRepository = new MockCardRepository();
+    }
+
+    public function getRandomCard($otherThanCards) : Card {
+        $cards = $this->cardRepository->getAll();
+
+        shuffle($cards);
+
+        return $cards[0];
     }
 }
