@@ -6,17 +6,19 @@ use Models\Round;
 use Models\Player;
 use Repositories\GameRepositoryInterface;
 use Repositories\MockGameRepository;
+use Services\IdGeneratorInterface;
+use Services\MockIdGenerator;
 use Test;
 
 class GameServiceTest extends Test {
     private GameRepositoryInterface $gameRepository;
     private CardServiceInterface $cardService;
-    private MockIdGeneratorService $idGeneratorService;
+    private IdGeneratorInterface $idGenerator;
 
     public function __construct() {
         $this->gameRepository = new MockGameRepository();
         $this->cardService = new MockCardService();
-        $this->idGeneratorService = new MockIdGeneratorService();
+        $this->idGenerator = new MockIdGenerator();
         
         parent::__construct();
     }
@@ -24,7 +26,7 @@ class GameServiceTest extends Test {
     public function createGame_createsNewGame() {
         // GIVEN
         $gameService = new GameService($this->gameRepository, $this->cardService,
-            $this->idGeneratorService);
+            $this->idGenerator);
 
         // WHEN
         $game = $gameService->createGame("Test Game", "Player 1", Player::CLAPPERBOARD);
@@ -43,7 +45,7 @@ class GameServiceTest extends Test {
     public function joinGame_addsPlayerToGame() {
         // GIVEN
         $gameService = new GameService($this->gameRepository, $this->cardService,
-            $this->idGeneratorService);
+            $this->idGenerator);
 
         // WHEN
         $game = $gameService->createGame("Test Game", "Player 1", Player::CLAPPERBOARD);
@@ -65,7 +67,7 @@ class GameServiceTest extends Test {
     public function startGame_startsANewRound() {
         // GIVEN
         $gameService = new GameService($this->gameRepository, $this->cardService,
-            $this->idGeneratorService);
+            $this->idGenerator);
 
         $game = $gameService->createGame("Test Game", "Player 1", Player::CLAPPERBOARD);
 
@@ -90,7 +92,7 @@ class GameServiceTest extends Test {
     public function updateGame_judgeTookTooLongToAskQuestion_asksRandomQuestion() {
         // GIVEN
         $gameService = new GameService($this->gameRepository, $this->cardService,
-            $this->idGeneratorService);
+            $this->idGenerator);
 
         $game = $gameService->createGame("Test Game", "Player 1", Player::CLAPPERBOARD);
 
@@ -121,7 +123,7 @@ class GameServiceTest extends Test {
     public function newRound_afterFirstRound_makesTheCorrectPlayerJudge() {
         // GIVEN
         $gameService = new GameService($this->gameRepository, $this->cardService,
-            $this->idGeneratorService);
+            $this->idGenerator);
 
         $game = $gameService->createGame("Test Game", "Player 1", Player::CLAPPERBOARD);
 
@@ -151,7 +153,7 @@ class GameServiceTest extends Test {
     public function askQuestion_asksQuestion() {
         // GIVEN
         $gameService = new GameService($this->gameRepository, $this->cardService,
-            $this->idGeneratorService);
+            $this->idGenerator);
 
         $game = $gameService->createGame("Test Game", "Player 1", Player::CLAPPERBOARD);
 
@@ -185,7 +187,7 @@ class GameServiceTest extends Test {
     public function answerQuestion_answersQuestion() {
         // GIVEN
         $gameService = new GameService($this->gameRepository, $this->cardService,
-            $this->idGeneratorService);
+            $this->idGenerator);
 
         $game = $gameService->createGame("Test Game", "Player 1", Player::CLAPPERBOARD);
 
@@ -233,7 +235,7 @@ class GameServiceTest extends Test {
     public function vote_votes() {
         // GIVEN
         $gameService = new GameService($this->gameRepository, $this->cardService,
-            $this->idGeneratorService);
+            $this->idGenerator);
 
         $game = $gameService->createGame("Test Game", "Player 1", Player::CLAPPERBOARD);
 
@@ -282,7 +284,7 @@ class GameServiceTest extends Test {
     public function chooseAnswer_choosesAnswer() {
         // GIVEN
         $gameService = new GameService($this->gameRepository, $this->cardService,
-            $this->idGeneratorService);
+            $this->idGenerator);
 
         $game = $gameService->createGame("Test Game", "Player 1", Player::CLAPPERBOARD);
 

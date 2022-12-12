@@ -7,7 +7,7 @@ use Repositories\GameRepositoryInterface;
 use Repositories\PlayerRepositoryInterface;
 use Repositories\RoundRepositoryInterface;
 use Repositories\VoteRepositoryInterface;
-class IdGeneratorService implements IdGeneratorServiceInterface {
+class IdGenerator implements IdGeneratorInterface {
     private GameRepositoryInterface $gameRepository;
     private PlayerRepositoryInterface $playerRepository;
     private RoundRepositoryInterface $roundRepository;

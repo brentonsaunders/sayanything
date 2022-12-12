@@ -16,16 +16,16 @@ use Services\ScoreService;
 class GameService {
     private GameRepositoryInterface $gameRepository;
     private CardServiceInterface $cardService;
-    private IdGeneratorServiceInterface $idGeneratorService;
+    private IdGeneratorInterface $idGenerator;
 
     public function __construct(
         GameRepositoryInterface $gameRepository,
         CardServiceInterface $cardService,
-        IdGeneratorServiceInterface $idGeneratorService
+        IdGeneratorInterface $idGenerator
     ) {
         $this->gameRepository = $gameRepository;
         $this->cardService = $cardService;
-        $this->idGeneratorService = $idGeneratorService;
+        $this->idGenerator = $idGenerator;
     }
 
     public function getGame($gameId) {
@@ -53,8 +53,8 @@ class GameService {
 
         $game = new Game();
 
-        $gameId = $this->idGeneratorService->generateGameId();
-        $playerId = $this->idGeneratorService->generatePlayerId();
+        $gameId = $this->idGenerator->generateGameId();
+        $playerId = $this->idGenerator->generatePlayerId();
 
         $game->setId($gameId);
         $game->setName($gameName);
@@ -111,7 +111,7 @@ class GameService {
 
         $player = new Player();
 
-        $player->setId($this->idGeneratorService->generatePlayerId());
+        $player->setId($this->idGenerator->generatePlayerId());
         $player->setGameId($game->getId());
         $player->setName($playerName);
         $player->setToken($playerToken);
@@ -186,7 +186,7 @@ class GameService {
 
         $round = new Round();
 
-        $round->setId($this->idGeneratorService->generateRoundId());
+        $round->setId($this->idGenerator->generateRoundId());
         $round->setGameId($game->getId());
         $round->setCardId($card->getId());
 
@@ -269,7 +269,7 @@ class GameService {
 
         $answer = new Answer();
 
-        $answer->setId($this->idGeneratorService->generateAnswerId());
+        $answer->setId($this->idGenerator->generateAnswerId());
         $answer->setPlayerId($playerId);
         $answer->setRoundId($currentRound->getId());
         $answer->setAnswer($answerText);
@@ -308,7 +308,7 @@ class GameService {
 
         $vote = new Vote();
 
-        $vote->setId($this->idGeneratorService->generateRoundId());
+        $vote->setId($this->idGenerator->generateRoundId());
         $vote->setPlayerId($playerId);
         $vote->setRoundId($currentRound->getId());
         $vote->setAnswer1Id($answer1Id);

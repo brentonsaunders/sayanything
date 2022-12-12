@@ -23,7 +23,7 @@ use Views\WaitingForPlayersView;
 use Views\TestGameView;
 use Views\TestView;
 use Models\Round;
-use Models\Round;
+use Models\Player;
 use Models\Answer;
 use Models\Question;
 use Models\Card;

@@ -1,7 +1,7 @@
 <?php
 namespace Services;
 
-class MockIdGeneratorService implements IdGeneratorServiceInterface {
+class MockIdGenerator implements IdGeneratorInterface {
     private $playerCounter = 1;
     private $roundCounter = 1;
     private $answerCounter = 1;

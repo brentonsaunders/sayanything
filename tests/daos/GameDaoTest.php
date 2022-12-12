@@ -41,7 +41,7 @@ class GameDaoTest extends Test {
 
     public function getById_returnsGame() {
         // GIVEN
-        $gameDao = new PlayerDao($this->mapper);
+        $gameDao = new GameDao($this->mapper);
 
         // WHEN
         $game = $this->mapper->select("Models\\Game", ["id" => 1]);
@@ -52,7 +52,7 @@ class GameDaoTest extends Test {
 
     public function insert_returnsGame() {
         // GIVEN
-        $gameDao = new PlayerDao($this->mapper);
+        $gameDao = new GameDao($this->mapper);
 
         // WHEN
         $game = $this->mapper->insert($this->testGame);
@@ -63,7 +63,7 @@ class GameDaoTest extends Test {
 
     public function update_returnsGame() {
         // GIVEN
-        $gameDao = new PlayerDao($this->mapper);
+        $gameDao = new GameDao($this->mapper);
 
         // WHEN
         $game = $this->mapper->update($this->testGame);
@@ -74,7 +74,7 @@ class GameDaoTest extends Test {
 
     public function delete_returnsGame() {
         // GIVEN
-        $gameDao = new PlayerDao($this->mapper);
+        $gameDao = new GameDao($this->mapper);
 
         // WHEN
         $game = $this->mapper->delete($this->testGame);

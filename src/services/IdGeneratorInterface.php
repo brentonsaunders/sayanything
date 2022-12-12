@@ -1,7 +1,7 @@
 <?php
 namespace Services;
 
-interface IdGeneratorServiceInterface {
+interface IdGeneratorInterface {
     public function generateGameId();
     public function generatePlayerId();
     public function generateRoundId();
