@@ -6,11 +6,7 @@ class Question {
     private $cardId = null;
     private $question = null;
 
-    public function __construct($id, $cardId, $question) {
-        $this->id = $id;
-        $this->cardId = $cardId;
-        $this->question = $question;
-    }
+    public function __construct() {}
 
     public function getId() {
         return $this->id;

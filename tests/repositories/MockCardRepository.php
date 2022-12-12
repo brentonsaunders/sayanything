@@ -14,14 +14,21 @@ class MockCardRepository implements CardRepositoryInterface {
             $questions = [];
 
             for ($j = 0; $j < 5; ++$j) {
-                $questions[] = new Question(
-                    $questionCounter++,
-                    $i,
-                    "Ullamco irure eu exercitation esse culpa excepteur occaecat."
-                );
+                $question = new Question();
+
+                $question->setId($questionCounter++);
+                $question->setCardId($i);
+                $question->setQuestion("Ullamco irure eu exercitation esse culpa excepteur occaecat.");
+
+                $questions[] = $question;
             }
 
-            $this->cards[$i] = new Card($i, $questions);
+            $card = new Card();
+
+            $card->setId($i);
+            $card->setQuestions($questions);
+
+            $this->cards[$i] = $card;
         }
     }
 	

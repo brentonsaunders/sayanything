@@ -1,39 +1,25 @@
 <?php
 namespace Daos;
 
-use DatabaseHelper;
+use Database\DbMapperInterface;
 use Models\Card;
 
 class CardDao implements CardDaoInterface {
-    private DatabaseHelper $db;
+    private DbMapperInterface $mapper;
 
-    public function __construct(DatabaseHelper $db) {
-        $this->db = $db;
+    public function __construct(DbMapperInterface $mapper) {
+        $this->mapper = $mapper;
     }
 
     public function getAll(): array {
-        $rows = $this->db->query("SELECT * FROM cards");
-
-        $cards = [];
-
-        foreach($rows as $row) {
-            $cards[] = new Card($row["id"], null);
-        }
-
-        return $cards;
+        return $this->mapper->select("Models\\Card");
     }
 
     public function insert(Card $card) : Card {
-        $this->db->insert("cards", []);
-
-        return new Card($this->db->lastInsertId(), $card->getQuestions());
+        return $this->mapper->insert($card);
     }
 
     public function delete(Card $card) : Card {
-        $this->db->query("DELETE FROM cards WHERE id = :id", [
-            ":id" => $card->getId()
-        ]);
-
-        return $card;
+        return $this->mapper->delete($card);
     }
 }

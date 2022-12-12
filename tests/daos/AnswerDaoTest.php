@@ -79,7 +79,7 @@ class AnswerDaoTest extends Test {
         return $player !== null;
     }
 
-    public function delete_returnsGame() {
+    public function delete_returnsAnswer() {
         // GIVEN
         $playerDao = new AnswerDao($this->mapper);
 

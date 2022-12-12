@@ -85,7 +85,7 @@ class PlayerDaoTest extends Test {
         return $player !== null;
     }
 
-    public function delete_returnsGame() {
+    public function delete_returnsPlayer() {
         // GIVEN
         $playerDao = new PlayerDao($this->mapper);
 

@@ -85,7 +85,7 @@ class RoundDaoTest extends Test {
         return $player !== null;
     }
 
-    public function delete_returnsGame() {
+    public function delete_returnsRound() {
         // GIVEN
         $playerDao = new RoundDao($this->mapper);
 

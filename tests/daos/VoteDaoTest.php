@@ -81,7 +81,7 @@ class VoteDaoTest extends Test {
         return $player !== null;
     }
 
-    public function delete_returnsGame() {
+    public function delete_returnsVote() {
         // GIVEN
         $playerDao = new VoteDao($this->mapper);
 
