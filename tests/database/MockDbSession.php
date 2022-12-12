@@ -21,7 +21,7 @@ class MockDbSession implements DbSessionInterface {
 			];
 		}
 
-		return [];
+		return []; 
 	}
 	
 	

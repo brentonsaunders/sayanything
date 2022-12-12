@@ -27,7 +27,7 @@ class RoundRepository implements RoundRepositoryInterface {
         $this->voteRepository = $voteRepository;
     }
 
-    public function getAll(): array(){
+    public function getAll(): array {
         return $this->roundDao->getAll();
     }
 
