@@ -18,6 +18,9 @@ class Player {
     private $turn = null;
     private $skipTurn = null;
     private $mustWaitForNextRound = null;
+    private $isWinner = null;
+    private $isJudge = null;
+    private $isMe = null;
 
     public function __construct() {}
 
@@ -92,5 +95,29 @@ class Player {
 
     public function setMustWaitForNextRound($mustWaitForNextRound) {
         $this->mustWaitForNextRound = $mustWaitForNextRound;
+    }
+
+    public function getIsWinner() {
+        return $this->isWinner;
+    }
+
+    public function setIsWinner($isWinner) {
+        $this->isWinner = $isWinner;
+    }
+
+    public function getIsJudge() {
+        return $this->isJudge;
+    }
+
+    public function setIsJudge($isJudge) {
+        $this->isJudge = $isJudge;
+    }
+
+    public function getIsMe() {
+        return $this->isMe;
+    }
+
+    public function setIsMe($isMe) {
+        $this->isMe = $isMe;
     }
 }

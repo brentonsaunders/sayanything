@@ -1,70 +1,54 @@
 <?php
 namespace Views;
 
-class MainView implements View {
-    private $gameId;
+class MainView extends View {
+    private $content = "";
 
-    public function __construct($gameId = null) {
-        $this->gameId = $gameId;
+    public function __construct($content = "") {
+        $this->content = $content;
     }
 
     protected function head() {
-        $gameId = ($this->gameId) ? "\"{$this->gameId}\"" : "null";
-
-        echo "<title>Say Anything</title>";
-        echo '<meta charset="UTF-8">';
-        echo '<meta name="viewport" content="width=device-width, initial-scale=1.0">';
-        echo '<link rel="stylesheet" href="css/index.css">';
-        echo '<script src="js/jquery-3.6.1.min.js"></script>';
-        echo "<script> const GAME_ID = $gameId; </script>";
-        echo '<script src="js/index.js"></script>';
+        return "<title>Say Anything</title>" .
+               '<meta charset="UTF-8">' .
+               '<meta name="viewport" content="width=device-width, initial-scale=1.0">' .
+               '<link rel="stylesheet" href="' . PUBLIC_HTML . '/css/index.css">' . 
+               '<script src="' . PUBLIC_HTML . '/js/jquery-3.6.1.min.js"></script>' .
+               '<script src="' . PUBLIC_HTML . '/js/index.js"></script>';
     }
 
     protected function body() {
-        echo '<div id="app">';
-        echo "<header>";
-
-        $this->header();
-
-        echo "</header>";
-
-        echo "<main>";
-
-        $this->main();
-
-        echo "</main>";
-        echo "</div>";
+        return '<div id="app">' . 
+               "<header>" .
+               $this->header() . 
+               "</header>" .
+               "<main>" .
+               $this->main() .
+               "</main>" .
+               "</div>";
     }
 
     protected function header() {
-        echo '<div class="left">';
-        echo '<div id="menu">';
-        echo "<div></div>";
-        echo "<div></div>";
-        echo "<div></div>";
-        echo "</div>";
-        echo "</div>";
-        echo '<div class="center"><div id="title">Say Anything</div></div>';
-        echo '<div class="right"></div>';
+        return  '<div class="left">' .
+                '<a id="menu-button"><span></span><span></span><span></span></a>' .
+                "</div>" .
+                '<div class="middle"><div id="title">Say Anything</div></div>' .
+                '<div class="right"></div>';
     }
 
     protected function main() {
-
+        return $this->content;
     }
 
     public function render() {
-        echo "<!DOCTYPE html>";
-        echo "<html>";
-        echo "<head>";
-
-        $this->head();
-
-        echo "</head>";
-        echo "<body>";
-
-        $this->body();
-
-        echo "</body>";
-        echo "</html>";
+        return "<!DOCTYPE html>" .
+               '<html lang="en">' . 
+               "<head>" .
+               $this->head() .
+               "</head>" . 
+               "<body>" .
+               $this->body() .
+               "</body>" .
+               "</html>";
     }
 }

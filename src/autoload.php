@@ -1,4 +1,7 @@
 <?php
+define('ROOT_DIR', realpath(__DIR__ . '/..'));
+define("PUBLIC_HTML", "http://localhost/sayanything/public/www");
+
 spl_autoload_register(function($className) {
     $parts = explode('\\', $className);
 

@@ -21,8 +21,6 @@ use Services\CardService;
 use Services\GameService;
 use Services\IdGeneratorService;
 
-define('ROOT_DIR', realpath(__DIR__ . '/..'));
-define("PUBLIC_HTML", "http://localhost/sayanything/public/www/");
 define('DEBUG', true);
 
 class App {

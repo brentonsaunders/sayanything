@@ -51,6 +51,14 @@ class GameService {
             throw new GameServiceException("Game name, player name, and player token must be given!");
         }
 
+        if(strlen($gameName) > 30) {
+            throw new GameServiceException("Game name must be no longer than 30 characters!");
+        }
+
+        if(strlen($playerName) > 12) {
+            throw new GameServiceException("Player name must be no longer than 12 characters!");
+        }
+
         $game = new Game();
 
         $gameId = $this->idGenerator->generateGameId();
@@ -83,6 +91,10 @@ class GameService {
         if(empty($playerName) ||
            !Player::isToken($playerToken)) {
             throw new GameServiceException("Player name and player token must be given!");
+        }
+
+        if(strlen($playerName) > 12) {
+            throw new GameServiceException("Player name must be no longer than 12 characters!");
         }
 
         $game = $this->gameRepository->getById($gameId);
