@@ -83,12 +83,15 @@ class GameView extends View {
     }
 
     public function withAnswer(?Answer $answer, $playerToken) {
+        $disabled = ($answer) ? "disabled" : "";
+        $answerText = ($answer) ? $answer->getAnswer() : "";
+        $charCount = ($answer) ? max(0, 80 - strlen($answerText)) : 80;
+
         $this->content .= 
             '<div id="answer">' .
             '<form action="/' . $this->gameId . '/answer" method="post">' .
-            '<textarea oninput="this.value = this.value.replace(/\n/g, \'\');" maxlength="80" rows="1" class="bg-color-' . $playerToken . ' shadow" placeholder="Write your answer" name="answer"></textarea>' . 
-            '<button class="submit-button" type="submit">Submit</button>' .
-            '<button class="edit-button" type="button">Edit</button>' .
+            '<textarea ' . $disabled . ' oninput="$(this).val($(this).val().replace(/\n/g, \'\')); $(\'#char-count\').text(Math.max(0, 80 - $(this).val().length));" maxlength="80" rows="1" class="bg-color-' . $playerToken . ' shadow" placeholder="Write your answer" name="answer">' . $answerText . '</textarea>' . 
+            '<span id="char-count">' . $charCount . '</span><button type="button" class="edit-button" onclick="const $textarea = $(this).siblings(\'textarea\'); const length = $textarea.val().length; $textarea.prop(\'disabled\', false); $textarea[0].setSelectionRange(length, length); $textarea.focus();"></button><button type="submit" class="save-button"></button>' .
             '</form>' .
             '</div>';
 

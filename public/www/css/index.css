@@ -431,6 +431,50 @@ span.token.clapperboard {
     position: relative;
 }
 
+#char-count {
+    position: absolute;
+    bottom: 2rem;
+    right: 2rem;
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: white;
+}
+
+#answer button {
+    position: absolute;
+    display: none;
+    top: 2rem;
+    right: 2rem;
+    width: 40px;
+    height: 40px;
+    background-color: inherit;
+    border: none;
+    outline: none;
+    background-size: 40px;
+    background-repeat: no-repeat;
+    background-position: center;
+}
+
+#answer .save-button {
+    background-image: url('../img/check-mark.png');
+}
+
+#answer .edit-button {
+    background-image: url('../img/pen-icon.png');
+}
+
+#answer textarea:enabled ~ .save-button {
+    display: block;
+}
+
+#answer textarea:disabled ~ .edit-button {
+    display: block;
+}
+
+#answer textarea:disabled ~ #char-count {
+    display: none;
+}
+
 #answer textarea {
     display: block;
     width: 100%;
@@ -452,21 +496,8 @@ span.token.clapperboard {
     font-weight: bold;
 }
 
-#answer button {
-    display: block;
-    position: absolute;
-    right: 2rem;
-    top: 2rem;
-    width: 40px;
-    height: 40px;
-}
-
-#answer textarea:disabled ~ .submit-button {
-    display: none;
-}
-
-#answer textarea:enabled ~ .edit-button {
-    display: none;
+#answer textarea:disabled {
+    font-size: 1.2rem;
 }
 
 /*

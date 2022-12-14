@@ -1,6 +1,7 @@
 <?php
 namespace Views;
 
+use Models\Answer;
 use Models\Card;
 use Models\Player;
 use Models\Question;
@@ -53,13 +54,17 @@ class GameViewTest {
         $card->setId(1);
         $card->setQuestions($questions);
 
+        $answer = new Answer();
+
+        $answer->setAnswer("My answer");
+
         $view = GameView::builder(1)
             ->withRoundNumber(2)
             ->withCountdownTimer(3)
             ->withMessage("In Brenton's Opinion ...")
             ->withMessage("Ullamco aliquip voluptate quis ex voluptate consequat Lorem irure proident.")
-            // ->withAnswer(null, Player::DOLLAR_SIGN);
-            ->withQuestions(...$card->getQuestions());
+            ->withAnswer($answer, Player::DOLLAR_SIGN);
+            // ->withQuestions(...$card->getQuestions());
 
         echo (new MainView($view->render()))->render();
     }
