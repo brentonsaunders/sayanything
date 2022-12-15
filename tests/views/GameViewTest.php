@@ -5,6 +5,7 @@ use Models\Answer;
 use Models\Card;
 use Models\Player;
 use Models\Question;
+use Models\Vote;
 
 class GameViewTest {
     public function __construct() {
@@ -58,12 +59,46 @@ class GameViewTest {
 
         $answer->setAnswer("My answer");
 
+        $answers = [];
+        $answerStrings = [
+            "Laborum aliqua sint ad adipisicing proident est esse sint ea.",
+            "Quis magna commodo minim nisi non ea proident ut laboris aliquip est adipisicing nulla.",
+            "Amet deserunt cillum ex exercitation adipisicing.",
+            "Aliquip eiusmod deserunt consectetur est commodo proident et adipisicing irure eu tempor.",
+            "Esse velit fugiat commodo dolore officia occaecat aute Lorem duis mollit excepteur ex aute.",
+            "Culpa nulla officia sint officia reprehenderit sit aliquip.",
+            "Pariatur mollit commodo fugiat sunt proident minim ipsum anim tempor dolore ea anim."
+        ];
+
+        foreach($answerStrings as $index => $answerString) {
+            $answer = new Answer();
+
+            $answer->setId($index + 1);
+            $answer->setAnswer($answerString);
+
+            $answers[] = $answer;
+        }
+        
+        $vote = new Vote();
+
+        $vote->setAnswer1Id(1);
+        $vote->setAnswer2Id(2);
+
+        $vote2 = new Vote();
+
+        $vote2->setAnswer1Id(1);
+        $vote2->setAnswer2Id(4);
+
+
         $view = GameView::builder(1)
-            ->withRoundNumber(2)
+            ->withSidebar()
             ->withCountdownTimer(3)
-            ->withMessage("In Brenton's Opinion ...")
-            ->withMessage("Ullamco aliquip voluptate quis ex voluptate consequat Lorem irure proident.")
-            ->withAnswer($answer, Player::DOLLAR_SIGN);
+            ->withMessage("Tap the answers to vote on which you believe is Brenton's favorite to the question")
+            ->withMessage("Adipisicing ea do deserunt mollit pariatur reprehenderit nostrud elit Lorem cupidatat fugiat?")
+            // ->withJoinGameButtonAndModal(Player::getTokens());
+                // ->withMessage("Ullamco aliquip voluptate quis ex voluptate consequat Lorem irure proident.")
+            ->withAnswers($answers, [$vote, $vote2], Player::CAR);
+            //->withAnswer($answer, Player::DOLLAR_SIGN);
             // ->withQuestions(...$card->getQuestions());
 
         echo (new MainView($view->render()))->render();

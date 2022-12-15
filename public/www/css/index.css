@@ -57,14 +57,21 @@ a {
 
 html, body {
     min-height: 100vh;
+    user-select: none;
+    font-family: 'Roboto', sans-serif;
+    background-color: rgb(230, 230, 230);
 }
 
-#app {
+#app,
+#sidebar {
     display: flex;
     flex-direction: column;
+    width: 100vw;
     height: 100vh;
-    font-family: 'Roboto', sans-serif;
-    user-select: none;
+}
+
+#app.sidebar-open #sidebar {
+    left: 0;
 }
 
 header {
@@ -72,7 +79,7 @@ header {
     height: 56px;
 }
 
-header .left {
+#menu-button {
     width: 56px;
     display: grid;
     place-items: center;
@@ -88,14 +95,14 @@ header .middle {
     flex: 1;
 }
 
-#menu-button {
+.hamburger {
     display: flex;
     flex-direction: column;
     gap: 4px;
     width: 24px;
 }
 
-#menu-button span {
+.hamburger span {
     display: block;
     content: '';
     height: 3px;
@@ -170,7 +177,7 @@ span.token {
     height: 40px;
     border-radius: 40px;
     border: 3px solid black;
-    background-size: 20px;
+    background-size: 50%;
     background-position: center;
     background-repeat: no-repeat;
 }
@@ -305,6 +312,19 @@ span.token.clapperboard {
     box-shadow: 0 0.3rem 0 0 var(--martini-glass-color-darken);
 }
 
+.bg-color-white {
+    background-color: white;
+}
+
+.black-border {
+    border: 2px solid black;
+}
+
+.white-text {
+    color: white;
+    text-shadow: 0 0.1rem 0.2rem black;
+}
+
 #game-name {
    text-align: center;
    font-size: 1.5rem;
@@ -332,7 +352,7 @@ span.token.clapperboard {
 .modal-container {
     position: fixed;
     inset: 0;
-    display: grid;
+    display: none;
     place-items: center;
     background-color: rgb(0, 0, 0, 0.5);
 }
@@ -348,13 +368,13 @@ span.token.clapperboard {
     background-color: white;
 }
 
-.modal h2 {
+:where(#join-game-modal, #create-game-modal) h2 {
     font-size: 1.6rem;
     font-weight: bold;
     text-align: center;
 }
 
-.modal input[type=text] {
+:where(#join-game-modal, #create-game-modal) input[type=text] {
     display: block;
     height: 5rem;
     padding: 1rem;
@@ -365,16 +385,17 @@ span.token.clapperboard {
     text-align: center;
 }
 
-.modal .tokens {
+:where(#join-game-modal, #create-game-modal) .tokens {
     display: flex;
+    flex-wrap: wrap;
     gap: 1rem;
 }
 
-.modal .tokens input[type=radio] {
+:where(#join-game-modal, #create-game-modal) .tokens input[type=radio] {
     display: none;
 }
 
-.modal .tokens input[type=radio]:checked + span {
+:where(#join-game-modal, #create-game-modal) .tokens input[type=radio]:checked + span {
     width: 50px;
     height: 50px;
 }
@@ -491,13 +512,103 @@ span.token.clapperboard {
 #answer textarea,
 #answer textarea::placeholder {
     font-size: 1.6rem;
-    color: white;
-    text-shadow: 0 0.1rem 0.2rem black;
     font-weight: bold;
 }
 
 #answer textarea:disabled {
     font-size: 1.2rem;
+}
+
+#answers .answer {
+    position: relative;
+    padding: 16vh 2rem;
+    border-radius: 5px;
+    line-height: 3rem;
+    text-align: center;
+    font-size: 1.6rem;
+    font-weight: bold;
+}
+
+#answers {
+    display: grid;
+    grid-template-columns: auto auto;
+    gap: 1rem;
+    flex: 1;
+}
+
+#answers .answer-short {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+    border-radius: 10px;
+    padding: 1.5rem;
+    min-width: 0;
+}
+
+#answers .text {
+    flex: 1;
+    font-size: 1.2rem;
+    font-weight: bold;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+#answers .votes {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.6rem;
+    font-weight: bold;
+}
+
+#answers .tokens {
+    display: flex;
+    flex-wrap: wrap;
+    position: absolute;
+    left: 1rem;
+    top: 1rem;
+}
+
+#answers .tokens .token {
+}
+
+#sidebar {
+    position: fixed;
+    left: -100vw;
+    top: 0;
+    background-color: white;
+    z-index: 1000;
+    transition: left ease-in 0.25s;
+}
+
+#close-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 56px;
+    margin-left: auto;
+}
+
+.close {
+    position: relative;
+    width: 30px;
+    height: 30px;
+}
+
+.close span {
+    position: absolute;
+    display: block;
+    left: 50%;
+    top: 50%;
+    width: 24px;
+    height: 2px;
+    background-color: black;
+    transform: translate(-50%, -50%) rotate(45deg);
+}
+
+.close span + span {
+    transform: translate(-50%, -50%) rotate(-45deg);
 }
 
 /*

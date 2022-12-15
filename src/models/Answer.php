@@ -6,6 +6,7 @@ class Answer {
     private $playerId = null;
     private $roundId = null;
     private $answer = null;
+    private $player = null;
 
     public function __construct() {}
 
@@ -39,5 +40,13 @@ class Answer {
 
     public function setAnswer($answer) {
         $this->answer = $answer;
+    }
+
+    public function getPlayer() {
+        return $this->player;
+    }
+
+    public function setPlayer(Player $player) {
+        $this->player = $player;
     }
 }

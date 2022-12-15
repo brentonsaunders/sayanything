@@ -29,9 +29,9 @@ class MainView extends View {
     }
 
     protected function header() {
-        return  '<div class="left">' .
-                '<a id="menu-button"><span></span><span></span><span></span></a>' .
-                "</div>" .
+        return  '<a id="menu-button">' .
+                '<div class="hamburger"><span></span><span></span><span></span></div>' .
+                "</a>" .
                 '<div class="middle"><div id="title">Say Anything</div></div>' .
                 '<div class="right"></div>';
     }

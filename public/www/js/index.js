@@ -1,111 +1,62 @@
+function vote(answerId) {
+    let vote1 = $("#answers").data("vote1");
+    let vote2 = $("#answers").data("vote2");
+    const currentVote = $("#answers").data("current-vote") ?? 0;
+
+    if(vote1 && vote2 && vote1 === vote2 && vote1 === answerId) {
+        $("#answers").data("vote1", null);
+        $("#answers").data("vote2", null);
+        $("#answers").data("current-vote",  0);
+
+        return;
+    }
+
+    if(currentVote === 0) {
+        $("#answers").data("vote1", answerId);
+    } else if(currentVote === 1) {
+        $("#answers").data("vote2", answerId);
+    }
+
+    $("#answers").data("current-vote", (currentVote + 1) % 2);
+
+    vote1 = $("#answers").data("vote1");
+    vote2 = $("#answers").data("vote2");
+
+    $("#vote1").show().appendTo(`.answer[data-answer-id=${vote1}] .tokens`);
+    $("#vote2").show().appendTo(`.answer[data-answer-id=${vote2}] .tokens`);
+
+    console.log($("#answers").data("vote1"), $("#answers").data("vote2"));
+}
+
 $(function() {
-    
-    const updateGame = () => {
-        const $countdownTimer = $("#countdown-timer");
-
-        if($countdownTimer.length > 0) {
-            const countdown = () => setTimeout(() => {
-                const startTime = parseInt($countdownTimer.text());
-
-                if(startTime <= 0) {
-                    $countdownTimer.text(0);
-                } else {
-                    $countdownTimer.text(startTime - 1);
-                }
-
-                countdown();
-            }, 1000);
-
-            countdown();
-        }
-    }
-
-    const loadGame = async(forceRefresh = false) => {
-        const $dontRefresh = $('*[data-dont-refresh="true"]:visible');
-        const $focus = $(":focus");
-        const focusId = ($focus.length > 0) ? $focus.attr("id") : null;
-        const scrollTops = new Map();
-
-        $dontRefresh.each(function() {
-            scrollTops.set(this, $(this).scrollTop());
-        });
-
-        await new Promise(resolve => $('main').load(`${GAME_ID}/view`, () => resolve()));
-
-        if(!forceRefresh) {
-            // Restore all the elements that aren't supposed to be refreshed
-            $dontRefresh.each(function() {
-                const id = $(this).attr("id");
-
-                $(`#${id}`).replaceWith($(this));
-
-                $(this).scrollTop(scrollTops.get(this));
-            });
-
-            $(`#${focusId}`).focus();
-
-            
-        }
-
-        updateGame();
-    }
-
-    if(GAME_ID) {
-        loadGame();
-
-        setInterval(() => {
-            loadGame();
-        }, 5000);
-    }
-
-
-    $(document).on("click", "#answer-picker label.answer-number input[type=radio]", function() {
-        const value = $(this).val();
-
-        $('#answers .answer').hide();
-
-        $(`#answers .answer.${value}`).show();
+    $("#menu-button").on("click", () => {
+        $("#app").addClass("sidebar-open");
     });
 
-        
-
-    $(document).on("submit", "form", function(e) {
-        e.preventDefault();
-
-        const method = $(this).attr("method");
-        const actionUrl = $(this).attr("action");
-
-        $.ajax({
-            type: method,
-            url: actionUrl,
-            data: $(this).serialize(),
-            success: function(data) {
-                if(data.redirect) {
-                    window.location = data.redirect;
-                    return;
-                }
-
-                if(data.forceRefresh === false) {
-                    return;
-                }
-
-                loadGame(true);
-            }
-        });
-    });
-    
-
-    $(document).on("click", "div.modal", e => {
-        e.stopPropagation();
+    $('#close-button').on("click", () => {
+        $("#app").removeClass("sidebar-open");
     });
 
-    $(document).on("click", "div.modal-overlay", function() {
-        $(this).hide();
+    $('.answer[data-answer-id]').on("click", function() {
+        const answerId = $(this).data("answer-id");
+
+        vote(answerId);
     });
 });
 
-function showModal(id) {
-    const $modal = $(`#${id}.modal-overlay`);
 
-    $modal.css("display", "flex");
+
+function showModal(id) {
+    const $modal = $(id);
+    const $container = $(id).parent(".modal-container");
+
+    $container.css("display", "grid");
+
+    $modal.on("click", e => {
+        e.stopPropagation();
+    });
+
+    $container.on("click", () => {
+        $container.hide();
+    });
 }
