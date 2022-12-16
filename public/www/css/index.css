@@ -170,7 +170,7 @@ main {
 
 }
 
-span.token {
+.token {
     position: relative;
     display: block;
     width: 40px;
@@ -208,42 +208,50 @@ span.token {
     background-repeat: no-repeat;
 }
 
-span.token.martini-glass {
+span.token.martini-glass,
+.bg-martini-glass {
     background-color: var(--martini-glass-color);
     background-image: var(--martini-glass-image);
 }
 
-span.token.dollar-sign {
+span.token.dollar-sign,
+.bg-dollar-sign {
     background-color: var(--dollar-sign-color);
     background-image: var(--dollar-sign-image);
 }
 
-span.token.high-heels {
+span.token.high-heels,
+.bg-high-heels {
     background-color: var(--high-heels-color);
     background-image: var(--high-heels-image);
 }
 
-span.token.computer {
+span.token.computer,
+.bg-computer {
     background-color: var(--computer-color);
     background-image: var(--computer-image);
 }
 
-span.token.car {
+span.token.car,
+.bg-car {
     background-color: var(--car-color);
     background-image: var(--car-image);
 }
 
-span.token.football {
+span.token.football,
+.bg-football {
     background-color: var(--football-color);
     background-image: var(--football-image);
 }
 
-span.token.guitar {
+span.token.guitar,
+.bg-guitar {
     background-color: var(--guitar-color);
     background-image: var(--guitar-image);
 }
 
-span.token.clapperboard {
+span.token.clapperboard,
+.bg-clapperboard {
     background-color: var(--clapperboard-color);
     background-image: var(--clapperboard-image);
 }
@@ -350,15 +358,15 @@ span.token.clapperboard {
 }
 
 .modal-container {
+    display: grid;
     position: fixed;
     inset: 0;
-    display: none;
     place-items: center;
     background-color: rgb(0, 0, 0, 0.5);
 }
 
 .modal {
-    display: flex;
+    display: none;
     flex-direction: column;
     gap: 2rem;
     width: 100%;
@@ -366,6 +374,10 @@ span.token.clapperboard {
     border-radius: 20px;
     padding: 2rem;
     background-color: white;
+}
+
+.modal-container .modal {
+    display: flex;
 }
 
 :where(#join-game-modal, #create-game-modal) h2 {
@@ -554,7 +566,7 @@ span.token.clapperboard {
     text-overflow: ellipsis;
 }
 
-#answers .votes {
+#answers .num-votes {
     display: flex;
     align-items: center;
     justify-content: center;
@@ -562,7 +574,7 @@ span.token.clapperboard {
     font-weight: bold;
 }
 
-#answers .tokens {
+#answers .votes {
     display: flex;
     flex-wrap: wrap;
     position: absolute;
@@ -570,7 +582,12 @@ span.token.clapperboard {
     top: 1rem;
 }
 
-#answers .tokens .token {
+#answers label input[type=radio] {
+    display: none;
+}
+
+#answers input[type=radio]:not(:checked) + .token {
+    display: none;
 }
 
 #sidebar {
@@ -611,971 +628,76 @@ span.token.clapperboard {
     transform: translate(-50%, -50%) rotate(-45deg);
 }
 
-/*
-#question-card button {
-    display: block;
-    width: 100%;
-    height: 4rem;
-    font-size: 1.5rem;
-    border: none;
-    outline: none;
-    background-color: inherit;
-}
-*/
-
-/* 
-#game-name-round {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    font-size: 100%;
-    margin-bottom: 20px;
-    font-weight: bold;
-}
-
-#round {
-    display: flex;
-    align-items: center;
-    margin-left: 5px;
-}
-
-#Player::before {
-    display: block;
-    content: "";
-    width: 20px;
-    height: 20px;
-    background-image: url("../img/round-icon.png");
-    background-size: 20px;
-}
-
-#players {
-    display: flex;
-    justify-content: center;
-    flex-wrap: wrap;
-    padding-top: 15px;
-}
-
-#game .player {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    flex-direction: column;
-    width: 60px;
-    height: 60px;
-    text-align: center;
-    font-size: 80%;
-    font-weight: bold;
-}
-
-.token {
-    position: relative;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 40px;
-    height: 40px;
-    border-radius: 40px;
-    border: 3px solid black;
-}
-
-#game .token {
-    margin-bottom: 5px;
-}
-
-.martini-glass {
-    background-color: rgb(255, 201, 14);
-}
-
-.dollar-sign {
-    background-color: rgb(0, 186, 0);
-}
-
-.high-heels {
-    background-color: rgb(148, 0, 148);
-}
-
-.computer {
-    background-color: rgb(255, 128, 0);
-}
-
-.car {
-    background-color: rgb(0, 162, 232);
-}
-
-.football {
-    background-color: rgb(94, 53, 17);
-}
-
-.guitar {
-    background-color: rgb(217, 0, 0);
-}
-
-.clapperboard {
-    background-color: rgb(112, 112, 112);
-}
-
-#game .player.judge .token::before {
-    position: absolute;
-    display: block;
-    content: "";
-    width: 40px;
-    height: 40px;
-    background-size: 40px 40px;
-    background-position: center;
-    background-repeat: no-repeat;
-    background-image: url("../img/judge-wig.png");
-}
-
-#game .player.winner .token::before {
-    position: absolute;
-    display: block;
-    content: "";
-    width: 40px;
-    height: 80px;
-    background-size: 40px 30px;
-    background-position: top;
-    background-repeat: no-repeat;
-    background-image: url("../img/crown.png");
-}
-
-.token::after {
-    display: block;
-    content: "";
-    width: 40px;
-    height: 40px;
-    background-size: 50%;
-    background-position: center;
-    background-repeat: no-repeat;
-}
-
-.token.martini-glass::after {
-    background-image: url("../img/martini-glass.png");
-}
-
-.token.dollar-sign::after {
-    background-image: url("../img/dollar-sign.png");
-}
-
-.token.high-heels::after {
-    background-image: url("../img/high-heels.png");
-}
-
-.token.computer::after {
-    background-image: url("../img/computer.png");
-}
-
-.token.car::after {
-    background-image: url("../img/car.png");
-}
-
-.token.football::after {
-    background-image: url("../img/football.png");
-}
-
-.token.guitar::after {
-    background-image: url("../img/guitar.png");
-}
-
-.token.clapperboard::after {
-    background-image: url("../img/clapperboard.png");
-}
-
-#create-game-button,
-#start-game-button,
-#join-game-button,
-#answer-button,
-#next-round-button,
-#scores-button {
-    position: absolute;
-    bottom: 0;
-}
-
-#game .player .name {
-    display: flex;
-    align-items: center;
-}
-
-#game .player.me .name::after {
-    display: block;
-    content: "";
-    width: 10px;
-    height: 10px;
-    background-image: url("../img/star.png");
-    background-size: 10px;
-    margin-left: 2px;
-}
-
-#game-state {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 120%;
-    font-weight: bold;
-    margin-top: 10px;
-    margin-bottom: 10px;
-    text-align: center;
-    line-height: 150%;
-}
-
-#countdown-timer {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 150%;
-    font-weight: bold;
-    margin-top: 10px;
-    margin-bottom: 10px;
-}
-
-#game #play-area {
-    position: absolute;
-    width: 100%;
-    bottom: 0;
-}
-
-form {
-    width: 100%;
-}
-
-button {
-    display: block;
-    width: 100%;
-    height: 48px;
-    background-color: rgb(159, 201, 25);
-    border: none;
-    border-radius: 5px;
-    font-size: 120%;
-    font-weight: bold;
-    color: rgb(255, 255, 255);
-}
-
-button:hover {
-    background-color: rgb(131, 166, 21);
-}
-
-button:disabled {
-    background-color: rgb(127, 127, 127);
-}
-
-.modal {
-    background-color: white;
-    border-radius: 15px;
-    padding: 30px 20px;
-    width: 100%;
-    max-width: 400px;
-}
-
-.modal-overlay {
-    display: none;
-    position: fixed;
-    justify-content: center;
-    align-items: center;
-    content: "";
-    left: 0;
-    top: 0;
-    right: 0;
-    bottom: 0;
-    padding: 20px;
-    background-color: rgb(0, 0, 0, 0.25);
-}
-
-#join-game h2,
-#create-game h2 {
-    text-align: center;
-    font-size: 120%;
-    margin-bottom: 15px;
-}
-
-#join-game input[type=text],
-#create-game input[type=text] {
-    display: block;
-    width: 100%;
-    height: 48px;
-    border: 2px solid rgb(200, 200, 200);
-    border-radius: 5px;
-    margin-bottom: 10px;
-    text-align: center;
-    font-size: 120%;
-}
-
-#join-game #tokens,
-#create-game #tokens {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
-    margin-bottom: 40px;
-}
-
-#join-game #tokens input[type=radio],
-#create-game #tokens input[type=radio] {
-    display: none;
-}
-
-#join-game #tokens input[type=radio]:checked + .token,
-#create-game #tokens input[type=radio]:checked + .token {
-    width: 60px;
-    height: 60px;
-}
-
-#my-games {
-}
-
-#my-games h2 {
-    font-size: 120%;
-    text-align: center;
-    margin-bottom: 20px;
-}
-
-#my-games p {
-    text-align: center;
-}
-
-#my-games a {
-    display: flex;
-    border-radius: 5px;
-    color: rgb(255, 255, 255);
-    margin-bottom: 20px;
-}
-
-#my-games a .left {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    padding: 10px;
-}
-
-#my-games a .center {
-    display: flex;
-    align-items: center;
-    flex: 1;
-    padding: 10px;
-    font-weight: bold;
-}
-
-#my-games a .right {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    padding: 10px;
-}
-
-#my-games .arrow {
-    width: 10px;
-    height: 10px;
-    border-right: 3px solid white;
-    border-bottom: 3px solid white;
-    transform: rotate(-45deg);
-}
-
-#my-games .token {
-    border-color: white;
-    margin-bottom: 0;
-}
-
-#my-games .game-name {
-    flex: 1;
-}
-
-#my-games .round {
-    display: flex;
-    align-items: center;
-    height: 20px;
-}
-
-#my-games .Player::before {
-    display: block;
-    content: "";
-    width: 20px;
-    height: 20px;
-    background-image: url("../img/round-icon-white.png");
-    background-size: 20px;
-}
-
-#game {
-    display: flex;
-    flex-direction: column;
-    max-height: 100%;
-}
-
-#game > .head {
-}
-
-#game > .body {
-    flex: 1;
-    overflow: auto;
-    -ms-overflow-style: none;
-    scrollbar-width: none;
-}
-
-#game > .body::-webkit-scrollbar {
-    display: none;
-}
-
 #select-o-matic {
     position: relative;
-    width: 250px;
-    height: 250px;
-    margin: 20px auto;
-    padding: 20px;
-    background-color: rgb(50, 50, 50);
-    border-radius: 250px;
-    
-}
-
-@keyframes spinToGuitar {
-    0% { transform: rotate(0deg);}
-    100% { transform: rotate(810deg); }
-}
-
-@keyframes spinToComputer {
-    0% { transform: rotate(0deg);}
-    100% { transform: rotate(855deg); }
-}
-
-@keyframes spinToMartiniGlass {
-    0% { transform: rotate(0deg);}
-    100% { transform: rotate(900deg); }
-}
-
-@keyframes spinToDollarSign {
-    0% { transform: rotate(0deg);}
-    100% { transform: rotate(945deg); }
-}
-
-@keyframes spinToCar {
-    0% { transform: rotate(0deg);}
-    100% { transform: rotate(990deg); }
-}
-
-@keyframes spinToHighHeels {
-    0% { transform: rotate(0deg);}
-    100% { transform: rotate(1035deg); }
-}
-
-@keyframes spinToClapperboard {
-    0% { transform: rotate(0deg);}
-    100% { transform: rotate(1080deg); }
-}
-
-@keyframes spinToFootball {
-    0% { transform: rotate(0deg);}
-    100% { transform: rotate(1125deg); }
-}
-
-@keyframes show {
-    from {
-        visibility: collapse;
-    }
-    to {
-        visibility: visible;
-    }
-}
-
-#game.results #select-o-matic ~ * {
-    animation-fill-mode: forwards;
-    animation-name: show;
-    animation-delay: 2s;
-    visibility: collapse;
-}
-
-#game.results #players {
-    margin-top: 40px;
+    aspect-ratio: 1;
+    border-radius: 100%;
+    background-color: rgb(40, 40, 40);
 }
 
 #select-o-matic .arrow {
     position: absolute;
-    left: 95px;
-    top: 105px;
-    display: none;
-    width: 60px;
-    height: 125px;
-    background-image: url("../img/arrow.png");
-    background-size: 60px 125px;
-    background-color: transparent;
-    transform-origin: 30px 20px;
-    animation-duration: 2s;
-    animation-fill-mode: forwards;
+    left: 40%;
+    top: 45%;
+    width: 20%;
+    height: 45%;
+    background-image: url(../img/arrow.png);
+    background-size: 100% 100%;
+    transform-origin: center 10%;
+    transition: transform 1s;
 }
 
-#select-o-matic.guitar .arrow {
-    animation-name: spinToGuitar;
-    display: block;
-}
-
-#select-o-matic.computer .arrow {
-    animation-name: spinToComputer;
-    display: block;
-}
-
-#select-o-matic.martini-glass .arrow {
-    animation-name: spinToMartiniGlass;
-    display: block;
-}
-
-#select-o-matic.dollar-sign .arrow {
-    animation-name: spinToDollarSign;
-    display: block;
-}
-
-#select-o-matic.car .arrow {
-    animation-name: spinToCar;
-    display: block;
-}
-
-#select-o-matic.high-heels .arrow {
-    animation-name: spinToHighHeels;
-    display: block;
-}
-
-#select-o-matic.clapperboard .arrow {
-    animation-name: spinToClapperboard;
-    display: block;
-}
-
-#select-o-matic.football .arrow {
-    animation-name: spinToFootball;
-    display: block;
-}
-
-#select-o-matic .space {
+#select-o-matic div:not(.arrow) {
     position: absolute;
-    left: 95px;
-    bottom: 15px;
-    transform-origin: 30px -30px;
-    width: 60px;
-    height: 80px;
-    -webkit-mask-image: url("../img/teardrop.png");
-    -webkit-mask-size: 60px 80px;
-    -webkit-mask-repeat: no-repeat;
-    background-size: 30px 30px;
+    width: 25%;
+    height: 35%;
+    left: 38%;
+    transform-origin: 50% -28.5%;
+    bottom: 5%;
+    mask-image: url(../img/teardrop.png);
+    mask-size: 100% 100%;
+    -webkit-mask-image: url(../img/teardrop.png);
+    -webkit-mask-size: 100% 100%;
+    background-size: 60% auto;
     background-repeat: no-repeat;
-    background-position: center bottom 5px;
+    background-position: center bottom 10%;
 }
 
-#select-o-matic .space::after {
-    display: block;
-    content: "";
-    width: 60px;
-    height: 80px;
-}
-
-#select-o-matic input[type=radio] {
-    display: none;
-}
-
-#select-o-matic input[type=radio]:checked ~ .arrow {
-    display: block;
-    animation: none;
-}
-
-#select-o-matic.clapperboard .arrow {
-    transform: rotate(0deg);
-}
-
-#select-o-matic .space.football,
-#select-o-matic.football .arrow {
-    transform: rotate(45deg);
-}
-
-#select-o-matic .space.guitar,
-#select-o-matic.guitar .arrow {
-    transform: rotate(90deg);
-}
-
-#select-o-matic .space.computer,
-#select-o-matic.computer .arrow {
-    transform: rotate(135deg);
-}
-
-#select-o-matic .space.martini-glass,
-#select-o-matic.martini-glass .arrow {
-    transform: rotate(180deg);
-}
-
-#select-o-matic .space.dollar-sign,
-#select-o-matic.dollar-sign .arrow {
-    transform: rotate(225deg);
-}
-
-#select-o-matic .space.car,
-#select-o-matic.car .arrow {
-    transform: rotate(270deg);
-}
-
-#select-o-matic .space.high-heels,
-#select-o-matic.high-heels .arrow {
-    transform: rotate(315deg);
-}
-
-#select-o-matic label.inactive {
+#select-o-matic div:not(.arrow).disabled {
     filter: brightness(25%);
 }
 
-#select-o-matic .space.martini-glass {
-    background-image: url("../img/martini-glass.png");
+#select-o-matic div.bg-dollar-sign,
+#select-o-matic.dollar-sign .arrow {
+    transform: rotate(-45deg);
 }
 
-#select-o-matic .space.dollar-sign {
-    background-image: url("../img/dollar-sign.png");
+#select-o-matic div.bg-martini-glass,
+#select-o-matic.martini-glass .arrow {
+    transform: rotate(-90deg);
 }
 
-#select-o-matic .space.high-heels {
-    background-image: url("../img/high-heels.png");
+#select-o-matic div.bg-computer,
+#select-o-matic.computer .arrow {
+    transform: rotate(-135deg);
 }
 
-#select-o-matic .space.computer {
-    background-image: url("../img/computer.png");
+#select-o-matic div.bg-guitar,
+#select-o-matic.guitar .arrow {
+    transform: rotate(-180deg);
 }
 
-#select-o-matic .space.car {
-    background-image: url("../img/car.png");
+#select-o-matic div.bg-football,
+#select-o-matic.football .arrow {
+    transform: rotate(-225deg);
 }
 
-#select-o-matic .space.football {
-    background-image: url("../img/football.png");
+#select-o-matic div.bg-clapperboard,
+#select-o-matic.clapperboard .arrow {
+    transform: rotate(-270deg);
 }
 
-#select-o-matic .space.guitar {
-    background-image: url("../img/guitar.png");
+#select-o-matic div.bg-high-heels,
+#select-o-matic.high-heels .arrow {
+    transform: rotate(-315deg);
 }
-
-#select-o-matic .space.clapperboard {
-    background-image: url("../img/clapperboard.png");
-}
-
-#select-o-matic.guitar ~ #answers .answer.guitar {
-    border: 10px solid rgb(0, 255, 0);
-}
-
-#select-o-matic.clapperboard ~ #answers .answer.clapperboard {
-    border: 10px solid rgb(0, 255, 0);
-}
-
-#select-o-matic.high-heels ~ #answers .answer.high-heels {
-    border: 10px solid rgb(0, 255, 0);
-}
-
-#select-o-matic.computer ~ #answers .answer.computer {
-    border: 10px solid rgb(0, 255, 0);
-}
-
-#select-o-matic.car ~ #answers .answer.car {
-    border: 10px solid rgb(0, 255, 0);
-}
-
-#select-o-matic.dollar-sign ~ #answers .answer.dollar-sign {
-    border: 10px solid rgb(0, 255, 0);
-}
-
-#select-o-matic.football ~ #answers .answer.football {
-    border: 10px solid rgb(0, 255, 0);
-}
-
-#select-o-matic.martini-glass ~ #answers .answer.martini-glass {
-    border: 10px solid rgb(0, 255, 0);
-}
-
-#game-heading {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    font-weight: bold;
-    margin-bottom: 20px;
-}
-
-#game-round {
-    display: flex;
-    align-items: center;
-    margin-left: 8px;
-}
-
-#game-Player::before {
-    display: block;
-    content: "";
-    width: 20px;
-    height: 20px;
-    background-image: url('../img/round-icon.png');
-    background-size: 20px;
-}
-
-#select-o-matic.clapperboard ~ #answer-cards .answer-card.clapperboard,
-#select-o-matic.car ~ #answer-cards .answer-card.car,
-#select-o-matic.martini-glass ~ #answer-cards .answer-card.martini-glass,
-#select-o-matic.computer ~ #answer-cards .answer-card.computer,
-#select-o-matic.dollar-sign ~ #answer-cards .answer-card.dollar-sign,
-#select-o-matic.guitar ~ #answer-cards .answer-card.guitar,
-#select-o-matic.football ~ #answer-cards .answer-card.football,
-#select-o-matic.high-heels ~ #answer-cards .answer-card.high-heels  {
-    order: -1;
-    border: 10px solid rgb(133, 255, 0);
-}
-
-#answer-cards {
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
-    margin: 40px auto 80px;
-}
-
-.answer-card {
-    position: relative;
-    display: flex;
-    padding: 20px 20px 10px;
-    border: 3px solid black;
-    border-radius: 10px;
-    height: 275px;
-    background-image: url('../img/bubble.png');
-    background-repeat: no-repeat;
-    background-origin: content-box;
-    background-size: 100% 100%;
-}
-
-.answer-card.voting {
-    background-color: rgb(215, 215, 215);
-}
-
-.answer-card-text {
-    width: 100%;
-    margin: 30px 30px 50px;
-    overflow: hidden;
-    font-weight: bold;
-}
-
-.answer-card-text textarea {
-    display: block;
-    width: 100%;
-    height: 100%;
-    resize: none;
-    border: none;
-    outline: none;
-    font-size: 100%;
-    font-weight: bold;
-    overflow: hidden;
-}
-
-.answer-card-text textarea:read-only {
-    background-image: url('../img/pen-icon.png');
-    background-size: 30px;
-    background-repeat: no-repeat;
-    background-position: right top;
-    cursor: pointer;
-}
-
-.answer-card .votes {
-    position: absolute;
-    display: flex;
-    flex-wrap: wrap;
-    gap: 2px;
-    left: 0;
-    padding: 10px 20px;
-}
-
-.answer-card .votes.top {
-    top: 0;
-}
-
-.answer-card .votes.bottom {
-    bottom: 0;
-}
-
-.answer-card .votes label {
-    display: block;
-    width: 40px;
-    height: 40px;
-    border-radius: 40px;
-    background-color: rgb(100, 100, 100);
-}
-
-.answer-card .votes label input[type=radio] {
-    display: none;
-}
-
-.answer-card .votes label .token {
-    display: none;
-}
-
-.answer-card .votes label input[type=radio]:checked + .token {
-    display: flex;
-}
-
-#asking-question {
-    position: absolute;
-    bottom: 0;
-}
-
-#answering-question button:disabled {
-    visibility: hidden;
-}
-
-#answering-question .answer-card {
-    margin-top: 20px;
-    margin-bottom: 40px;
-}
-
-#questions-card {
-    padding: 10px 15px;
-    background-color: rgb(133, 255, 0);
-    border: 3px solid black;
-    margin-bottom: 40px;
-}
-
-#questions-card .questions {
-    min-height: 200px;
-    background-color: white;
-    border: 5px solid black;
-    border-radius: 10px;
-    padding: 10px 10px 20px;
-}
-
-#questions-card label {
-    display: block;
-    padding: 5px 0;
-}
-
-#questions-card label + label {
-    border-top: 3px dotted black;
-}
-
-#questions-card label input[type=radio] {
-    display: none;
-}
-
-#questions-card input[type=radio]:checked + span {
-    font-weight: bold;
-    font-size: 110%;
-}
-
-#score-board {
-    position: absolute;
-}
-
-#score-board .caption {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    height: 30px;
-    background-color: black;
-    margin-left: 260px;
-    width: 356px;
-    border-top-left-radius: 15px;
-    border-top-right-radius: 15px;
-    color: rgb(255, 255, 255);
-    font-size: 133%;
-    font-weight: bold;
-}
-
-#score-board .head {
-    display: flex;
-    height: 30px;
-    margin-left: 77px;
-    width: 820px;
-    font-size: 133%;
-    font-weight: bold;
-}
-
-#score-board .head .col {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    width: 60px;
-    background-color: rgb(0, 0, 0);
-    color: rgb(168, 168, 168);
-}
-
-#score-board .head .col:first-child {
-    border-top-left-radius: 15px;
-}
-
-#score-board .head .col:nth-child(12) {
-    border-top-right-radius: 15px;
-}
-
-#score-board .head .col:last-child {
-    width: 96px;
-    margin-left: auto;
-    border-top-left-radius: 15px;
-    border-top-right-radius: 15px;
-    color: white;
-}
-
-#score-board .body {
-    display: flex;
-    flex-direction: column;
-    gap: 5px;
-    border: 5px solid black;
-    border-radius: 15px;
-    background-color: black;
-}
-
-#score-board .body .row {
-    display: flex;
-    height: 50px;
-    border: 1px solid black;
-    border-radius: 15px;
-}
-
-#score-board .body .col {
-    display: flex;
-    width: 60px;
-    padding: 5px 2px;
-}
-
-#score-board .body .col:first-child {
-    width: 70px;
-}
-
-#score-board .body .col:last-child {
-    width: 110px;
-    padding-right: 10px;
-}
-
-#score-board .body .col span {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex: 1;
-    border: 1px solid black;
-    background-color: white;
-}
-
-#score-board .body .col:last-child span {
-    border-width: 2px;
-}
-
-#score-board .body .row .col:first-child {
-    background-size: auto 40px;
-    background-repeat: no-repeat;
-    background-position: center;
-}
-
-#score-board .row.martini-glass .col:first-child {
-    background-image: url("../img/martini-glass.png");
-}
-
-#score-board .row.dollar-sign .col:first-child {
-    background-image: url("../img/dollar-sign.png");
-}
-
-#score-board .row.high-heels .col:first-child {
-    background-image: url("../img/high-heels.png");
-}
-
-#score-board .row.computer .col:first-child {
-    background-image: url("../img/computer.png");
-}
-
-#score-board .row.car .col:first-child {
-    background-image: url("../img/car.png");
-}
-
-#score-board .row.football .col:first-child {
-    background-image: url("../img/football.png");
-}
-
-#score-board .row.guitar .col:first-child {
-    background-image: url("../img/guitar.png");
-}
-
-#score-board .row.clapperboard .col:first-child {
-    background-image: url("../img/clapperboard.png");
-} */

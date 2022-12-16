@@ -76,6 +76,8 @@ class GameViewTest {
             $answer->setId($index + 1);
             $answer->setAnswer($answerString);
 
+            $answer->setPlayer($players[$index]);
+
             $answers[] = $answer;
         }
         
@@ -92,12 +94,12 @@ class GameViewTest {
 
         $view = GameView::builder(1)
             ->withSidebar()
-            ->withCountdownTimer(3)
-            ->withMessage("Tap the answers to vote on which you believe is Brenton's favorite to the question")
-            ->withMessage("Adipisicing ea do deserunt mollit pariatur reprehenderit nostrud elit Lorem cupidatat fugiat?")
             // ->withJoinGameButtonAndModal(Player::getTokens());
-                // ->withMessage("Ullamco aliquip voluptate quis ex voluptate consequat Lorem irure proident.")
-            ->withAnswers($answers, [$vote, $vote2], Player::CAR);
+            // ->withMessage("Ullamco aliquip voluptate quis ex voluptate consequat Lorem irure proident.")
+            // ->withAnswersToBeVotedOn($answers, $players[0], $vote);
+            ->withSelectOMatic()
+            ->withAnswersToBeChosenByJudge($answers);
+            
             //->withAnswer($answer, Player::DOLLAR_SIGN);
             // ->withQuestions(...$card->getQuestions());
 
