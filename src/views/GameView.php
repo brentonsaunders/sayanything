@@ -53,8 +53,40 @@ class GameView extends View {
         return $this;
     }
 
-    public function withSelectOMatic(Answer ...$answers) {
-        $this->content .= '<div id="select-o-matic">';
+    public function withWinners($winners) {
+        $this->content .= '<div id="winners">';
+        $this->content .= '<h2>Winner</h2>';
+        $this->content .= '<div class="winners">';
+
+        foreach($winners as $winner) {
+            $token = $winner->getToken();
+            $name = $winner->getName();
+
+            $this->content .= "<div class=\"winner\">";
+            $this->content .= "<div class=\"token crown bg-$token\"></div>";
+            $this->content .= "<div class=\"name\">$name</div>";
+            $this->content .= "</div>";
+        }
+
+        $this->content .= '</div>';
+        $this->content .= '</div>';
+
+        return $this;
+    }
+
+    public function withSelectOMatic($answers, $chosenAnswerToken = null,
+        $longSpin = false) {
+        if($longSpin) {
+            $this->content .= '<div id="select-o-matic" class="long-spin">';
+            $this->content .= '<script>';
+            $this->content .= 'setTimeout(() => document.getElementById("select-o-matic").classList.add("fade-away", "' . $chosenAnswerToken . '"), 0);';
+            $this->content .= 'setTimeout(() => document.getElementById("select-o-matic").classList.add("show-after"), 3000);';
+            $this->content .= '</script>';
+        } else if($chosenAnswerToken) {
+            $this->content .= '<div id="select-o-matic" class="' . $chosenAnswerToken . '">';
+        } else {
+            $this->content .= '<div id="select-o-matic">';
+        }
 
         $tokens = [];
 
@@ -64,7 +96,11 @@ class GameView extends View {
 
             $tokens[] = $token;
 
-            $this->content .= "<div class=\"bg-$token\" onclick=\"select('$token', $answerId);\"></div>";
+            if($chosenAnswerToken) {
+                $this->content .= "<div class=\"bg-$token\"></div>";
+            } else {
+                $this->content .= "<div class=\"bg-$token\" onclick=\"select('$token', $answerId);\"></div>";
+            }
         }
 
         $remainingTokens = array_diff(Player::getTokens(), $tokens);
@@ -79,139 +115,89 @@ class GameView extends View {
         return $this;
     }
 
-    public function withAnswersToBeChosenByJudge($answers) {
+    public function withAnswers($answers, $votes, Player $votingPlayer = null) {
         if(!$answers) {
             return $this;
         }
 
-        $this->content .= '<div id="answers">';
-                    
-
-        foreach($answers as $index => $answer) {
-            $modalId = "answer-$index";
-
-            $class = 'white-text shadow bg-color-' . $answer->getPlayer()->getToken();
-
-            $this->content .= '<div class="answer-short ' . $class . '" onclick="showModal(\'#' . $modalId . '\');">';
-            $this->content .= '<div class="text">' . $answer->getAnswer() . '</div>';
-            $this->content .= '</div>';
-
-            $this->content .= '<div id="' . $modalId . '" class="modal">' .
-                              '<div class="answer ' . $class . '">' .
-                              $answer->getAnswer() . 
-                              '</div>' .
-                              '</div>';
-        }
-
-        $this->content .= '</div>';
-
-        return $this;
-    }
-
-    public function withAnswers($answers, $votes, $player, $showColors) {
-        if(!$answers) {
-            return $this;
+        if(!$votes) {
+            $votes = [];
         }
 
         $this->content .= '<div id="answers">';
-                    
 
+        if ($votingPlayer) {
+            $this->content .= '<form id="vote-form" action="' . $this->gameId . '/vote" method="post">' .
+                              '<input name="playerId" type="hidden" value="' . $votingPlayer->getId() . '">' .
+                              '</form>';
+        }
+                    
         foreach($answers as $index => $answer) {
             $modalId = "answer-$index";
+            $checked1 = "";
+            $checked2 = "";
 
             $numVotes = 0;
 
             foreach($votes as $vote) {
                 if($vote->getAnswer1Id() === $answer->getId()) {
                     ++$numVotes;
+
+                    $checked1 = ($votingPlayer) ? "checked" : "";
                 }
 
                 if($vote->getAnswer2Id() === $answer->getId()) {
                     ++$numVotes;
+
+                    $checked2 = ($votingPlayer) ? "checked" : "";
                 }
             }
 
-            if ($showColors) {
-                $class = 'white-text shadow bg-color-' . $answer->getPlayer()->getToken();
-            } else {
+            // Player is voting on answers, so hide the colors of the answer boxes
+            if ($votingPlayer) {
                 $class = 'bg-color-white';
+            } else {
+                $class = 'white-text shadow bg-color-' . $answer->getPlayer()->getToken();
             }
 
-            $this->content .= '<div class="answer-short ' . $class . '" onclick="showModal(\'#' . $modalId . '\');">';
+            if ($votingPlayer) {
+                $this->content .= '<div class="answer-short ' . $class . '" onclick="showModal(\'#' . $modalId . '\').then(() => $(\'#vote-form\').submit());">';
+            } else {
+                $this->content .= '<div class="answer-short ' . $class . '" onclick="showModal(\'#' . $modalId . '\');">';
+            }
+
             $this->content .= '<div class="text">' . $answer->getAnswer() . '</div>';
             $this->content .= '<div class="num-votes">' . (($numVotes === 0) ? '' : $numVotes) . '</div>';
             $this->content .= '</div>';
 
-            $this->content .= '<div id="' . $modalId . '" class="modal">' .
-                              '<div class="answer ' . $class . '">' .
-                              '<div class="votes">'; 
+            $this->content .= '<div id="' . $modalId . '" class="modal">';
 
-            foreach($votes as $vote) {
-                $token = $vote->getPlayer()->getToken();
+            // Player is voting on answers, so let the player click on the answer box to vote for that answer
+            if($votingPlayer) {
+                $token = $votingPlayer->getToken();
 
-                if($vote->getAnswer1Id() === $answer->getId()) {
-                    $this->content .= "<div class=\"token bg-$token\"></div>";
-                }
+                $this->content .= '<div class="answer ' . $class . '" onclick="vote(' . $answer->getId() . ');">';
+                $this->content .= '<div class="votes">';
+                $this->content .= "<input $checked1 name=\"vote1\" type=\"radio\" value=\"{$answer->getId()}\"><div class=\"token bg-$token\"></div>";
+                $this->content .= "<input $checked2 name=\"vote2\" type=\"radio\" value=\"{$answer->getId()}\"><div class=\"token bg-$token\"></div>";
+            } else {
+                $this->content .= '<div class="answer ' . $class . '">';
+                $this->content .= '<div class="votes">';
 
-                if($vote->getAnswer2Id() === $answer->getId()) {
-                    $this->content .= "<div class=\"token bg-$token\"></div>";
+                foreach ($votes as $vote) {
+                    $token = $vote->getPlayer()->getToken();
+
+                    if ($vote->getAnswer1Id() === $answer->getId()) {
+                        $this->content .= "<div class=\"token bg-$token\"></div>";
+                    }
+
+                    if ($vote->getAnswer2Id() === $answer->getId()) {
+                        $this->content .= "<div class=\"token bg-$token\"></div>";
+                    }
                 }
             }
 
             $this->content .= '</div>' .
-                              $answer->getAnswer() . 
-                              '</div>' .
-                              '</div>';
-        }
-
-        $this->content .= '</div>';
-
-        return $this;
-    }
-
-    public function withAnswersToBeVotedOn($answers, Player $player, Vote $vote) {
-        if(!$answers) {
-            return $this;
-        }
-
-        $myToken = $player->getToken();
-
-        $this->content .= '<div id="answers">';
-        $this->content .= '<form id="vote-form" action="' . $this->gameId . '/vote" method="post">' . 
-                          '<input name="playerId" type="hidden" value="' . $player->getId() . '">' .
-                          '</form>';
-                    
-
-        foreach($answers as $index => $answer) {
-            $numVotes = 0;
-            $checked1 = "";
-            $checked2 = "";
-
-            if($vote->getAnswer1Id() == $answer->getId()) {
-                ++$numVotes;
-
-                $checked1 = "checked";
-            }
-
-            if($vote->getAnswer2Id() == $answer->getId()) {
-                ++$numVotes;
-
-                $checked2 = "checked";
-            }
-
-            $modalId = "answer-$index";
-
-            $this->content .= '<div class="answer-short bg-color-white" onclick="showModal(\'#' . $modalId . '\').then(() => $(\'#vote-form\').submit());">';
-            $this->content .= '<div class="text">' . $answer->getAnswer() . '</div>';
-            $this->content .= '<div class="num-votes">' . (($numVotes === 0) ? '' : $numVotes) . '</div>';
-            $this->content .= '</div>';
-
-            $this->content .= '<div id="' . $modalId . '" class="modal">' .
-                              '<div class="answer bg-color-white" onclick="vote(\'' . $answer->getId() . '\');">' . 
-                              '<div class="votes">' . 
-                              '<label><input ' . $checked1 . ' form="vote-form" name="vote1" type="radio" value="' . $answer->getId() . '"><span class="token bg-' . $myToken . '"></span></label>' . 
-                              '<label><input ' . $checked2 . ' form="vote-form" name="vote2" type="radio" value="' . $answer->getId() . '"><span class="token bg-' . $myToken . '"></span></label>' . 
-                              '</div>' . 
                               $answer->getAnswer() . 
                               '</div>' .
                               '</div>';

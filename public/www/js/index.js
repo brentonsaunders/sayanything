@@ -22,6 +22,10 @@ $(function() {
 
         });
     });
+
+    // Check the game div for the current game state
+    // Only force a reload on the entire div if the game state changes
+    // Otherwise, only reload elements with the data-reload="true" attribute
 });
 
 function select(token, answerId) {

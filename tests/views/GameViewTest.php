@@ -93,6 +93,8 @@ class GameViewTest {
         $vote2->setAnswer2Id(4);
         $vote2->setPlayer($players[3]);
 
+        $winners = [$players[3]];
+
 
         $view = GameView::builder(1)
             ->withSidebar(GameView::builder(1)
@@ -100,11 +102,16 @@ class GameViewTest {
                 ->withRoundNumber(2)
                 ->withPlayers(...$players)
                 ->render())
-            ->withMessage("Ullamco aliquip voluptate quis ex voluptate consequat Lorem irure proident?")
+            ->withSelectOMatic($answers, "guitar", true)
+            ->withWinners($winners)
             ->withCountdownTimer(30)
+            ->withMessage($winners[0]->getName() . " wins Round x")
+            ->withMessage("Waiting for new round to begin ...")
+            ->withAnswers($answers, [$vote, $vote2])
+            ->withNextRoundButton();
                 // ->withJoinGameButtonAndModal(Player::getTokens());
                 // 
-            ->withAnswers($answers, [$vote, $vote2], [$players[0]], true);
+            //->withAnswers($answers, [$vote], $players[0]);
             //->withAnswersToBeVotedOn($answers, $players[0], $vote);
             //->withAnswerPicker($players[0], ...$answers)
             

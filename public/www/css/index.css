@@ -53,6 +53,14 @@ a {
     --football-image: url('../img/football.png');
     --guitar-image: url('../img/guitar.png');
     --clapperboard-image: url('../img/clapperboard.png');
+    --car-arrow-rotate: 0deg;
+    --dollar-sign-arrow-rotate: -45deg;
+    --martini-glass-arrow-rotate: -90deg;
+    --computer-arrow-rotate: -135deg;
+    --guitar-arrow-rotate: -180deg;
+    --football-arrow-rotate: -225deg;
+    --clapperboard-arrow-rotate: -270deg;
+    --high-heels-arrow-rotate: -315deg;
 }
 
 html, body {
@@ -76,7 +84,7 @@ html, body {
 
 header {
     display: flex;
-    height: 56px;
+    min-height: 56px;
 }
 
 #menu-button {
@@ -174,14 +182,55 @@ main {
     position: relative;
     display: block;
     width: 40px;
-    height: 40px;
-    border-radius: 40px;
+    aspect-ratio: 1;
+    border-radius: 100%;
     border: 3px solid black;
     background-size: 50%;
     background-position: center;
     background-repeat: no-repeat;
+    line-height: 100%;
 }
 
+.token.crown::before {
+    position: absolute;
+    content: '';
+    left: -20%;
+    top: -60%;
+    width: 140%;
+    aspect-ratio: 100 / 60;
+    background-image: url(../img/crown.png);
+    background-size: contain;
+    background-repeat: no-repeat;
+}
+
+#winners h2 {
+    text-align: center;
+    font-size: 1.6rem;
+    font-weight: bold;
+    margin-bottom: 2.5rem;
+}
+
+#winners .token {
+    width: 50px;
+}
+
+#winners .winners {
+    display: flex;
+    justify-content: center;
+}
+
+#winners .winner {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.6rem;
+    font-size: 1.2rem;
+    font-weight: bold;
+}
+
+
+
+/*
 #players .player.judge span.token::before {
     position: absolute;
     left: -3px;
@@ -206,7 +255,7 @@ main {
     background-image: url('../img/crown.png');
     background-size: 40px;
     background-repeat: no-repeat;
-}
+}*/
 
 .bg-martini-glass {
     background-color: var(--martini-glass-color);
@@ -579,7 +628,7 @@ main {
     top: 1rem;
 }
 
-#answers label input[type=radio] {
+#answers input[type=radio] {
     display: none;
 }
 
@@ -653,9 +702,13 @@ main {
 
 #select-o-matic {
     position: relative;
+    width: 100%;
     aspect-ratio: 1;
     border-radius: 100%;
     background-color: rgb(40, 40, 40);
+    transition: all 1s;
+    transition-delay: 3s;
+    margin-inline: auto;
 }
 
 #select-o-matic .arrow {
@@ -668,6 +721,29 @@ main {
     background-size: 100% 100%;
     transform-origin: center 10%;
     transition: transform 1s;
+}
+
+#select-o-matic.long-spin .arrow {
+    transform: rotate(calc(6 * -360deg));
+    transition: transform 2s;
+}
+
+#select-o-matic.long-spin {
+    margin-bottom: auto;
+}
+
+#select-o-matic.fade-away {
+    width: 0;
+    opacity: 0;
+    margin-bottom: 0;
+}
+
+#select-o-matic.fade-away ~ * {
+    visibility: hidden;
+}
+
+#select-o-matic.show-after ~ * {
+    visibility: visible; 
 }
 
 #select-o-matic div:not(.arrow) {
@@ -690,37 +766,42 @@ main {
     filter: brightness(25%);
 }
 
+#select-o-matic div.bg-car,
+#select-o-matic.car .arrow {
+    transform: rotate(var(--car-arrow-rotate));
+}
+
 #select-o-matic div.bg-dollar-sign,
 #select-o-matic.dollar-sign .arrow {
-    transform: rotate(-45deg);
+    transform: rotate(var(--dollar-sign-arrow-rotate));
 }
 
 #select-o-matic div.bg-martini-glass,
 #select-o-matic.martini-glass .arrow {
-    transform: rotate(-90deg);
+    transform: rotate(var(--martini-glass-arrow-rotate));
 }
 
 #select-o-matic div.bg-computer,
 #select-o-matic.computer .arrow {
-    transform: rotate(-135deg);
+    transform: rotate(var(--computer-arrow-rotate));
 }
 
 #select-o-matic div.bg-guitar,
 #select-o-matic.guitar .arrow {
-    transform: rotate(-180deg);
+    transform: rotate(var(--guitar-arrow-rotate));
 }
 
 #select-o-matic div.bg-football,
 #select-o-matic.football .arrow {
-    transform: rotate(-225deg);
+    transform: rotate(var(--football-arrow-rotate));
 }
 
 #select-o-matic div.bg-clapperboard,
 #select-o-matic.clapperboard .arrow {
-    transform: rotate(-270deg);
+    transform: rotate(var(--clapperboard-arrow-rotate));
 }
 
 #select-o-matic div.bg-high-heels,
 #select-o-matic.high-heels .arrow {
-    transform: rotate(-315deg);
+    transform: rotate(var(--high-heels-arrow-rotate));
 }
