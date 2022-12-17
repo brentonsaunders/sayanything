@@ -21,37 +21,60 @@ class GameView extends View {
         return new GameView($gameId);
     }
 
-    public function withSidebar() {
+    public function withSidebar($content = "") {
         $this->content .= '<div id="sidebar">' . 
                           '<header>' . 
                           '<a id="close-button"><div class="close"><span></span><span></span></div></a>' . 
                           '</header>' . 
                           '<main>' . 
+                          $content .
                           '</main>' . 
                           '</div>';
 
         return $this;
     }
 
-    public function withSelectOMatic() {
-        $this->content .= '<div id="answer-picker" onclick="showModal(\'#select-o-matic-modal\')">' . 
+    public function withAnswerPicker(Player $judge, Answer ...$answers) {
+        $this->content .= '<div id="answer-picker" onclick="showModal(\'#select-o-matic-modal\').then(() => $(\'#choose-answer-form\').submit());">' .
+                          '<form id="choose-answer-form" action="' . $this->gameId . '/chooseAnswer" method="post">' . 
+                          '<input name="playerId" type="hidden" value="' . $judge->getId() . '">' . 
+                          '<input name="chosenAnswerId" type="hidden">' . 
+                          '</form>' .
                           '<h2>Tap to pick your favorite answer</h2>' .
-                          '<div class="token guitar"></div>' .
-                          '</div>';
-
-        $this->content .= '<div class="modal" id="select-o-matic-modal">' .
-                          '<div id="select-o-matic">' .
-                          '<div data-token="car" class="bg-car"></div>' .
-                          '<div data-token="dollar-sign" class="bg-dollar-sign"></div>' .
-                          '<div data-token="martini-glass" class="bg-martini-glass"></div>' .
-                          '<div data-token="computer" class="bg-computer"></div>' .
-                          '<div data-token="guitar" class="bg-guitar disabled"></div>' .
-                          '<div data-token="football" class="bg-football"></div>' .
-                          '<div data-token="clapperboard" class="bg-clapperboard"></div>' .
-                          '<div data-token="high-heels" class="bg-high-heels"></div>' .
-                          '<div class="arrow"></div>' .
+                          '<div id="chosen-answer-token" class="token none"></div>' .
+                          '<p>No answer chosen yet</p>' .
                           '</div>' .
-                          '</div>';  
+                          '<div class="modal" id="select-o-matic-modal">';
+
+        $this->withSelectOMatic(...$answers);
+
+        $this->content .= '</div>';  
+
+        return $this;
+    }
+
+    public function withSelectOMatic(Answer ...$answers) {
+        $this->content .= '<div id="select-o-matic">';
+
+        $tokens = [];
+
+        foreach($answers as $answer) {
+            $token = $answer->getPlayer()->getToken();
+            $answerId = $answer->getId();
+
+            $tokens[] = $token;
+
+            $this->content .= "<div class=\"bg-$token\" onclick=\"select('$token', $answerId);\"></div>";
+        }
+
+        $remainingTokens = array_diff(Player::getTokens(), $tokens);
+
+        foreach($remainingTokens as $token) {
+            $this->content .= "<div class=\"bg-$token disabled\"></div>";
+        }
+
+        $this->content .= '<div class="arrow"></div>' .
+                          '</div>';
 
         return $this;
     }
@@ -60,9 +83,6 @@ class GameView extends View {
         if(!$answers) {
             return $this;
         }
-
-        $this->content .= '<form id="choose-answer-form" action="' . $this->gameId . '/chooseAnswer" method="post">' . 
-                          '</form>';
 
         $this->content .= '<div id="answers">';
                     
@@ -88,6 +108,67 @@ class GameView extends View {
         return $this;
     }
 
+    public function withAnswers($answers, $votes, $player, $showColors) {
+        if(!$answers) {
+            return $this;
+        }
+
+        $this->content .= '<div id="answers">';
+                    
+
+        foreach($answers as $index => $answer) {
+            $modalId = "answer-$index";
+
+            $numVotes = 0;
+
+            foreach($votes as $vote) {
+                if($vote->getAnswer1Id() === $answer->getId()) {
+                    ++$numVotes;
+                }
+
+                if($vote->getAnswer2Id() === $answer->getId()) {
+                    ++$numVotes;
+                }
+            }
+
+            if ($showColors) {
+                $class = 'white-text shadow bg-color-' . $answer->getPlayer()->getToken();
+            } else {
+                $class = 'bg-color-white';
+            }
+
+            $this->content .= '<div class="answer-short ' . $class . '" onclick="showModal(\'#' . $modalId . '\');">';
+            $this->content .= '<div class="text">' . $answer->getAnswer() . '</div>';
+            $this->content .= '<div class="num-votes">' . (($numVotes === 0) ? '' : $numVotes) . '</div>';
+            $this->content .= '</div>';
+
+            $this->content .= '<div id="' . $modalId . '" class="modal">' .
+                              '<div class="answer ' . $class . '">' .
+                              '<div class="votes">'; 
+
+            foreach($votes as $vote) {
+                $token = $vote->getPlayer()->getToken();
+
+                if($vote->getAnswer1Id() === $answer->getId()) {
+                    $this->content .= "<div class=\"token bg-$token\"></div>";
+                }
+
+                if($vote->getAnswer2Id() === $answer->getId()) {
+                    $this->content .= "<div class=\"token bg-$token\"></div>";
+                }
+            }
+
+            $this->content .= '</div>' .
+                              $answer->getAnswer() . 
+                              '</div>' .
+                              '</div>';
+        }
+
+        $this->content .= '</div>';
+
+        return $this;
+    }
+
     public function withAnswersToBeVotedOn($answers, Player $player, Vote $vote) {
         if(!$answers) {
             return $this;
@@ -95,11 +176,10 @@ class GameView extends View {
 
         $myToken = $player->getToken();
 
+        $this->content .= '<div id="answers">';
         $this->content .= '<form id="vote-form" action="' . $this->gameId . '/vote" method="post">' . 
                           '<input name="playerId" type="hidden" value="' . $player->getId() . '">' .
                           '</form>';
-
-        $this->content .= '<div id="answers">';
                     
 
         foreach($answers as $index => $answer) {
@@ -129,8 +209,8 @@ class GameView extends View {
             $this->content .= '<div id="' . $modalId . '" class="modal">' .
                               '<div class="answer bg-color-white" onclick="vote(\'' . $answer->getId() . '\');">' . 
                               '<div class="votes">' . 
-                              '<label><input ' . $checked1 . ' form="vote-form" name="vote1" type="radio" value="' . $answer->getId() . '"><span class="token ' . $myToken . '"></span></label>' . 
-                              '<label><input ' . $checked2 . ' form="vote-form" name="vote2" type="radio" value="' . $answer->getId() . '"><span class="token ' . $myToken . '"></span></label>' . 
+                              '<label><input ' . $checked1 . ' form="vote-form" name="vote1" type="radio" value="' . $answer->getId() . '"><span class="token bg-' . $myToken . '"></span></label>' . 
+                              '<label><input ' . $checked2 . ' form="vote-form" name="vote2" type="radio" value="' . $answer->getId() . '"><span class="token bg-' . $myToken . '"></span></label>' . 
                               '</div>' . 
                               $answer->getAnswer() . 
                               '</div>' .
@@ -164,7 +244,7 @@ class GameView extends View {
             $judge = $player->getIsJudge() ? " judge" : "";
             $winner = $player->getIsWinner() ? " winner" : "";
 
-            $this->content .= '<div class="player ' . $me . $judge . $winner . '"><span class="token ' . $token . '"></span><span class="name">' . $name . '</span></div>';
+            $this->content .= '<div class="player ' . $me . $judge . $winner . '"><div class="token bg-' . $token . '"></div><span class="name">' . $name . '</span></div>';
         }
         
         $this->content .= "</div>";
@@ -254,8 +334,8 @@ class GameView extends View {
                 
         foreach($availableTokens as $token) {
             $modal .= '<label>' .
-                      '<input name="playerToken" type="radio" value="' . $token . '">' . 
-                      '<span class="token ' . $token . '"></span>' . 
+                      '<input name="playerToken" type="radio" value="bg-' . $token . '">' . 
+                      '<div class="token bg-' . $token . '"></div>' . 
                       '</label>';
         }
 

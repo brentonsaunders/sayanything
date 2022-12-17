@@ -7,6 +7,7 @@ class Vote {
     private $playerId = null;
     private $answer1Id = null;
     private $answer2Id = null;
+    private $player = null;
 
     public function __construct() {}
 
@@ -48,5 +49,13 @@ class Vote {
 
     public function setAnswer2Id($answer2Id) {
         $this->answer2Id = $answer2Id;
+    }
+
+    public function getPlayer() {
+        return $this->player;
+    }
+
+    public function setPlayer($player) {
+        $this->player = $player;
     }
 }

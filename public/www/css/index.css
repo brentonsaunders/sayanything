@@ -208,49 +208,41 @@ main {
     background-repeat: no-repeat;
 }
 
-span.token.martini-glass,
 .bg-martini-glass {
     background-color: var(--martini-glass-color);
     background-image: var(--martini-glass-image);
 }
 
-span.token.dollar-sign,
 .bg-dollar-sign {
     background-color: var(--dollar-sign-color);
     background-image: var(--dollar-sign-image);
 }
 
-span.token.high-heels,
 .bg-high-heels {
     background-color: var(--high-heels-color);
     background-image: var(--high-heels-image);
 }
 
-span.token.computer,
 .bg-computer {
     background-color: var(--computer-color);
     background-image: var(--computer-image);
 }
 
-span.token.car,
 .bg-car {
     background-color: var(--car-color);
     background-image: var(--car-image);
 }
 
-span.token.football,
 .bg-football {
     background-color: var(--football-color);
     background-image: var(--football-image);
 }
 
-span.token.guitar,
 .bg-guitar {
     background-color: var(--guitar-color);
     background-image: var(--guitar-image);
 }
 
-span.token.clapperboard,
 .bg-clapperboard {
     background-color: var(--clapperboard-color);
     background-image: var(--clapperboard-image);
@@ -351,6 +343,7 @@ span.token.clapperboard,
     place-items: center;
     font-size: 1.5rem;
     font-weight: bold;
+    line-height: 2rem;
 }
 
 #game button {
@@ -531,6 +524,10 @@ span.token.clapperboard,
     font-size: 1.2rem;
 }
 
+#answers form {
+    display: none;
+}
+
 #answers .answer {
     position: relative;
     padding: 16vh 2rem;
@@ -626,6 +623,32 @@ span.token.clapperboard,
 
 .close span + span {
     transform: translate(-50%, -50%) rotate(-45deg);
+}
+
+#answer-picker {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+}
+
+#answer-picker h2 {
+    font-size: 1.4rem;
+    font-weight: bold;
+}
+
+#answer-picker .token {
+    width: 60px;
+    height: 60px;
+}
+
+#answer-picker p {
+    display: none;
+}
+
+#answer-picker .token.none + p {
+    display: block;
+    font-size: 1.2rem;
 }
 
 #select-o-matic {

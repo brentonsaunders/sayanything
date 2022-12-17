@@ -85,20 +85,29 @@ class GameViewTest {
 
         $vote->setAnswer1Id(1);
         $vote->setAnswer2Id(2);
+        $vote->setPlayer($players[1]);
 
         $vote2 = new Vote();
 
         $vote2->setAnswer1Id(1);
         $vote2->setAnswer2Id(4);
+        $vote2->setPlayer($players[3]);
 
 
         $view = GameView::builder(1)
-            ->withSidebar()
-            // ->withJoinGameButtonAndModal(Player::getTokens());
-            // ->withMessage("Ullamco aliquip voluptate quis ex voluptate consequat Lorem irure proident.")
-            // ->withAnswersToBeVotedOn($answers, $players[0], $vote);
-            ->withSelectOMatic()
-            ->withAnswersToBeChosenByJudge($answers);
+            ->withSidebar(GameView::builder(1)
+                ->withGameName("Redbud Ballers")
+                ->withRoundNumber(2)
+                ->withPlayers(...$players)
+                ->render())
+            ->withMessage("Ullamco aliquip voluptate quis ex voluptate consequat Lorem irure proident?")
+            ->withCountdownTimer(30)
+                // ->withJoinGameButtonAndModal(Player::getTokens());
+                // 
+            ->withAnswers($answers, [$vote, $vote2], [$players[0]], true);
+            //->withAnswersToBeVotedOn($answers, $players[0], $vote);
+            //->withAnswerPicker($players[0], ...$answers)
+            
             
             //->withAnswer($answer, Player::DOLLAR_SIGN);
             // ->withQuestions(...$card->getQuestions());

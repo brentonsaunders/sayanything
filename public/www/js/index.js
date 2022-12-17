@@ -7,18 +7,28 @@ $(function() {
         $("#app").removeClass("sidebar-open");
     });
 
-    $(document).on("click", "#select-o-matic div:not(.arrow)", function() {
-        if($(this).hasClass("disabled")) {
-            return;
-        }
+    $(document).on("submit", "form", function(e) {
+        e.preventDefault();
 
-        console.log("test");
+        const method = $(this).attr("method");
+        const url = $(this).attr("action");
+        const formData = new FormData(e.target);
 
-        const token = $(this).data("token");
+        $.ajax({
+            method: method,
+            url: url,
+            data: [...formData]
+        }).done(() => {
 
-        $("#select-o-matic").attr("class", token);
+        });
     });
 });
+
+function select(token, answerId) {
+    $("#select-o-matic").attr("class", token);
+    $("#chosen-answer-token").class(`token bg-${token}`);
+    $('input[name=chosenAnswerId]').val(answerId);
+}
 
 function vote(answerId) {
     const vote1 = $("input[name=vote1]:checked").val();
@@ -32,6 +42,7 @@ function vote(answerId) {
         if(answerId != vote1) {
             $(`input[name=vote1][value=${vote2}]`).prop("checked", true);
         }
+
         $(`input[name=vote2][value=${answerId}]`).prop("checked", true);
     }
 }
