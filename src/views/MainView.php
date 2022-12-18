@@ -2,10 +2,10 @@
 namespace Views;
 
 class MainView extends View {
-    private $content = "";
+    private View $contentView;
 
-    public function __construct($content = "") {
-        $this->content = $content;
+    public function __construct(View $contentView) {
+        $this->contentView = $contentView;
     }
 
     protected function head() {
@@ -37,7 +37,7 @@ class MainView extends View {
     }
 
     protected function main() {
-        return $this->content;
+        return $this->contentView->render();
     }
 
     public function render() {

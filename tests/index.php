@@ -2,6 +2,7 @@
 require "../src/autoload.php";
 require "autoload.php";
 
+use Controllers\AppControllerTest;
 use Daos\AnswerDaoTest;
 use Daos\CardDaoTest;
 use Daos\GameDaoTest;
@@ -15,11 +16,16 @@ use Services\IdGeneratorTest;
 use Views\GameViewTest;
 
 const TEST_VIEWS = true;
+const TEST_CONTROLLERS = false;
 const TEST_SERVICES = false;
 const TEST_DAOS = false;
 
 if(TEST_VIEWS) {
     new GameViewTest();
+}
+
+if(TEST_CONTROLLERS) {
+    new AppControllerTest();
 }
 
 if (TEST_SERVICES) {

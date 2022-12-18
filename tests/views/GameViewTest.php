@@ -96,12 +96,11 @@ class GameViewTest {
         $winners = [$players[3]];
 
 
-        $view = GameView::builder(1)
-            ->withSidebar(GameView::builder(1)
+        $view = GameViewBuilder::builder(1, "waiting-for-players")
+            ->withSidebar(GameViewBuilder::builder(1, "")
                 ->withGameName("Redbud Ballers")
                 ->withRoundNumber(2)
-                ->withPlayers(...$players)
-                ->render())
+                ->withPlayers(...$players))
             ->withSelectOMatic($answers, "guitar", true)
             ->withWinners($winners)
             ->withCountdownTimer(30)
@@ -119,11 +118,11 @@ class GameViewTest {
             //->withAnswer($answer, Player::DOLLAR_SIGN);
             // ->withQuestions(...$card->getQuestions());
 
-        echo (new MainView($view->render()))->render();
+        echo (new MainView(new GameView("1", "waiting-for-players", "1/answer", $view)))->render();
     }
 
     private function waitingForPlayersView(Player ...$players) {
-        return GameView::builder()
+        return GameViewBuilder::builder()
             ->withGameName("Test Game")
             ->withPlayers(...$players)
             ->withMessage("Waiting for more players to join...");
