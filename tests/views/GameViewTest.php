@@ -96,27 +96,12 @@ class GameViewTest {
         $winners = [$players[3]];
 
 
-        $view = GameViewBuilder::builder(1, "waiting-for-players")
-            ->withSidebar(GameViewBuilder::builder(1, "")
+        $view = GameViewBuilder::builder()
+            ->withSidebar(GameViewBuilder::builder()
                 ->withGameName("Redbud Ballers")
                 ->withRoundNumber(2)
                 ->withPlayers(...$players))
-            ->withSelectOMatic($answers, "guitar", true)
-            ->withWinners($winners)
-            ->withCountdownTimer(30)
-            ->withMessage($winners[0]->getName() . " wins Round x")
-            ->withMessage("Waiting for new round to begin ...")
-            ->withAnswers($answers, [$vote, $vote2])
-            ->withNextRoundButton();
-                // ->withJoinGameButtonAndModal(Player::getTokens());
-                // 
-            //->withAnswers($answers, [$vote], $players[0]);
-            //->withAnswersToBeVotedOn($answers, $players[0], $vote);
-            //->withAnswerPicker($players[0], ...$answers)
-            
-            
-            //->withAnswer($answer, Player::DOLLAR_SIGN);
-            // ->withQuestions(...$card->getQuestions());
+            ->withStartGameButton();
 
         echo (new MainView(new GameView("1", "waiting-for-players", "1/answer", $view)))->render();
     }

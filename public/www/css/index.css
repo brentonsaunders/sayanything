@@ -25,6 +25,11 @@ a {
     text-decoration: none;
 }
 
+textarea::placeholder {
+    font: inherit;
+    color: inherit;
+}
+
 :root {
     font-size: 62.5%;
     --martini-glass-color: rgb(255, 220, 0);
@@ -135,6 +140,7 @@ main {
     display: flex;
     flex-direction: column;
     gap: 1rem;
+    flex: 1;
 }
 
 #round-number {
@@ -448,7 +454,7 @@ main {
     display: none;
 }
 
-:where(#join-game-modal, #create-game-modal) .tokens input[type=radio]:checked + span {
+:where(#join-game-modal, #create-game-modal) .tokens input[type=radio]:checked + .token {
     width: 50px;
     height: 50px;
 }
@@ -476,9 +482,6 @@ main {
 
 #questions {
     margin-top: auto;
-}
-
-#questions form {
     display: flex;
     flex-direction: column;
     gap: 1rem;
@@ -498,11 +501,8 @@ main {
 }
 
 #answer {
-    margin-top: auto;
-}
-
-#answer form {
     position: relative;
+    margin-top: auto;
 }
 
 #char-count {
@@ -562,8 +562,7 @@ main {
     overflow: hidden;
 }
 
-#answer textarea,
-#answer textarea::placeholder {
+#answer textarea {
     font-size: 1.6rem;
     font-weight: bold;
 }
@@ -642,6 +641,10 @@ main {
     background-color: white;
     z-index: 1000;
     transition: left ease-in 0.25s;
+}
+
+#sidebar main {
+    gap: 1rem;
 }
 
 #close-button {

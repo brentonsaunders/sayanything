@@ -12,12 +12,14 @@ $(function() {
 
         const method = $(this).attr("method");
         const url = $(this).attr("action");
-        const formData = new FormData(e.target);
+        const formData = $(this).serialize();
+
+        console.log(formData);
 
         $.ajax({
             method: method,
             url: url,
-            data: [...formData]
+            data: formData
         }).done(() => {
 
         });
@@ -30,7 +32,7 @@ $(function() {
 
 function select(token, answerId) {
     $("#select-o-matic").attr("class", token);
-    $("#chosen-answer-token").class(`token bg-${token}`);
+    $("#chosen-answer-token").attr("class", `token bg-${token}`);
     $('input[name=chosenAnswerId]').val(answerId);
 }
 

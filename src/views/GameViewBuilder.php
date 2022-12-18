@@ -11,16 +11,12 @@ use Models\Vote;
 
 class GameViewBuilder extends View {
     private $content = "";
-    private $gameId = null;
-    private $gameState = null;
 
-    private function __construct($gameId, $gameState) {
-        $this->gameId = $gameId;
-        $this->gameState = $gameState;
+    private function __construct() {
     }
 
-    public static function builder($gameId, $gameState) {
-        return new GameViewBuilder($gameId, $gameState);
+    public static function builder() {
+        return new GameViewBuilder();
     }
 
     public function withSidebar(View $contentView) {
@@ -36,19 +32,17 @@ class GameViewBuilder extends View {
         return $this;
     }
 
-    public function withAnswerPicker(Player $judge, Answer ...$answers) {
-        $this->content .= '<div id="answer-picker" onclick="showModal(\'#select-o-matic-modal\').then(() => $(\'#choose-answer-form\').submit());">' .
-                          '<form id="choose-answer-form" action="' . $this->gameId . '/chooseAnswer" method="post">' . 
-                          '<input name="playerId" type="hidden" value="' . $judge->getId() . '">' . 
-                          '<input name="chosenAnswerId" type="hidden">' . 
-                          '</form>' .
+    public function withAnswerPicker(Player $judge, $answers) {
+        $this->content .= '<div id="answer-picker" onclick="showModal(\'#select-o-matic-modal\').then(() => $(\'#form\').submit());">' .
+                          '<input form="form" name="playerId" type="hidden" value="' . $judge->getId() . '">' . 
+                          '<input form="form" name="chosenAnswerId" type="hidden">' . 
                           '<h2>Tap to pick your favorite answer</h2>' .
                           '<div id="chosen-answer-token" class="token none"></div>' .
                           '<p>No answer chosen yet</p>' .
                           '</div>' .
                           '<div class="modal" id="select-o-matic-modal">';
 
-        $this->withSelectOMatic(...$answers);
+        $this->withSelectOMatic($answers);
 
         $this->content .= '</div>';  
 
@@ -129,9 +123,7 @@ class GameViewBuilder extends View {
         $this->content .= '<div id="answers">';
 
         if ($votingPlayer) {
-            $this->content .= '<form id="vote-form" action="' . $this->gameId . '/vote" method="post">' .
-                              '<input name="playerId" type="hidden" value="' . $votingPlayer->getId() . '">' .
-                              '</form>';
+            $this->content .= '<input form="form" name="playerId" type="hidden" value="' . $votingPlayer->getId() . '">';
         }
                     
         foreach($answers as $index => $answer) {
@@ -163,7 +155,7 @@ class GameViewBuilder extends View {
             }
 
             if ($votingPlayer) {
-                $this->content .= '<div class="answer-short ' . $class . '" onclick="showModal(\'#' . $modalId . '\').then(() => $(\'#vote-form\').submit());">';
+                $this->content .= '<div class="answer-short ' . $class . '" onclick="showModal(\'#' . $modalId . '\').then(() => $(\'#form\').submit());">';
             } else {
                 $this->content .= '<div class="answer-short ' . $class . '" onclick="showModal(\'#' . $modalId . '\');">';
             }
@@ -180,8 +172,8 @@ class GameViewBuilder extends View {
 
                 $this->content .= '<div class="answer ' . $class . '" onclick="vote(' . $answer->getId() . ');">';
                 $this->content .= '<div class="votes">';
-                $this->content .= "<input $checked1 name=\"vote1\" type=\"radio\" value=\"{$answer->getId()}\"><div class=\"token bg-$token\"></div>";
-                $this->content .= "<input $checked2 name=\"vote2\" type=\"radio\" value=\"{$answer->getId()}\"><div class=\"token bg-$token\"></div>";
+                $this->content .= "<input $checked1 form=\"form\" name=\"vote1\" type=\"radio\" value=\"{$answer->getId()}\"><div class=\"token bg-$token\"></div>";
+                $this->content .= "<input $checked2 form=\"form\" name=\"vote2\" type=\"radio\" value=\"{$answer->getId()}\"><div class=\"token bg-$token\"></div>";
             } else {
                 $this->content .= '<div class="answer ' . $class . '">';
                 $this->content .= '<div class="votes">';
@@ -253,8 +245,8 @@ class GameViewBuilder extends View {
     }
 
     public function withQuestions(Question ...$questions) {
-        $this->content .= '<div id="questions">' .
-                          '<form action="/' . $this->gameId . '/ask" method="post">';
+        $this->content .= '<div id="questions">';
+        $this->content .= '<input form="form" name="questionId" type="hidden">';
 
         $tokens = Player::getTokens();
 
@@ -263,11 +255,10 @@ class GameViewBuilder extends View {
         foreach($questions as $question) {
             $token = next($tokens);
 
-            $this->content .= '<button class="question-button bg-color-' . $token . ' shadow" name="questionId" value="' . $question->getId() . '" type="submit">' . $question->getQuestion() . '</button>';
+            $this->content .= '<button form="form" class="question-button bg-color-' . $token . ' white-text shadow" type="submit" onclick="$(\'input[name=questionId]\').val(\'' . $question->getId() . '\');">' . $question->getQuestion() . '</button>';
         }
 
-        $this->content .= '</form>' .
-                          '</div>';
+        $this->content .= '</div>';
 
         return $this;
     }
@@ -279,86 +270,77 @@ class GameViewBuilder extends View {
 
         $this->content .= 
             '<div id="answer">' .
-            '<form action="/' . $this->gameId . '/answer" method="post">' .
-            '<textarea ' . $disabled . ' oninput="$(this).val($(this).val().replace(/\n/g, \'\')); $(\'#char-count\').text(Math.max(0, 80 - $(this).val().length));" maxlength="80" rows="1" class="bg-color-' . $playerToken . ' shadow white-text" placeholder="Write your answer" name="answer">' . $answerText . '</textarea>' . 
-            '<span id="char-count">' . $charCount . '</span><button type="button" class="edit-button" onclick="const $textarea = $(this).siblings(\'textarea\'); const length = $textarea.val().length; $textarea.prop(\'disabled\', false); $textarea[0].setSelectionRange(length, length); $textarea.focus();"></button><button type="submit" class="save-button"></button>' .
-            '</form>' .
+            '<textarea ' . $disabled . ' form="form" oninput="$(this).val($(this).val().replace(/\n/g, \'\')); $(\'#char-count\').text(Math.max(0, 80 - $(this).val().length));" maxlength="80" rows="1" class="bg-color-' . $playerToken . ' shadow white-text" placeholder="Write your answer" name="answer">' . $answerText . '</textarea>' . 
+            '<span id="char-count">' . $charCount . '</span><button type="button" class="edit-button" onclick="const $textarea = $(this).siblings(\'textarea\'); const length = $textarea.val().length; $textarea.prop(\'disabled\', false); $textarea[0].setSelectionRange(length, length); $textarea.focus();"></button><button form="form" type="submit" class="save-button"></button>' .
             '</div>';
 
         return $this;
     }
 
-    private function withJoinGameButton() {
-        $this->content .= '<button class="button" id="join-game-button" onclick="showModal(\'#join-game-modal\');">Join Game</button>';
-
-        return $this;
-    }
-
-    private function withCreateGameButton() {
-        $this->content .= '<button class="button" id="create-game-button" onclick="showModal(\'#create-game-modal\');">Create Game</button>';
-
-        return $this;
-    }
-
     public function withStartGameButton() {
-        $this->content .= '<button class="button" id="start-game-button">Start Game</button>';
+        $this->content .= '<button form="form" class="button" id="start-game-button">Start Game</button>';
 
         return $this;
     }
 
     public function withNextRoundButton() {
-        $this->content .= '<button class="button" id="next-round-button">Next Round</button>';
+        $this->content .= '<button form="form" class="button" id="next-round-button">Next Round</button>';
 
         return $this;
     }
 
-    public function withJoinGameButtonAndModal($availableTokens = []) {
+    public function withJoinGameButton($availableTokens = []) {
         $modal = '<div id="join-game-modal" class="modal">' .
                  '<h2>Join Game</h2>' .
-                 '<input placeholder="Your Name" name="playerName" maxlength="12" type="text">' .
+                 '<input form="form" placeholder="Your Name" name="playerName" maxlength="12" type="text">' .
                  '<h2>Your Token</h2>' .
                  '<div class="tokens">';
 
                 
         foreach($availableTokens as $token) {
             $modal .= '<label>' .
-                      '<input name="playerToken" type="radio" value="bg-' . $token . '">' . 
+                      '<input form="form" name="playerToken" type="radio" value="' . $token . '">' . 
                       '<div class="token bg-' . $token . '"></div>' . 
                       '</label>';
         }
 
         $modal .= '</div>' .
-                  '<button class="button">OK</button>' .
+                  '<button form="form" class="button" type="submit">OK</button>' .
                   '</div>';
 
         $this->content .= $modal;
 
-        return $this->withJoinGameButton();
+        $this->content .= '<button class="button" id="join-game-button" onclick="showModal(\'#join-game-modal\');">Join Game</button>';
+
+        return $this;
     }
 
-    public function withCreateGameButtonAndModal($availableTokens = []) {
+    public function withCreateGameButton() {
         $modal = '<div id="create-game-modal" class="modal">' .
                  '<h2>Create Game</h2>' .
-                 '<input placeholder="Game Name" name="gameName" maxlength="30" type="text">' .
-                 '<input placeholder="Your Name" name="playerName" maxlength="12" type="text">' .
+                 '<input form="form" placeholder="Game Name" name="gameName" maxlength="30" type="text">' .
+                 '<input form="form" placeholder="Your Name" name="playerName" maxlength="12" type="text">' .
                  '<h2>Your Token</h2>' .
                  '<div class="tokens">';
 
+        $tokens = Player::getTokens();
                 
-        foreach($availableTokens as $token) {
+        foreach($tokens as $token) {
             $modal .= '<label>' .
-                      '<input name="playerToken" type="radio" value="' . $token . '">' . 
-                      '<span class="token ' . $token . '"></span>' . 
+                      '<input form="form" name="playerToken" type="radio" value="' . $token . '">' . 
+                      '<span class="token bg-' . $token . '"></span>' . 
                       '</label>';
         }
 
         $modal .= '</div>' .
-                  '<button class="button">OK</button>' .
+                  '<button form="form" class="button" type="submit">OK</button>' .
                   '</div>';
 
         $this->content .= $modal;
 
-        return $this->withCreateGameButton();
+        $this->content .= '<button class="button" id="create-game-button" onclick="showModal(\'#create-game-modal\');">Create Game</button>';
+
+        return $this;
     }
 
     public function render() {
