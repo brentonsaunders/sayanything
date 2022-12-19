@@ -97,13 +97,9 @@ class GameViewTest {
         $winners = [$players[3]];
 
 
-        $view = GameViewBuilder::builder()
-        /*
-            ->withSidebar(GameViewBuilder::builder()
-                ->withGameName("Redbud Ballers")
-                ->withRoundNumber(2))
-            ->withPlayers(...$players)*/
-            ->withGamesList([
+        $view = new GameView();
+
+            $view->withGamesList([
                 ["gameId" => 12, "playerToken" => Player::MARTINI_GLASS, "gameName" => "Test", "round" => "Round 1"],
                 ["gameId" => 13, "playerToken" => Player::GUITAR, "gameName" => "Test 2", "round" => "Waiting for players"],
                 ["gameId" => 12, "playerToken" => Player::MARTINI_GLASS, "gameName" => "Test", "round" => "Round 1"],
@@ -137,7 +133,7 @@ class GameViewTest {
             ])
             ->withCreateGameButton();
 
-        echo (new MainView(new GameView("1", "waiting-for-players", "1/answer", $view)))->render();
+        echo (new MainView($view, "1", "waiting-for-players", "1/answer"))->render();
     }
 
     private function waitingForPlayersView(Player ...$players) {

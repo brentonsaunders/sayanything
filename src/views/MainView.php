@@ -2,10 +2,16 @@
 namespace Views;
 
 class MainView extends View {
-    private View $contentView;
+    private View $gameView;
+    private $gameId = null;
+    private $gameState = null;
+    private $gameEndpoint = null;
 
-    public function __construct(View $contentView) {
-        $this->contentView = $contentView;
+    public function __construct(View $gameView, $gameId, $gameState, $gameEndpoint) {
+        $this->gameView = $gameView;
+        $this->gameId = $gameId;
+        $this->gameState = $gameState;
+        $this->gameEndpoint = $gameEndpoint;
     }
 
     protected function head() {
@@ -37,7 +43,10 @@ class MainView extends View {
     }
 
     protected function main() {
-        return $this->contentView->render();
+        return "<div id=\"game\" data-state=\"{$this->gameState}\">" .
+               "<form id=\"form\" action=\"{$this->gameEndpoint}\" method=\"post\"></form>" . 
+               $this->gameView->render() . 
+               "</div>";
     }
 
     public function render() {
