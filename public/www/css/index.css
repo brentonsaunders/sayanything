@@ -32,7 +32,10 @@ textarea::placeholder {
 
 :root {
     font-size: 62.5%;
-    --background-color: rgb(230, 230, 230);
+    --bg-color-r: 230;
+    --bg-color-g: 230;
+    --bg-color-b: 230;
+    --bg-color: rgb(var(--bg-color-r), var(--bg-color-b), var(--bg-color-g));
     --martini-glass-color: rgb(255, 220, 0);
     --martini-glass-color-darken: rgb(179, 155, 0);
     --dollar-sign-color: rgb(0, 200, 0);
@@ -73,7 +76,7 @@ html, body {
     min-height: 100vh;
     user-select: none;
     font-family: 'Roboto', sans-serif;
-    background-color: var(--background-color);
+    background-color: var(--bg-color);
 }
 
 #app,
@@ -813,7 +816,10 @@ main {
     right: 0;
     bottom: 0;
     height: 20px;
-    box-shadow: 0 -10px 10px 0 var(--background-color) inset;
+    background: linear-gradient(
+        rgba(var(--bg-color-r), var(--bg-color-b), var(--bg-color-g), 0), 
+        rgb(var(--bg-color-r), var(--bg-color-b), var(--bg-color-g))
+    );
 }
 
 #my-games h2 {
@@ -837,7 +843,7 @@ main {
     overflow: auto;
     -ms-overflow-style: none;
     scrollbar-width: none;
-    padding-bottom: 20px;
+    padding-bottom: 40px;
 }
 
 #games-list::-webkit-scrollbar {
