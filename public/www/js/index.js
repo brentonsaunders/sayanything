@@ -25,6 +25,14 @@ $(function() {
         });
     });
 
+    $('#games-list').on("scroll", function() {
+        const e = $(this)[0];
+        
+        if (e.scrollHeight - e.scrollTop === e.clientHeight) {
+            console.log('scrolled');
+        }
+    })
+
     // Check the game div for the current game state
     // Only force a reload on the entire div if the game state changes
     // Otherwise, only reload elements with the data-reload="true" attribute

@@ -3,6 +3,7 @@ namespace Views;
 
 use Models\Answer;
 use Models\Card;
+use Models\Game;
 use Models\Player;
 use Models\Question;
 use Models\Vote;
@@ -20,11 +21,11 @@ class GameViewTest {
 
             return $player;
         }, [Player::CLAPPERBOARD, Player::GUITAR, Player::CAR, Player::FOOTBALL,
-        Player::HIGH_HEELS, Player::DOLLAR_SIGN, Player::COMPUTER, Player::MARTINI_GLASS]);
+    Player::HIGH_HEELS, Player::DOLLAR_SIGN, Player::COMPUTER/*, Player::MARTINI_GLASS*/]);
 
         $players[0]->setIsMe(true);
         $players[1]->setIsJudge(true);
-        $players[2]->setIsWinner(true);
+        $players[6]->setIsWinner(true);
 
         $card = new Card();
 
@@ -97,11 +98,44 @@ class GameViewTest {
 
 
         $view = GameViewBuilder::builder()
+        /*
             ->withSidebar(GameViewBuilder::builder()
                 ->withGameName("Redbud Ballers")
-                ->withRoundNumber(2)
-                ->withPlayers(...$players))
-            ->withStartGameButton();
+                ->withRoundNumber(2))
+            ->withPlayers(...$players)*/
+            ->withGamesList([
+                ["gameId" => 12, "playerToken" => Player::MARTINI_GLASS, "gameName" => "Test", "round" => "Round 1"],
+                ["gameId" => 13, "playerToken" => Player::GUITAR, "gameName" => "Test 2", "round" => "Waiting for players"],
+                ["gameId" => 12, "playerToken" => Player::MARTINI_GLASS, "gameName" => "Test", "round" => "Round 1"],
+                ["gameId" => 13, "playerToken" => Player::GUITAR, "gameName" => "Test 2", "round" => "Waiting for players"],
+                ["gameId" => 12, "playerToken" => Player::MARTINI_GLASS, "gameName" => "Test", "round" => "Round 1"],
+                ["gameId" => 13, "playerToken" => Player::GUITAR, "gameName" => "Test 2", "round" => "Waiting for players"],
+                ["gameId" => 12, "playerToken" => Player::MARTINI_GLASS, "gameName" => "Test", "round" => "Round 1"],
+                ["gameId" => 13, "playerToken" => Player::GUITAR, "gameName" => "Test 2", "round" => "Waiting for players"],
+                ["gameId" => 12, "playerToken" => Player::MARTINI_GLASS, "gameName" => "Test", "round" => "Round 1"],
+                ["gameId" => 13, "playerToken" => Player::GUITAR, "gameName" => "Test 2", "round" => "Waiting for players"],
+                ["gameId" => 12, "playerToken" => Player::MARTINI_GLASS, "gameName" => "Test", "round" => "Round 1"],
+                ["gameId" => 13, "playerToken" => Player::GUITAR, "gameName" => "Test 2", "round" => "Waiting for players"],
+                ["gameId" => 12, "playerToken" => Player::MARTINI_GLASS, "gameName" => "Test", "round" => "Round 1"],
+                ["gameId" => 13, "playerToken" => Player::GUITAR, "gameName" => "Test 2", "round" => "Waiting for players"],
+                ["gameId" => 12, "playerToken" => Player::MARTINI_GLASS, "gameName" => "Test", "round" => "Round 1"],
+                ["gameId" => 13, "playerToken" => Player::GUITAR, "gameName" => "Test 2", "round" => "Waiting for players"],
+                ["gameId" => 12, "playerToken" => Player::MARTINI_GLASS, "gameName" => "Test", "round" => "Round 1"],
+                ["gameId" => 13, "playerToken" => Player::GUITAR, "gameName" => "Test 2", "round" => "Waiting for players"],
+                ["gameId" => 12, "playerToken" => Player::MARTINI_GLASS, "gameName" => "Test", "round" => "Round 1"],
+                ["gameId" => 13, "playerToken" => Player::GUITAR, "gameName" => "Test 2", "round" => "Waiting for players"],
+                ["gameId" => 12, "playerToken" => Player::MARTINI_GLASS, "gameName" => "Test", "round" => "Round 1"],
+                ["gameId" => 13, "playerToken" => Player::GUITAR, "gameName" => "Test 2", "round" => "Waiting for players"],
+                ["gameId" => 12, "playerToken" => Player::MARTINI_GLASS, "gameName" => "Test", "round" => "Round 1"],
+                ["gameId" => 13, "playerToken" => Player::GUITAR, "gameName" => "Test 2", "round" => "Waiting for players"],
+                ["gameId" => 12, "playerToken" => Player::MARTINI_GLASS, "gameName" => "Test", "round" => "Round 1"],
+                ["gameId" => 13, "playerToken" => Player::GUITAR, "gameName" => "Test 2", "round" => "Waiting for players"],
+                ["gameId" => 12, "playerToken" => Player::MARTINI_GLASS, "gameName" => "Test", "round" => "Round 1"],
+                ["gameId" => 13, "playerToken" => Player::GUITAR, "gameName" => "Test 2", "round" => "Waiting for players"],
+                ["gameId" => 12, "playerToken" => Player::MARTINI_GLASS, "gameName" => "Test", "round" => "Round 1"],
+                ["gameId" => 13, "playerToken" => Player::GUITAR, "gameName" => "Test 2", "round" => "Waiting for players"],
+            ])
+            ->withCreateGameButton();
 
         echo (new MainView(new GameView("1", "waiting-for-players", "1/answer", $view)))->render();
     }

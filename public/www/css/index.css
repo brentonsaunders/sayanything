@@ -32,6 +32,7 @@ textarea::placeholder {
 
 :root {
     font-size: 62.5%;
+    --background-color: rgb(230, 230, 230);
     --martini-glass-color: rgb(255, 220, 0);
     --martini-glass-color-darken: rgb(179, 155, 0);
     --dollar-sign-color: rgb(0, 200, 0);
@@ -72,7 +73,7 @@ html, body {
     min-height: 100vh;
     user-select: none;
     font-family: 'Roboto', sans-serif;
-    background-color: rgb(230, 230, 230);
+    background-color: var(--background-color);
 }
 
 #app,
@@ -151,8 +152,11 @@ main {
 }
 
 #players {
+    padding-block: 2rem;
     display: flex;
     flex-wrap: wrap;
+    row-gap: 2rem;
+    justify-content: center;
 }
 
 #players .player {
@@ -172,6 +176,7 @@ main {
     display: flex;
 }
 
+/*
 #players .player.me .name::after {
     display: block;
     content: '';
@@ -180,7 +185,12 @@ main {
     background-image: url('../img/star.png');
     background-repeat: no-repeat;
     background-size: 10px 10px;
+}
+*/
 
+#players .player.me .name {
+    font-weight: 800;
+    font-size: 1.2rem;
 }
 
 .token {
@@ -204,6 +214,18 @@ main {
     width: 140%;
     aspect-ratio: 100 / 60;
     background-image: url(../img/crown.png);
+    background-size: contain;
+    background-repeat: no-repeat;
+}
+
+.token.wig::before {
+    position: absolute;
+    content: '';
+    left: -20%;
+    top: -35%;
+    width: 140%;
+    aspect-ratio: 268 / 300;
+    background-image: url(../img/judge-wig.png);
     background-size: contain;
     background-repeat: no-repeat;
 }
@@ -232,35 +254,6 @@ main {
     font-size: 1.2rem;
     font-weight: bold;
 }
-
-
-
-/*
-#players .player.judge span.token::before {
-    position: absolute;
-    left: -3px;
-    top: -6px;
-    display: block;
-    content: '';
-    width: 40px;
-    height: 40px;
-    background-image: url('../img/judge-wig.png');
-    background-size: 40px;
-    background-repeat: no-repeat;
-}
-
-#players .player.winner span.token::before {
-    position: absolute;
-    left: -3px;
-    top: -16px;
-    display: block;
-    content: '';
-    width: 40px;
-    height: 40px;
-    background-image: url('../img/crown.png');
-    background-size: 40px;
-    background-repeat: no-repeat;
-}*/
 
 .bg-martini-glass {
     background-color: var(--martini-glass-color);
@@ -806,4 +799,81 @@ main {
 #select-o-matic div.bg-high-heels,
 #select-o-matic.high-heels .arrow {
     transform: rotate(var(--high-heels-arrow-rotate));
+}
+
+#my-games {
+    position: relative;
+}
+
+#my-games::after {
+    position: absolute;
+    content: '';
+    display: block;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 20px;
+    box-shadow: 0 -10px 10px 0 var(--background-color) inset;
+}
+
+#my-games h2 {
+    font-size: 1.6rem;
+    font-weight: bold;
+    text-align: center;
+    margin-bottom: 3rem;
+}
+
+#my-games p {
+    font-size: 1.4rem;
+    text-align: center;
+}
+
+#games-list {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+    max-height: 50vh;
+    overflow: auto;
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+    padding-bottom: 20px;
+}
+
+#games-list::-webkit-scrollbar {
+    display: none;
+}
+
+#games-list a {
+    display: flex;
+    align-items: center;
+    gap: 2rem;
+    height: 6rem;
+    padding: 1rem 2rem;
+    border-radius: 5px;
+    font-size: 1.2rem;
+    font-weight: 800;
+}
+
+
+#games-list .token {
+    width: 40px;
+    height: 40px;
+    border-color: white;
+}
+
+#games-list .name {
+    flex: 1;
+}
+
+#games-list .round {
+}
+
+#games-list .arrow {
+    margin-left: auto;
+    width: 12px;
+    height: 12px;
+    border-right: 3px solid white;
+    border-bottom: 3px solid white;
+    transform: rotate(-45deg);
 }

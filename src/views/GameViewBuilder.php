@@ -221,10 +221,10 @@ class GameViewBuilder extends View {
             $name = $player->getName();
             $token = $player->getToken();
             $me = $player->getIsMe() ? " me" : "";
-            $judge = $player->getIsJudge() ? " judge" : "";
-            $winner = $player->getIsWinner() ? " winner" : "";
+            $wig = $player->getIsJudge() ? " wig" : "";
+            $crown = $player->getIsWinner() ? " crown" : "";
 
-            $this->content .= '<div class="player ' . $me . $judge . $winner . '"><div class="token bg-' . $token . '"></div><span class="name">' . $name . '</span></div>';
+            $this->content .= '<div class="player ' . $me. '"><div class="token ' . $crown . $wig . ' bg-' . $token . '"></div><span class="name">' . $name . '</span></div>';
         }
         
         $this->content .= "</div>";
@@ -339,6 +339,32 @@ class GameViewBuilder extends View {
         $this->content .= $modal;
 
         $this->content .= '<button class="button" id="create-game-button" onclick="showModal(\'#create-game-modal\');">Create Game</button>';
+
+        return $this;
+    }
+
+    public function withGamesList($games) {
+        $this->content .= '<div id="my-games">';
+        $this->content .= '<h2>My Games</h2>';
+
+        if(!$games) {
+            $this->content .= '<p>No games yet</p>';
+        } else {
+            $this->content .= '<div id="games-list">';
+
+            foreach($games as $game) {
+                $this->content .= "<a class=\"bg-color-{$game["playerToken"]} white-text shadow\" href=\"{$game["gameId"]}\">";
+                $this->content .= "<div class=\"token bg-{$game["playerToken"]}\"></div>";
+                $this->content .= "<div class=\"name\">{$game["gameName"]}</div>";
+                $this->content .= "<div class=\"round\">{$game["round"]}</div>";
+                $this->content .= "<div class=\"arrow\"></div>";
+                $this->content .= '</a>';
+            }
+
+            $this->content .= '</div>';
+        }
+
+        $this->content .= '</div>';
 
         return $this;
     }
